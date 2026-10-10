@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using SharpCompress.Archives;
+using System.IO.Compression;
 
 namespace EmuVora.Core;
 public record EmulatorPackage(string Id,string Version,string Url,string Sha256,string Executable);
@@ -97,6 +98,20 @@ public sealed class PackageManager : IDisposable
     }
     public static void ExtractSafely(string archiveFile,string destination,CancellationToken token=default)
     {
+        if(Path.GetExtension(archiveFile).Equals(".zip",StringComparison.OrdinalIgnoreCase))
+        {
+            using var zip=ZipFile.OpenRead(archiveFile);long length=0;
+            if(zip.Entries.Count>100000)throw new InvalidDataException("Zu viele Archivdateien.");
+            foreach(var entry in zip.Entries)
+            {
+                token.ThrowIfCancellationRequested();var path=SafeEntryPath(destination,entry.FullName);
+                if((entry.ExternalAttributes>>16&0xF000)==0xA000)throw new InvalidDataException("Archiv enthält einen Link.");
+                if(entry.FullName.EndsWith('/')){Directory.CreateDirectory(path);continue;}
+                if((length+=entry.Length)>4_000_000_000)throw new InvalidDataException("Archiv überschreitet das Größenlimit.");
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);using var input=entry.Open();using var output=new FileStream(path,FileMode.CreateNew,FileAccess.Write);input.CopyTo(output);
+            }
+            return;
+        }
         using var archive=ArchiveFactory.OpenArchive(archiveFile);using var reader=archive.ExtractAllEntries();long total=0;var count=0;
         while(reader.MoveToNextEntry())
         {

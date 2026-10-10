@@ -11,6 +11,7 @@ public sealed class AppSettings
     public List<string> RomFolders {get;set;}=[];
     public bool Fullscreen {get;set;}=true;
     public bool CheckUpdatesOnStartup {get;set;}=true;
+    public bool AutoInstallUpdates {get;set;}=false;
 }
 public record InstalledPackage(string Version,string ExecutablePath,string? PreviousExecutablePath=null);
 public sealed class SettingsStore(string file)
@@ -30,7 +31,7 @@ public sealed class SettingsStore(string file)
         catch(Exception ex) when(ex is IOException or JsonException or UnauthorizedAccessException)
         {
             LoadWarning="Einstellungen konnten nicht geladen werden. Die vorhandene Datei bleibt erhalten: "+ex.Message;
-            try{File.Copy(file,file+".invalid-"+DateTime.UtcNow.ToString("yyyyMMddHHmmss"),false);}catch(IOException){ }return new();
+            try{File.Copy(file,file+".invalid-"+DateTime.UtcNow.ToString("yyyyMMddHHmmss"),false);}catch(Exception copyError) when(copyError is IOException or UnauthorizedAccessException){ }return new();
         }
     }
     public void Save(AppSettings settings)=>AtomicFile.WriteText(file,JsonSerializer.Serialize(settings,JsonOptions));

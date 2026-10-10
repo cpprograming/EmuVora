@@ -50,6 +50,9 @@ public sealed class MainWindow : Window
     private readonly Dictionary<string,Process> running=new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> runningEmulators=[];
     private readonly List<Button> operationButtons=[];
+    private readonly DispatcherTimer gamepadTimer=new(){Interval=TimeSpan.FromMilliseconds(100)};
+    private ushort previousButtons;
+    private bool dialogOpen;
     public MainWindow():this(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"EmuVora")){ }
     public MainWindow(string directory)
     {
@@ -76,7 +79,7 @@ public sealed class MainWindow : Window
         var header=new Grid {ColumnDefinitions=new("*,Auto")};
         header.Children.Add(new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold});Grid.SetColumn(summary,1);header.Children.Add(summary);main.Children.Add(header);
         var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),ColumnSpacing=10};filters.Children.Add(search);Grid.SetColumn(systems,1);filters.Children.Add(systems);Grid.SetColumn(sort,2);filters.Children.Add(sort);AddRow(main,filters,1);
-        gamesList.ItemsPanel=new FuncTemplate<Panel>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
+        gamesList.ItemsPanel=new FuncTemplate<Panel?>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
         ScrollViewer.SetHorizontalScrollBarVisibility(gamesList,Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
         var library=new Grid();library.Children.Add(gamesList);library.Children.Add(empty);AddRow(main,library,2);
         AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);AddRow(main,footer,4);
@@ -93,7 +96,8 @@ public sealed class MainWindow : Window
         UpdateSystems();ApplyTheme();Refresh();
         status.Text=settingsStore.LoadWarning??"ROM-Ordner importieren oder Emulatoren einrichten, um zu starten.";
         Opened+=async(_,_)=>{if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();};
-        Closed+=(_,_)=>{operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();};
+        gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
+        Closed+=(_,_)=>{gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
     private Button ActionButton(string text,Action action)
@@ -185,7 +189,11 @@ public sealed class MainWindow : Window
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Spieldetails",FontSize=24});panel.Children.Add(new TextBlock {Text="Titel"});panel.Children.Add(title);panel.Children.Add(new TextBlock {Text="Konsole"});panel.Children.Add(console);
         var dialog=Dialog("Spieldetails",panel);panel.Children.Add(ActionButton("Speichern",()=>{if(string.IsNullOrWhiteSpace(title.Text)||console.SelectedItem is not string system){status.Text="Titel und Konsole wählen.";return;}store.Update(game with {Title=title.Text.Trim(),System=system});Reload(game.Path);dialog.Close();}));await dialog.ShowDialog(this);
     }
-    private Window Dialog(string title,Control content)=>new(){Title=title,Width=640,Height=640,MinWidth=520,MinHeight=420,WindowStartupLocation=WindowStartupLocation.CenterOwner,Content=new ScrollViewer {Content=content},RequestedThemeVariant=RequestedThemeVariant};
+    private Window Dialog(string title,Control content)
+    {
+        var dialog=new Window {Title=title,Width=640,Height=640,MinWidth=520,MinHeight=220,WindowStartupLocation=WindowStartupLocation.CenterOwner,Content=new ScrollViewer {Content=content},RequestedThemeVariant=RequestedThemeVariant};
+        dialog.Opened+=(_,_)=>dialogOpen=true;dialog.Closed+=(_,_)=>dialogOpen=false;return dialog;
+    }
     private async Task<bool> ConfirmAsync(string message)
     {
         var panel=new StackPanel {Spacing=20,Margin=new(24)};panel.Children.Add(new TextBlock {Text=message,TextWrapping=TextWrapping.Wrap});var dialog=Dialog("Bestätigen",panel);dialog.Height=260;
@@ -214,6 +222,7 @@ public sealed class MainWindow : Window
             if(definition==null){status.Text="Zuerst die Konsole des Spiels zuordnen.";return;}
             var executable=settings.EmulatorPaths.GetValueOrDefault(definition.Id);
             if(string.IsNullOrEmpty(executable)){status.Text=$"{definition.Name} zuerst unter „Emulatoren einrichten“ installieren oder auswählen.";await ShowSettingsAsync(definition.Id);return;}
+            if(runningEmulators.Contains(definition.Id)){status.Text="Das laufende Spiel zuerst im Emulator beenden.";return;}
             var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen);running[game.Path]=process;runningEmulators.Add(definition.Id);
             store.MarkPlayed(game);Reload(game.Path);status.Text=$"{game.Title} läuft mit {definition.Name}.";
             _=TrackProcessAsync(process,game,definition.Id);
@@ -240,9 +249,39 @@ public sealed class MainWindow : Window
         var files=await StorageProvider.OpenFilePickerAsync(new(){Title="Bibliothek wiederherstellen",AllowMultiple=false,FileTypeFilter=[new("Bibliothek"){Patterns=["*.json"]}]});if(files.Count==0)return;
         if(await ConfirmAsync("Bibliothek aus der Sicherung ergänzen? Vorhandene Einträge mit gleichem Dateipfad werden ersetzt."))Guard(()=>{var games=JsonSerializer.Deserialize<Game[]>(File.ReadAllText(files[0].TryGetLocalPath()!),SettingsStore.JsonOptions)??throw new InvalidDataException("Sicherung ist leer.");store.Restore(games);Reload();status.Text="Bibliothek wiederhergestellt.";});
     }
+    private async Task HandleGamepadAsync()
+    {
+        var buttons=Gamepad.ReadButtons();var pressed=buttons&~previousButtons;previousButtons=buttons;
+        if(!IsActive||dialogOpen||operation!=null||running.Count>0||pressed==0)return;
+        var count=gamesList.ItemCount;if(count==0)return;var index=Math.Max(0,gamesList.SelectedIndex);var columns=Math.Max(1,(int)(gamesList.Bounds.Width/174));
+        if((pressed&1)!=0)index-=columns;if((pressed&2)!=0)index+=columns;if((pressed&4)!=0)index--;if((pressed&8)!=0)index++;
+        gamesList.SelectedIndex=Math.Clamp(index,0,count-1);gamesList.ScrollIntoView(gamesList.SelectedItem!);
+        if((pressed&0x1000)!=0)await PlayAsync();
+        if((pressed&0x8000)!=0&&Selected is{} game)Guard(()=>{store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);});
+    }
     private async Task CheckUpdatesAsync()
     {
-        try{catalog=await packages.GetCatalogAsync();var updates=catalog.Packages.Where(p=>settings.Packages.TryGetValue(p.Id,out var current)&&current.Version!=p.Version).ToArray();if(updates.Length>0)status.Text=$"{updates.Length} Emulator-/Core-Updates verfügbar. Unter „Emulatoren einrichten“ installieren.";}
+        try
+        {
+            catalog=await packages.GetCatalogAsync();var updates=catalog.Packages.Where(p=>settings.Packages.TryGetValue(p.Id,out var current)&&current.Version!=p.Version).ToArray();
+            if(updates.Length==0)return;
+            if(!settings.AutoInstallUpdates){status.Text=$"{updates.Length} Emulator-/Core-Updates verfügbar. Unter „Emulatoren einrichten“ installieren.";return;}
+            await BusyAsync(async token=>
+            {
+                foreach(var package in updates)
+                {
+                    if(runningEmulators.Contains(package.Id))continue;var old=settings.Packages[package.Id];
+                    var path=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
+                    if(!package.Id.StartsWith("core-")&&File.Exists(old.ExecutablePath))await Task.Run(()=>PreserveConfiguration(old.ExecutablePath,path),token);
+                    settings.Packages[package.Id]=new(package.Version,path,old.ExecutablePath);
+                    if(package.Id.StartsWith("core-"))
+                    {foreach(var system in PackageManager.CoreIds.Where(k=>"core-"+k.Value==package.Id).Select(k=>k.Key))if(settings.CorePaths.GetValueOrDefault(system)==old.ExecutablePath)settings.CorePaths[system]=path;}
+                    else settings.EmulatorPaths[package.Id]=path;
+                    settingsStore.Save(settings);
+                }
+                status.Text="Verfügbare Updates installiert. Vorige Emulator-Versionen bleiben erhalten.";
+            });
+        }
         catch(Exception ex){Log(ex);}
     }
     private async Task ShowSettingsAsync(string? initialEmulator=null)
@@ -250,6 +289,8 @@ public sealed class MainWindow : Window
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Emulatoren & Einstellungen",FontSize=25,FontWeight=FontWeight.Bold});
         var theme=new ComboBox {ItemsSource=new[]{"Midnight","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
         var fullscreen=new CheckBox {Content="Spiele im Vollbild starten (wenn unterstützt)",IsChecked=settings.Fullscreen};var auto=new CheckBox {Content="Beim Start auf Updates prüfen",IsChecked=settings.CheckUpdatesOnStartup};panel.Children.Add(fullscreen);panel.Children.Add(auto);
+        var autoInstall=new CheckBox {Content="Updates für verwaltete Installationen automatisch installieren",IsChecked=settings.AutoInstallUpdates};panel.Children.Add(autoInstall);
+        autoInstall.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoInstallUpdates=autoInstall.IsChecked==true;settingsStore.Save(settings);});
         theme.SelectionChanged+=(_,_)=>Guard(()=>{settings.Theme=theme.SelectedItem as string??"Midnight";settingsStore.Save(settings);ApplyTheme();Refresh();});fullscreen.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.Fullscreen=fullscreen.IsChecked==true;settingsStore.Save(settings);});auto.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckUpdatesOnStartup=auto.IsChecked==true;settingsStore.Save(settings);});
         var emulator=new ComboBox {ItemsSource=EmulatorCatalog.Known.Select(e=>e.Name).ToArray(),SelectedIndex=Math.Max(0,Array.FindIndex(EmulatorCatalog.Known,e=>e.Id==initialEmulator))};panel.Children.Add(new Separator());panel.Children.Add(emulator);
         var path=new TextBox {Watermark="Pfad zur Emulator-EXE"};var packageInfo=new TextBlock {TextWrapping=TextWrapping.Wrap};panel.Children.Add(path);panel.Children.Add(packageInfo);
@@ -275,6 +316,10 @@ public sealed class MainWindow : Window
             });
         }));
         panel.Children.Add(ActionButton("Zur vorigen Version zurück",()=>{var id=Current().Id;if(!settings.Packages.TryGetValue(id,out var installed)||!File.Exists(installed.PreviousExecutablePath)){status.Text="Keine vorige Installation vorhanden.";return;}settings.EmulatorPaths[id]=installed.PreviousExecutablePath!;settings.Packages[id]=installed with {Version="rollback",ExecutablePath=installed.PreviousExecutablePath!,PreviousExecutablePath=installed.ExecutablePath};settingsStore.Save(settings);Load();status.Text="Vorige Version aktiviert.";}));
+        var downloadStatus=new TextBlock {TextWrapping=TextWrapping.Wrap};
+        void FollowStatus(object? sender,AvaloniaPropertyChangedEventArgs e){if(e.Property==TextBlock.TextProperty)downloadStatus.Text=status.Text;}
+        status.PropertyChanged+=FollowStatus;panel.Children.Add(downloadStatus);
+        panel.Children.Add(ActionButton("Laufenden Download abbrechen",()=>operation?.Cancel()));
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="RetroArch-Core je Konsole",FontWeight=FontWeight.Bold});
         var coreSystem=new ComboBox {ItemsSource=EmulatorCatalog.Get("retroarch").Systems,SelectedIndex=0};var corePath=new TextBox();panel.Children.Add(coreSystem);panel.Children.Add(corePath);
         void LoadCore()=>corePath.Text=settings.CorePaths.GetValueOrDefault((string)coreSystem.SelectedItem!)??"";
@@ -288,7 +333,8 @@ public sealed class MainWindow : Window
         }));
         panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden vor dem Entpacken mit SHA-256 geprüft. Alte Installationen bleiben erhalten. PS1 / PS2 benötigen gegebenenfalls eigene BIOS-Dateien. Controller, Grafik und Speicherstände werden im Emulator eingerichtet.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
-        var dialog=Dialog("EmuVora einrichten",panel);dialog.Height=760;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
+        panel.Children.Add(AsyncButton("Jetzt auf Updates prüfen",()=>CheckUpdatesAsync()));
+        var dialog=Dialog("EmuVora einrichten",panel);dialog.Height=760;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
     }
     private static void PreserveConfiguration(string previous,string next)
     {

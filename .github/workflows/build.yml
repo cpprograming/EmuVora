@@ -17,7 +17,15 @@ jobs:
       - name: Build
         run: dotnet build EmuVora.sln --no-restore -c Release
       - name: Test
+        env:
+          EMUVORA_SCREENSHOTS: ${{ github.workspace }}/screenshots
         run: dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj --no-build -c Release
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EmuVora-UI-previews
+          path: screenshots/
+          if-no-files-found: ignore
       - name: Publish Windows portable
         run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
       - uses: actions/upload-artifact@v4

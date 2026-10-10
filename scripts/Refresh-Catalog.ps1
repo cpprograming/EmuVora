@@ -11,6 +11,7 @@ function Add-Package([string]$Id,[string]$Version,[string]$Url,[string]$Executab
         try{Invoke-WebRequest $Url -OutFile $taskTemporary; $taskSha=(Get-FileHash $taskTemporary -Algorithm SHA256).Hash.ToLowerInvariant()}
         finally{if(Test-Path -LiteralPath $taskTemporary){Remove-Item -LiteralPath $taskTemporary}}
     }
+    if($Id.StartsWith('core-')){$Version=$taskSha.Substring(0,16)}
     $taskPackages.Add(@{Id=$Id;Version=$Version;Url=$Url;Sha256=$taskSha;Executable=$Executable})
     Write-Host "$Id $Version verified"
 }
