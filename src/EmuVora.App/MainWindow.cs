@@ -371,10 +371,10 @@ public sealed class MainWindow : Window
     private static void PreserveConfiguration(string previous,string next)
     {
         var source=Path.GetDirectoryName(previous)!;var destination=Path.GetDirectoryName(next)!;
-        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","portable.ini","settings.ini"})if(File.Exists(Path.Combine(source,name)))File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
-        foreach(var name in new[]{"memstick","inis","memcards","sstates","bios","saves","states","config","cheats"})
+        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","portable.ini","portable.txt","settings.ini"})if(File.Exists(Path.Combine(source,name))&&(File.GetAttributes(Path.Combine(source,name))&FileAttributes.ReparsePoint)==0)File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
+        foreach(var name in new[]{"memstick","inis","memcards","sstates","bios","system","saves","states","config","autoconfig","playlists","cheats","User"})
         {
-            var folder=Path.Combine(source,name);if(!Directory.Exists(folder))continue;
+            var folder=Path.Combine(source,name);if(!Directory.Exists(folder)||(File.GetAttributes(folder)&FileAttributes.ReparsePoint)!=0)continue;
             foreach(var file in Directory.EnumerateFiles(folder,"*",new EnumerationOptions {RecurseSubdirectories=true,AttributesToSkip=FileAttributes.ReparsePoint}))
             {var target=Path.Combine(destination,name,Path.GetRelativePath(folder,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);File.Copy(file,target,true);}
         }
@@ -385,3 +385,4 @@ public sealed class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
+
