@@ -59,6 +59,7 @@ public static class RomScanner
                         catch(Exception ex) when(ex is IOException or InvalidDataException or UnauthorizedAccessException){warnings.Add(file+": "+ex.Message);continue;}
                     }
                     else if(!Extensions.TryGetValue(extension,out system))continue;
+                    if(system==null)continue;
                     if(extension.Equals(".md",StringComparison.OrdinalIgnoreCase)&&!HasSegaHeader(file))continue;
                     if(system=="Unknown disc")system=DetectDiscSystem(file,root);
                     games.Add(new(System.IO.Path.GetFileNameWithoutExtension(file),system,System.IO.Path.GetFullPath(file)));
