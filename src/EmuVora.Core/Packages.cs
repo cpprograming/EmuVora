@@ -26,7 +26,26 @@ public sealed class PackageManager : IDisposable
         var text=await response.Content.ReadAsStringAsync(token);
         var catalog=JsonSerializer.Deserialize<PackageCatalog>(text.TrimStart('\uFEFF'),SettingsStore.JsonOptions)??throw new InvalidDataException("Download-Katalog ist leer.");
         if(catalog.SchemaVersion!=1||catalog.Packages.Length>32)throw new InvalidDataException("Unbekannter Download-Katalog.");
-        foreach(var package in catalog.Packages)ValidatePackage(package);return catalog;
+        foreach(var package in catalog.Packages)ValidatePackage(package);
+        // Mutable GitHub tags (notably DuckStation's "latest") must be resolved again
+        // so a previously published catalog cannot silently install different bytes.
+        var updated=catalog.Packages.ToArray();
+        foreach(var (id,repository,pattern) in new[]{("duckstation","stenzek/duckstation","^duckstation-windows-x64-release.zip$"),("pcsx2","PCSX2/pcsx2","windows-x64-Qt\\.7z$"),("ppsspp","hrydgard/ppsspp","Windows-x64\\.zip$")})
+        {
+            var index=Array.FindIndex(updated,p=>p.Id==id);if(index<0)continue;
+            try
+            {
+                using var metadata=await http.GetAsync($"https://api.github.com/repos/{repository}/releases/latest",token);metadata.EnsureSuccessStatusCode();
+                using var json=JsonDocument.Parse(await metadata.Content.ReadAsStringAsync(token));var release=json.RootElement;
+                var asset=release.GetProperty("assets").EnumerateArray().FirstOrDefault(a=>Regex.IsMatch(a.GetProperty("name").GetString()??"",pattern));
+                if(asset.ValueKind==JsonValueKind.Undefined)continue;
+                var digest=asset.TryGetProperty("digest",out var hash)?hash.GetString():null;
+                if(digest==null||!digest.StartsWith("sha256:"))continue;
+                var package=updated[index] with {Version=release.GetProperty("tag_name").GetString()+"-"+asset.GetProperty("id").GetInt64(),Url=asset.GetProperty("browser_download_url").GetString()!,Sha256=digest[7..]};ValidatePackage(package);updated[index]=package;
+            }
+            catch(Exception ex) when(ex is HttpRequestException or JsonException or InvalidOperationException){ /* The pinned catalog remains a safe fallback. */ }
+        }
+        return catalog with {Packages=updated};
     }
     public static void ValidatePackage(EmulatorPackage package)
     {

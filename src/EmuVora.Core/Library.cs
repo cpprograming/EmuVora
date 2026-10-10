@@ -1,6 +1,7 @@
 using Microsoft.Data.Sqlite;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.IO.Compression;
 
 namespace EmuVora.Core;
 
@@ -47,7 +48,18 @@ public static class RomScanner
                 foreach(var file in Directory.EnumerateFiles(directory))
                 {
                     cancellationToken.ThrowIfCancellationRequested();var extension=System.IO.Path.GetExtension(file);
-                    if(!Extensions.TryGetValue(extension,out var system))continue;
+                    string? system;
+                    if(extension.Equals(".zip",StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            using var zip=ZipFile.OpenRead(file);var roms=zip.Entries.Select(e=>Extensions.GetValueOrDefault(System.IO.Path.GetExtension(e.FullName))).Where(s=>s!=null&&EmulatorCatalog.Get("retroarch").Systems.Contains(s)).ToArray();
+                            if(roms.Length!=1){warnings.Add(file+": ZIP muss genau eine unterstützte Cartridge-ROM enthalten.");continue;}system=roms[0];
+                        }
+                        catch(Exception ex) when(ex is IOException or InvalidDataException or UnauthorizedAccessException){warnings.Add(file+": "+ex.Message);continue;}
+                    }
+                    else if(!Extensions.TryGetValue(extension,out system))continue;
+                    if(extension.Equals(".md",StringComparison.OrdinalIgnoreCase)&&!HasSegaHeader(file))continue;
                     if(system=="Unknown disc")system=DetectDiscSystem(file,root);
                     games.Add(new(System.IO.Path.GetFileNameWithoutExtension(file),system,System.IO.Path.GetFullPath(file)));
                     if(extension.Equals(".m3u",StringComparison.OrdinalIgnoreCase)||extension.Equals(".cue",StringComparison.OrdinalIgnoreCase))
@@ -92,6 +104,11 @@ public static class RomScanner
         for(var directory=Directory.GetParent(file);directory!=null;directory=directory.Parent)
         {if(Folders.TryGetValue(directory.Name,out var system))return system;if(directory.FullName.Equals(root,StringComparison.OrdinalIgnoreCase))break;}
         return "Unknown disc";
+    }
+    private static bool HasSegaHeader(string file)
+    {
+        try{using var stream=File.OpenRead(file);if(stream.Length<0x104)return false;stream.Position=0x100;Span<byte> bytes=stackalloc byte[4];return stream.Read(bytes)==4&&bytes.SequenceEqual("SEGA"u8);}
+        catch(IOException){return false;}catch(UnauthorizedAccessException){return false;}
     }
 }
 public sealed class LibraryStore

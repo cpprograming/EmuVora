@@ -42,6 +42,11 @@ public class LibraryTests
     }
     [Fact] public void ScanHonorsCancellation()
     {using var dir=new TestDirectory();using var cts=new CancellationTokenSource();cts.Cancel();Assert.Throws<OperationCanceledException>(()=>RomScanner.ScanDetailed(dir.Path,cts.Token));}
+    [Fact] public void ZipCartridgeIsImportedAndMarkdownIsNotARom()
+    {
+        using var dir=new TestDirectory();dir.File("README.md","Documentation");var file=System.IO.Path.Combine(dir.Path,"Zelda.zip");using(var archive=ZipFile.Open(file,ZipArchiveMode.Create))archive.CreateEntry("Zelda.nes");
+        var game=Assert.Single(RomScanner.Scan(dir.Path));Assert.Equal("NES",game.System);Assert.Equal(file,game.Path);
+    }
     [Fact] public void LegacyCoreAndNullCollectionsAreMigrated()
     {
         using var dir=new TestDirectory();var file=dir.File("settings.json","{\"CorePaths\":{\"retroarch\":\"core.dll\"},\"EmulatorPaths\":null}");var settings=new SettingsStore(file).Load();Assert.Empty(settings.EmulatorPaths);Assert.Equal("core.dll",settings.CorePaths["SNES"]);

@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Themes.Fluent;
 using Avalonia.VisualTree;
+using Avalonia.Threading;
 using EmuVora.App;
 using EmuVora.Core;
 using Xunit;
@@ -23,8 +24,8 @@ public class InterfaceTests
         var store=new LibraryStore(System.IO.Path.Combine(dir.Path,"library.db"));store.Restore([new("Mario","NES",dir.File("Mario.nes"),true),new("Zelda","SNES",dir.File("Zelda.sfc")),new("Racing","PS2",dir.File("Racing.iso"))]);
         var window=new MainWindow(dir.Path);window.Show();var list=window.GetVisualDescendants().OfType<ListBox>().Single();Assert.Equal(3,list.ItemCount);
         var console=window.GetVisualDescendants().OfType<ComboBox>().First(c=>c.Items.Contains("Alle Konsolen"));console.SelectedItem="NES";Assert.Equal("Mario",Assert.IsType<Game>(Assert.Single(list.Items)).Title);
-        list.SelectedIndex=0;var search=window.GetVisualDescendants().OfType<TextBox>().First(t=>t.Watermark=="Spiele suchen …");search.Text="Mario";Assert.Equal("Mario",Assert.IsType<Game>(list.SelectedItem).Title);
-        search.Text="Zelda";Assert.Empty(list.Items);Assert.Null(list.SelectedItem);search.Text="";console.SelectedItem="Alle Konsolen";
+        list.SelectedIndex=0;var search=window.GetVisualDescendants().OfType<TextBox>().First(t=>t.Watermark=="Spiele suchen …");search.Text="Mario";Dispatcher.UIThread.RunJobs();Assert.Equal("Mario",Assert.IsType<Game>(list.SelectedItem).Title);
+        search.Text="Zelda";Dispatcher.UIThread.RunJobs();Assert.Empty(list.Items);Assert.Null(list.SelectedItem);search.Text="";Dispatcher.UIThread.RunJobs();console.SelectedItem="Alle Konsolen";
         var favorites=window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Favoriten");favorites.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Assert.Single(list.Items);
         window.Close();
     }

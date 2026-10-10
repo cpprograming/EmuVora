@@ -318,6 +318,7 @@ public sealed class MainWindow : Window
         panel.Children.Add(ActionButton("EXE-Pfad speichern",()=>{var full=Path.GetFullPath(path.Text?.Trim().Trim('"')??"");new ExternalEmulatorAdapter(Current()).CreateStartInfo(null,full);settings.EmulatorPaths[Current().Id]=full;settingsStore.Save(settings);status.Text="Emulator gespeichert.";}));
         panel.Children.Add(ActionButton("Emulator öffnen · BIOS / Controller einrichten",()=>{using var process=new ExternalEmulatorAdapter(Current()).Launch(null,settings.EmulatorPaths.GetValueOrDefault(Current().Id)??"");}));
         panel.Children.Add(ActionButton("Offizielle Webseite / Lizenz",()=>OpenPath(Current().Homepage)));
+        panel.Children.Add(ActionButton("Microsoft Visual C++ Runtime herunterladen",()=>OpenPath("https://aka.ms/vs/17/release/vc_redist.x64.exe")));
         panel.Children.Add(AsyncButton("Offiziell herunterladen / aktualisieren",async()=>
         {
             var id=Current().Id;
@@ -348,7 +349,7 @@ public sealed class MainWindow : Window
             var system=(string)coreSystem.SelectedItem!;await BusyAsync(async token=>
             {catalog=await packages.GetCatalogAsync(token);var id="retroarch-cores";var package=catalog.Packages.First(p=>p.Id==id);var path=settings.Packages.TryGetValue(id,out var installed)&&installed.Version==package.Version&&File.Exists(installed.ExecutablePath)?installed.ExecutablePath:await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);ConfigureCores(path);settings.Packages[id]=new(package.Version,path,installed?.ExecutablePath);settingsStore.Save(settings);LoadCore();status.Text="Cores für alle unterstützten RetroArch-Konsolen eingerichtet.";});
         }));
-        panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden vor dem Entpacken mit SHA-256 geprüft. Alte Installationen bleiben erhalten. PS1 / PS2 benötigen gegebenenfalls eigene BIOS-Dateien. Controller, Grafik und Speicherstände werden im Emulator eingerichtet.",TextWrapping=TextWrapping.Wrap,FontSize=12});
+        panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden vor dem Entpacken mit SHA-256 geprüft. Alte Installationen bleiben erhalten. Bei fehlenden VCRUNTIME/MSVCP-DLLs die Microsoft Visual C++ Runtime installieren. PS1 / PS2 benötigen eigene BIOS-Dateien. Controller, Grafik und Speicherstände werden im Emulator eingerichtet.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
         panel.Children.Add(AsyncButton("Jetzt auf Updates prüfen",()=>CheckUpdatesAsync()));
         var dialog=Dialog("EmuVora einrichten",panel);dialog.Height=760;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
