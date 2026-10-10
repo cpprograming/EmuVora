@@ -36,46 +36,11 @@
       "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch.7z"
     },
     {
-      "Executable": "fceumm_libretro.dll",
-      "Sha256": "5016df52589dc1921c06f1e0569124b1f0e3a56fc49c477046799aec83ac1647",
-      "Version": "5016df52589dc192",
-      "Id": "core-fceumm",
-      "Url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fceumm_libretro.dll.zip"
-    },
-    {
-      "Executable": "snes9x_libretro.dll",
-      "Sha256": "af334c14699af8784f751223d6ee63a0c22226eaa95d448dd95d3543452ff845",
-      "Version": "af334c14699af878",
-      "Id": "core-snes9x",
-      "Url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/snes9x_libretro.dll.zip"
-    },
-    {
-      "Executable": "gambatte_libretro.dll",
-      "Sha256": "8db955c14032e842484e6de019c3f4a5cc8b8159594d2617b7a7a17235d9c7bd",
-      "Version": "8db955c14032e842",
-      "Id": "core-gambatte",
-      "Url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/gambatte_libretro.dll.zip"
-    },
-    {
-      "Executable": "mgba_libretro.dll",
-      "Sha256": "65503fddd112ebe899afbc308588b2bafd66f1ab5d224f350240e867f53a4f13",
-      "Version": "65503fddd112ebe8",
-      "Id": "core-mgba",
-      "Url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/mgba_libretro.dll.zip"
-    },
-    {
-      "Executable": "mupen64plus_next_libretro.dll",
-      "Sha256": "afd7460d6c08960b4b35a68579136eacc34516bb3b09e721ef3d3e532088c4b9",
-      "Version": "afd7460d6c08960b",
-      "Id": "core-mupen64plus_next",
-      "Url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/mupen64plus_next_libretro.dll.zip"
-    },
-    {
-      "Executable": "genesis_plus_gx_libretro.dll",
-      "Sha256": "a30944605e0129adfb57799706e46811324044b990d109acb92adf5dc7a67ffa",
-      "Version": "a30944605e0129ad",
-      "Id": "core-genesis_plus_gx",
-      "Url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/genesis_plus_gx_libretro.dll.zip"
+      "Id": "retroarch-cores",
+      "Version": "1.22.2",
+      "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch_cores.7z",
+      "Sha256": "86b871e11b9b4772ac644b40a38f2c8e9449da1f355eae7da08aa061148547b0",
+      "Executable": "fceumm_libretro.dll"
     }
   ],
   "GeneratedAt": "2026-10-10T17:09:30.9238316Z",

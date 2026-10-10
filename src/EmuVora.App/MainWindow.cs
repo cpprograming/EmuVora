@@ -37,6 +37,7 @@ public sealed class MainWindow : Window
     private readonly Button favorite=new(){Content="☆ Favorit",IsEnabled=false};
     private readonly Button edit=new(){Content="Titel / Konsole bearbeiten",IsEnabled=false};
     private readonly Button cover=new(){Content="Cover wählen",IsEnabled=false};
+    private readonly Button onlineCover=new(){Content="Cover online suchen",IsEnabled=false};
     private readonly Button remove=new(){Content="Aus Bibliothek entfernen",IsEnabled=false};
     private readonly Button reveal=new(){Content="ROM-Ordner öffnen",IsEnabled=false};
     private readonly Border sideBorder=new();
@@ -50,6 +51,7 @@ public sealed class MainWindow : Window
     private readonly Dictionary<string,Process> running=new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> runningEmulators=[];
     private readonly List<Button> operationButtons=[];
+    private readonly Dictionary<string,Button> viewButtons=[];
     private readonly DispatcherTimer gamepadTimer=new(){Interval=TimeSpan.FromMilliseconds(100)};
     private ushort previousButtons;
     private bool dialogOpen;
@@ -65,7 +67,7 @@ public sealed class MainWindow : Window
         sidebar.Children.Add(new TextBlock {Text="DEINE BIBLIOTHEK",FontSize=11,Opacity=0.65});
         foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt","Konsole zuordnen","Fehlende Dateien"})
         {
-            var item=ActionButton(name,()=>{view=name;Refresh();});sidebar.Children.Add(item);
+            var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;sidebar.Children.Add(item);
         }
         sidebar.Children.Add(new Separator {Margin=new(0,12)});
         var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());sidebar.Children.Add(import);operationButtons.Add(import);
@@ -85,10 +87,11 @@ public sealed class MainWindow : Window
         AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);AddRow(main,footer,4);
         Grid.SetColumn(main,1);layout.Children.Add(main);
         var details=new StackPanel {Spacing=14,Margin=new(18)};details.Children.Add(detailCover);details.Children.Add(detailTitle);details.Children.Add(detailInfo);
-        foreach(var button in new[]{play,favorite,cover,edit,reveal,remove})details.Children.Add(button);
+        foreach(var button in new[]{play,favorite,cover,onlineCover,edit,reveal,remove})details.Children.Add(button);
         detailBorder.Child=new ScrollViewer {Content=details};Grid.SetColumn(detailBorder,2);layout.Children.Add(detailBorder);Content=layout;
         play.Click+=async(_,_)=>await PlayAsync();favorite.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);}});
         cover.Click+=async(_,_)=>await ChooseCoverAsync();edit.Click+=async(_,_)=>await EditAsync();remove.Click+=async(_,_)=>await RemoveAsync();reveal.Click+=(_,_)=>Guard(()=>{if(Selected is{} game)OpenPath(Path.GetDirectoryName(game.Path)!);});
+        onlineCover.Click+=async(_,_)=>await FetchCoverAsync();ToolTip.SetTip(onlineCover,"Sucht den Spieltitel bei libretro-thumbnails. Titel und Konsole werden dafür an GitHub gesendet.");
         gamesList.SelectionChanged+=(_,_)=>UpdateSelected();gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
         gamesList.KeyDown+=async(_,e)=>{if(e.Key==Key.Enter){e.Handled=true;await PlayAsync();}};
         search.TextChanged+=(_,_)=>Refresh();systems.SelectionChanged+=(_,_)=>Refresh();sort.SelectionChanged+=(_,_)=>Refresh();cancel.Click+=(_,_)=>operation?.Cancel();
@@ -114,6 +117,7 @@ public sealed class MainWindow : Window
         {"Classic Light"=>("#F3F5F9","#172235","#E6EAF2","#315DBD"),"Retro Green"=>("#101A13","#D9FFE1","#18291D","#69E991"),"Neon Purple"=>("#1A1026","#F5E6FF","#291939","#CC8CFF"),_=>("#101722","#EAF0FA","#1A2433","#6AA8FF")};
         RequestedThemeVariant=settings.Theme=="Classic Light"?ThemeVariant.Light:ThemeVariant.Dark;
         Background=Brush.Parse(palette.Item1);Foreground=Brush.Parse(palette.Item2);sideBorder.Background=detailBorder.Background=Brush.Parse(palette.Item3);status.Foreground=Brush.Parse(palette.Item4);
+        gamesList.Background=Brushes.Transparent;
     }
     private void UpdateSystems()
     {
@@ -131,6 +135,7 @@ public sealed class MainWindow : Window
         gamesList.ItemsSource=result;gamesList.SelectedItem=result.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));
         empty.IsVisible=result.Length==0;empty.Text=allGames.Count==0?"Deine Bibliothek ist leer.\nImportiere einen Ordner mit deinen ROMs.":"Hier sind keine Spiele.\nPasse Suche, Konsole oder Bibliotheksansicht an.";
         summary.Text=$"{view}\n{result.Length} von {allGames.Count} Spielen";UpdateSelected();
+        foreach(var(name,button)in viewButtons)button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;
     }
     private Control Artwork(Game game,int width)
     {
@@ -154,7 +159,7 @@ public sealed class MainWindow : Window
     }
     private void UpdateSelected()
     {
-        var game=Selected;foreach(var button in new[]{favorite,edit,cover,remove,reveal})button.IsEnabled=game!=null&&operation==null;
+        var game=Selected;foreach(var button in new[]{favorite,edit,cover,onlineCover,remove,reveal})button.IsEnabled=game!=null&&operation==null;
         play.IsEnabled=game!=null&&operation==null&&!running.ContainsKey(game.Path);
         detailTitle.Text=game?.Title??"Spiel auswählen";detailCover.Content=game==null?null:Artwork(game,220);
         favorite.Content=game?.Favorite==true?"★ Favorit entfernen":"☆ Als Favorit merken";
@@ -177,7 +182,7 @@ public sealed class MainWindow : Window
     {if(settings.RomFolders.Count==0){status.Text="Zuerst einen ROM-Ordner importieren.";return;}await ScanAsync(settings.RomFolders.ToArray(),false);}
     private Task ScanAsync(string[] folders,bool remember)=>BusyAsync(async token=>
     {
-        var results=await Task.Run(()=>folders.Select(path=>{token.ThrowIfCancellationRequested();return RomScanner.ScanDetailed(path,token);}).ToArray(),token);
+        var results=await Task.Run(()=>folders.Select(path=>{token.ThrowIfCancellationRequested();try{return RomScanner.ScanDetailed(path,token);}catch(Exception ex) when(ex is IOException or UnauthorizedAccessException){return new ScanResult([],[$"{path}: {ex.Message}"]);}}).ToArray(),token);
         var before=allGames.Count;await Task.Run(()=>store.Upsert(results.SelectMany(r=>r.Games)),token);
         if(remember){foreach(var path in folders)if(!settings.RomFolders.Contains(path,StringComparer.OrdinalIgnoreCase))settings.RomFolders.Add(path);settingsStore.Save(settings);}
         Reload();status.Text=$"{allGames.Count-before} neue Spiele · {results.Sum(r=>r.Warnings.Count)} übersprungene oder nicht lesbare Einträge. Unklare Discs unter „Konsole zuordnen“ bearbeiten.";
@@ -229,6 +234,18 @@ public sealed class MainWindow : Window
         }
         catch(Exception ex){ShowError(ex);}
     }
+    private Task FetchCoverAsync()
+    {
+        if(Selected is not{} game)return Task.CompletedTask;
+        return BusyAsync(async token=>
+        {
+            status.Text="Cover bei libretro-thumbnails suchen …";var file=await CoverLookup.DownloadAsync(game,Path.Combine(dataDir,"covers"),token);
+            if(file==null){status.Text="Kein exakter Cover-Treffer. No-Intro/Redump-Titel mit Region verwenden oder eigenes Cover wählen.";return;}
+            try{using var stream=File.OpenRead(file);using var image=Bitmap.DecodeToWidth(stream,480);}
+            catch{File.Delete(file);throw;}
+            settings.Covers[game.Path]=file;settingsStore.Save(settings);Refresh(game.Path);status.Text="Cover gespeichert · Quelle: libretro-thumbnails.";
+        });
+    }
     private async Task TrackProcessAsync(Process process,Game game,string emulator)
     {
         try
@@ -272,10 +289,10 @@ public sealed class MainWindow : Window
                 {
                     if(runningEmulators.Contains(package.Id))continue;var old=settings.Packages[package.Id];
                     var path=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
-                    if(!package.Id.StartsWith("core-")&&File.Exists(old.ExecutablePath))await Task.Run(()=>PreserveConfiguration(old.ExecutablePath,path),token);
+                    if(package.Id!="retroarch-cores"&&File.Exists(old.ExecutablePath))await Task.Run(()=>PreserveConfiguration(old.ExecutablePath,path),token);
                     settings.Packages[package.Id]=new(package.Version,path,old.ExecutablePath);
-                    if(package.Id.StartsWith("core-"))
-                    {foreach(var system in PackageManager.CoreIds.Where(k=>"core-"+k.Value==package.Id).Select(k=>k.Key))if(settings.CorePaths.GetValueOrDefault(system)==old.ExecutablePath)settings.CorePaths[system]=path;}
+                    if(package.Id=="retroarch-cores")
+                    {ConfigureCores(path,Path.GetDirectoryName(old.ExecutablePath));}
                     else settings.EmulatorPaths[package.Id]=path;
                     settingsStore.Save(settings);
                 }
@@ -326,15 +343,26 @@ public sealed class MainWindow : Window
         coreSystem.SelectionChanged+=(_,_)=>LoadCore();LoadCore();
         panel.Children.Add(AsyncButton("Core-Datei wählen",async()=>{var files=await StorageProvider.OpenFilePickerAsync(new(){Title="RetroArch-Core",FileTypeFilter=[new("Core"){Patterns=["*.dll"]}]});if(files.Count>0)corePath.Text=files[0].TryGetLocalPath();}));
         panel.Children.Add(ActionButton("Core-Pfad speichern",()=>{if(!File.Exists(corePath.Text)||Path.GetExtension(corePath.Text)!=".dll")throw new InvalidOperationException("Gültige Core-DLL wählen.");settings.CorePaths[(string)coreSystem.SelectedItem!]=corePath.Text!;settingsStore.Save(settings);status.Text="Core gespeichert.";}));
-        panel.Children.Add(AsyncButton("Passenden Core herunterladen / aktualisieren",async()=>
+        panel.Children.Add(AsyncButton("Stabiles Core-Paket herunterladen / aktualisieren",async()=>
         {
             var system=(string)coreSystem.SelectedItem!;await BusyAsync(async token=>
-            {catalog=await packages.GetCatalogAsync(token);var id="core-"+PackageManager.CoreIds[system];var package=catalog.Packages.First(p=>p.Id==id);var path=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);settings.CorePaths[system]=path;settings.Packages[id]=new(package.Version,path);settingsStore.Save(settings);LoadCore();status.Text=system+"-Core installiert.";});
+            {catalog=await packages.GetCatalogAsync(token);var id="retroarch-cores";var package=catalog.Packages.First(p=>p.Id==id);var path=settings.Packages.TryGetValue(id,out var installed)&&installed.Version==package.Version&&File.Exists(installed.ExecutablePath)?installed.ExecutablePath:await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);ConfigureCores(path);settings.Packages[id]=new(package.Version,path,installed?.ExecutablePath);settingsStore.Save(settings);LoadCore();status.Text="Cores für alle unterstützten RetroArch-Konsolen eingerichtet.";});
         }));
         panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden vor dem Entpacken mit SHA-256 geprüft. Alte Installationen bleiben erhalten. PS1 / PS2 benötigen gegebenenfalls eigene BIOS-Dateien. Controller, Grafik und Speicherstände werden im Emulator eingerichtet.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
         panel.Children.Add(AsyncButton("Jetzt auf Updates prüfen",()=>CheckUpdatesAsync()));
         var dialog=Dialog("EmuVora einrichten",panel);dialog.Height=760;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
+    }
+    private void ConfigureCores(string executable,string? oldDirectory=null)
+    {
+        var directory=Path.GetDirectoryName(executable)!;
+        foreach(var (system,id) in PackageManager.CoreIds)
+        {
+            var current=settings.CorePaths.GetValueOrDefault(system);
+            if(oldDirectory!=null&&current!=null&&!Path.GetFullPath(current).StartsWith(Path.GetFullPath(oldDirectory)+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))continue;
+            var file=Directory.EnumerateFiles(directory,id+"_libretro.dll",SearchOption.AllDirectories).FirstOrDefault();
+            if(file!=null)settings.CorePaths[system]=file;
+        }
     }
     private static void PreserveConfiguration(string previous,string next)
     {

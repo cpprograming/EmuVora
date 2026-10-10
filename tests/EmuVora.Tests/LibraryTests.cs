@@ -57,6 +57,16 @@ public class LibraryTests
 }
 public class PackageTests
 {
+    private sealed class FakeDownload(byte[] bytes):HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken token)=>Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK){Content=new ByteArrayContent(bytes)});
+    }
+    [Fact] public async Task FailedDownloadLeavesExistingInstallationAndCleansStaging()
+    {
+        using var dir=new TestDirectory();var old=dir.File("duckstation/old/emulator.exe","previous");using var manager=new PackageManager(new FakeDownload([1,2,3]));
+        var package=new EmulatorPackage("duckstation","1","https://github.com/stenzek/duckstation/releases/download/latest/package.zip",new string('a',64),"duckstation.exe");
+        await Assert.ThrowsAsync<InvalidDataException>(()=>manager.InstallAsync(package,dir.Path));Assert.Equal("previous",System.IO.File.ReadAllText(old));Assert.Empty(Directory.GetDirectories(System.IO.Path.Combine(dir.Path,"duckstation"),"staging-*"));
+    }
     [Theory][InlineData("../outside.exe")][InlineData("..\\outside.exe")][InlineData("C:\\outside.exe")][InlineData("/outside.exe")][InlineData("folder/test.exe:stream")]
     public void RejectsTraversalAndAlternateStreams(string entry)
     {using var dir=new TestDirectory();Assert.Throws<InvalidDataException>(()=>PackageManager.SafeEntryPath(dir.Path,entry));}

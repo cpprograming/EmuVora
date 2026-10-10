@@ -31,9 +31,7 @@ Add-Package 'dolphin' $taskDolphin.shortrev $taskArtifact.url 'Dolphin.exe'
 $taskRetro=Invoke-RestMethod 'https://api.github.com/repos/libretro/RetroArch/releases/latest' -Headers $taskHeaders
 $taskRetroVersion=$taskRetro.tag_name -replace '^v',''
 Add-Package 'retroarch' $taskRetroVersion "https://buildbot.libretro.com/stable/$taskRetroVersion/windows/x86_64/RetroArch.7z" 'retroarch.exe'
-foreach($taskCore in @('fceumm','snes9x','gambatte','mgba','mupen64plus_next','genesis_plus_gx')){
-    Add-Package "core-$taskCore" ([DateTime]::UtcNow.ToString('yyyyMMdd')) "https://buildbot.libretro.com/nightly/windows/x86_64/latest/$($taskCore)_libretro.dll.zip" "$($taskCore)_libretro.dll"
-}
+Add-Package 'retroarch-cores' $taskRetroVersion "https://buildbot.libretro.com/stable/$taskRetroVersion/windows/x86_64/RetroArch_cores.7z" 'fceumm_libretro.dll'
 $taskParent=Split-Path -Parent ([System.IO.Path]::GetFullPath($OutputPath))
 New-Item -ItemType Directory -Force $taskParent | Out-Null
 @{SchemaVersion=1;GeneratedAt=[DateTime]::UtcNow.ToString('O');Packages=@($taskPackages.ToArray())} | ConvertTo-Json -Depth 5 | Set-Content $OutputPath -Encoding utf8

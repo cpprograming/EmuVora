@@ -31,7 +31,7 @@ public sealed class PackageManager : IDisposable
     public static void ValidatePackage(EmulatorPackage package)
     {
         if(!Regex.IsMatch(package.Id,"^[a-z0-9_-]+$")||!Regex.IsMatch(package.Sha256,"^[a-fA-F0-9]{64}$"))throw new InvalidDataException("Ungültige Paket-Prüfsumme.");
-        if(!EmulatorCatalog.Known.Any(e=>e.Id==package.Id)&&!CoreIds.Values.Any(id=>"core-"+id==package.Id))throw new InvalidDataException("Unbekanntes Paket.");
+        if(!EmulatorCatalog.Known.Any(e=>e.Id==package.Id)&&package.Id!="retroarch-cores")throw new InvalidDataException("Unbekanntes Paket.");
         var url=new Uri(package.Url);if(url.Scheme!="https"||url.UserInfo.Length!=0||url.Port!=443)throw new InvalidDataException("Ungültige Download-Adresse.");
         var valid=package.Id switch
         {
@@ -39,8 +39,8 @@ public sealed class PackageManager : IDisposable
             "pcsx2"=>url.Host=="github.com"&&url.AbsolutePath.StartsWith("/PCSX2/pcsx2/releases/download/",StringComparison.Ordinal),
             "ppsspp"=>url.Host=="github.com"&&url.AbsolutePath.StartsWith("/hrydgard/ppsspp/releases/download/",StringComparison.Ordinal),
             "dolphin"=>url.Host=="dl.dolphin-emu.org"&&url.AbsolutePath.StartsWith("/releases/",StringComparison.Ordinal),
-            "retroarch"=>url.Host=="buildbot.libretro.com"&&url.AbsolutePath.StartsWith("/stable/",StringComparison.Ordinal),
-            _=>url.Host=="buildbot.libretro.com"&&url.AbsolutePath.StartsWith("/nightly/windows/x86_64/latest/",StringComparison.Ordinal)
+            "retroarch" or "retroarch-cores"=>url.Host=="buildbot.libretro.com"&&url.AbsolutePath.StartsWith("/stable/",StringComparison.Ordinal),
+            _=>false
         };
         if(!valid)throw new InvalidDataException("Der Download stammt nicht aus der offiziellen Paketquelle.");
         if(Path.GetFileName(package.Executable)!=package.Executable||!Regex.IsMatch(package.Executable,"^[a-zA-Z0-9_.-]+\\.(exe|dll)$",RegexOptions.IgnoreCase))throw new InvalidDataException("Ungültiger Paket-Einstiegspunkt.");
