@@ -65,7 +65,7 @@ public sealed class MainWindow : Window
         main.Children.Add(new Border { Child=gamesList, Height=460 });
         var play=new Button {Content="▶ PLAY SELECTED GAME", HorizontalAlignment=HorizontalAlignment.Left}; play.Click+=async (_,_)=>await PlayAsync(); main.Children.Add(play);
         main.Children.Add(status);
-        ApplyTheme(settings.Theme); Refresh();
+        ApplyTheme(themes.SelectedItem as string ?? "Midnight"); Refresh();
     }
     private void ApplyTheme(string theme)
     {
@@ -95,7 +95,7 @@ public sealed class MainWindow : Window
             var found=await Task.Run(()=>RomScanner.Scan(path)); store.Upsert(found); allGames=store.GetAll(); Refresh(); status.Text=$"Imported {found.Count} files. Disc images may need manual system classification.";
         } catch(Exception ex) {status.Text=$"Import failed: {ex.Message}";}
     }
-    private EmulatorDefinition? CurrentEmulator() => emulators.SelectedIndex is >=0 and <5 ? EmulatorCatalog.Known[emulators.SelectedIndex] : null;
+    private EmulatorDefinition? CurrentEmulator() => emulators.SelectedIndex >= 0 && emulators.SelectedIndex < EmulatorCatalog.Known.Length ? EmulatorCatalog.Known[emulators.SelectedIndex] : null;
     private void LoadEmulatorSettings() { var def=CurrentEmulator(); if(def==null)return; emulatorPath.Text=settings.EmulatorPaths?.GetValueOrDefault(def.Id)??""; corePath.Text=settings.CorePaths?.GetValueOrDefault(def.Id)??""; }
     private void SaveEmulator()
     {
@@ -127,3 +127,4 @@ public sealed class MainWindow : Window
         catch(Exception ex){status.Text=$"Launch failed: {ex.Message}";}
     }
 }
+
