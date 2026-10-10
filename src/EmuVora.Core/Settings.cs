@@ -12,6 +12,8 @@ public sealed class AppSettings
     public bool Fullscreen {get;set;}=true;
     public bool CheckUpdatesOnStartup {get;set;}=true;
     public bool AutoInstallUpdates {get;set;}=false;
+    public bool AutomaticSetup {get;set;}=true;
+    public bool XboxDefaults {get;set;}=true;
 }
 public record InstalledPackage(string Version,string ExecutablePath,string? PreviousExecutablePath=null);
 public sealed class SettingsStore(string file)

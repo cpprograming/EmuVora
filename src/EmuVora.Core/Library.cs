@@ -12,7 +12,7 @@ public static class EmulatorCatalog
 {
     public static readonly EmulatorDefinition[] Known =
     [
-        new("retroarch","RetroArch",["NES","SNES","GB","GBC","GBA","N64","Mega Drive","Master System"],"https://www.retroarch.com/","retroarch.exe"),
+        new("retroarch","RetroArch",SystemCatalog.RetroSystems.Select(s=>s.Name).ToArray(),"https://www.retroarch.com/","retroarch.exe"),
         new("duckstation","DuckStation",["PS1"],"https://github.com/stenzek/duckstation","duckstation-qt-x64-ReleaseLTCG.exe"),
         new("pcsx2","PCSX2",["PS2"],"https://pcsx2.net/","pcsx2-qt.exe"),
         new("dolphin","Dolphin",["GameCube","Wii"],"https://dolphin-emu.org/","Dolphin.exe"),
@@ -53,15 +53,24 @@ public static class RomScanner
                     {
                         try
                         {
-                            using var zip=ZipFile.OpenRead(file);var roms=zip.Entries.Select(e=>Extensions.GetValueOrDefault(System.IO.Path.GetExtension(e.FullName))).Where(s=>s!=null&&EmulatorCatalog.Get("retroarch").Systems.Contains(s)).ToArray();
+                            var folderSystem=DetectFolderSystem(file,root);
+                            if(folderSystem!=null&&SystemCatalog.Find(folderSystem)?.ArchiveSet==true){games.Add(new(System.IO.Path.GetFileNameWithoutExtension(file),folderSystem,System.IO.Path.GetFullPath(file)));continue;}
+                            using var zip=ZipFile.OpenRead(file);var roms=zip.Entries.Select(e=>SystemCatalog.FromExtension(System.IO.Path.GetExtension(e.FullName))).Where(s=>s!=null).ToArray();
                             if(roms.Length!=1){warnings.Add(file+": ZIP muss genau eine unterstützte Cartridge-ROM enthalten.");continue;}system=roms[0];
                         }
                         catch(Exception ex) when(ex is IOException or InvalidDataException or UnauthorizedAccessException){warnings.Add(file+": "+ex.Message);continue;}
                     }
-                    else if(!Extensions.TryGetValue(extension,out system))continue;
+                    else if(!Extensions.TryGetValue(extension,out system))
+                    {
+                        var folderSystem=DetectFolderSystem(file,root);var definition=folderSystem==null?null:SystemCatalog.Find(folderSystem);
+                        if(definition!=null&&definition.Extensions.Split(' ').Contains(extension.TrimStart('.'),StringComparer.OrdinalIgnoreCase))system=folderSystem;
+                        else system=SystemCatalog.FromExtension(extension);
+                        if(system==null)continue;
+                    }
                     if(system==null)continue;
                     if(extension.Equals(".md",StringComparison.OrdinalIgnoreCase)&&!HasSegaHeader(file))continue;
                     if(system=="Unknown disc")system=DetectDiscSystem(file,root);
+                    else if(DetectFolderSystem(file,root) is{} folderMatch&&SystemCatalog.Find(folderMatch) is{} folderDefinition&&folderDefinition.Extensions.Split(' ').Contains(extension.TrimStart('.'),StringComparer.OrdinalIgnoreCase))system=folderMatch;
                     games.Add(new(System.IO.Path.GetFileNameWithoutExtension(file),system,System.IO.Path.GetFullPath(file)));
                     if(extension.Equals(".m3u",StringComparison.OrdinalIgnoreCase)||extension.Equals(".cue",StringComparison.OrdinalIgnoreCase))
                     {
@@ -102,9 +111,13 @@ public static class RomScanner
             }
             catch(IOException){ }catch(UnauthorizedAccessException){ }
         }
+        return DetectFolderSystem(file,root)??"Unknown disc";
+    }
+    private static string? DetectFolderSystem(string file,string root)
+    {
         for(var directory=Directory.GetParent(file);directory!=null;directory=directory.Parent)
-        {if(Folders.TryGetValue(directory.Name,out var system))return system;if(directory.FullName.Equals(root,StringComparison.OrdinalIgnoreCase))break;}
-        return "Unknown disc";
+        {if(Folders.TryGetValue(directory.Name,out var system))return system;if(SystemCatalog.FromFolder(directory.Name) is{} retro)return retro;if(directory.FullName.Equals(root,StringComparison.OrdinalIgnoreCase))break;}
+        return null;
     }
     private static bool HasSegaHeader(string file)
     {

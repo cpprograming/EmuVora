@@ -8,8 +8,8 @@ Unter [GitHub Actions](https://github.com/cpprograming/EmuVora/actions) den neue
 
 1. **ROM-Ordner importieren**. Unterordner werden mitgescannt; nicht lesbare Ordner werden gemeldet.
 2. Unklare Discs unter **Konsole zuordnen** bearbeiten. Wii/GameCube-ISO-Header und Konsolenordner helfen bei der Erkennung; andere Disc-Formate werden nicht als sicher erkannt ausgegeben.
-3. **Emulatoren einrichten**: vorhandene EXE auswählen und speichern oder das offizielle Windows-Paket herunterladen. Für RetroArch zusätzlich das stabile Core-Paket herunterladen.
-4. Emulator öffnen und eigene BIOS-Dateien, Grafik und Controller einrichten. Bei fehlenden VCRUNTIME/MSVCP-DLLs die verlinkte Microsoft Visual C++ Runtime installieren.
+3. **Spielen**: fehlende Emulatoren und RetroArch-Cores werden automatisch heruntergeladen und eingerichtet. Alternativ unter **Emulatoren einrichten → Alle Emulatoren + Cores automatisch einrichten** alles vorab installieren. Die Automatik lässt sich deaktivieren; vorhandene EXE-Pfade bleiben nutzbar.
+4. Xbox-Controller anschließen. Benötigte eigene BIOS-Dateien über die Einstellungen importieren. Dateinamen, Zusatzdateien und Systemhinweise stehen dort. PS2-BIOS mit 4 MiB wird als Standard gewählt, PS1 durchsucht den Firmware-Ordner. Die Emulatoren prüfen die tatsächliche BIOS-Gültigkeit und Region. Bei fehlenden VCRUNTIME/MSVCP-DLLs die verlinkte Microsoft Visual C++ Runtime installieren.
 5. Spiel auswählen und **Spielen**, doppelklicken oder Eingabetaste drücken.
 
 ## Bibliothek und Bedienung
@@ -20,7 +20,21 @@ Unter [GitHub Actions](https://github.com/cpprograming/EmuVora/actions) den neue
 - Mehrdisc-M3U-Dateien bündeln referenzierte Discs. ZIP-Dateien mit genau einer unterstützten Cartridge-ROM können über RetroArch gestartet werden.
 - Fehlende Dateien anzeigen; Entfernen betrifft nur den Bibliothekseintrag, nicht die ROM-Datei.
 - JSON-Sicherung/Wiederherstellung für Titel, Dateipfade, Konsole, Favoriten und Startverlauf. Cover, Einstellungen und Emulator-Speicherstände sind nicht in dieser JSON enthalten.
-- Tastatur: Eingabetaste startet; Strg+F aktiviert die Suche. XInput-Controller: Steuerkreuz navigiert, A startet, Y schaltet Favoriten um. Controller-Einstellungen innerhalb von Spielen gehören zum Emulator.
+- Tastatur: Eingabetaste startet; Strg+F aktiviert die Suche. Xbox/XInput: Steuerkreuz oder linker Stick navigiert mit Wiederholung; A startet, Y schaltet Favoriten um, LB/RB wechselt den Systemfilter, B setzt die Ansicht zurück. Verbundene Controller werden laufend angezeigt. RetroArch, DuckStation, PCSX2 und Dolphin erhalten automatisch Xbox-Profile mit Analogsticks, Triggern und unterstütztem Rumble. PPSSPP nutzt seine eingebauten Xbox-Defaults. RetroArch: View + Menu beendet, View + RB öffnet das Menü. Profile berücksichtigen den ersten verbundenen XInput-Slot. Eigene geänderte Belegungen bleiben erhalten; unveränderte verwaltete Werte werden bei Bedarf angepasst. **Xbox-Standardprofil erneut anwenden** setzt die Standardbelegung mit Dateisicherung zurück.
+
+## Unterstützte Systeme (47 Einträge)
+
+- Nintendo: NES, SNES, GB, GBC, GBA, N64, Nintendo DS, Virtual Boy, GameCube, Wii.
+- Sega: Mega Drive, Master System, Game Gear, Mega-CD, 32X, Saturn, Dreamcast.
+- Sony: PS1, PS2, PSP.
+- Atari: 2600, 5200, 7800, Lynx, Jaguar, ST.
+- NEC: PC Engine, PC Engine CD, SuperGrafx, PC-FX.
+- SNK: Neo Geo, Neo Geo CD, Neo Geo Pocket, Neo Geo Pocket Color.
+- Weitere: 3DO, ColecoVision, Intellivision, WonderSwan, WonderSwan Color.
+- Computer: Commodore 64, Amiga, Amstrad CPC, ZX Spectrum, MSX, DOS.
+- Arcade: FinalBurn Neo und MAME.
+
+Gemeinsame Formate wie CHD/CUE/ISO, DSK, ROM oder komplette ZIP-ROM-Sets in einen Systemordner legen, z. B. `Saturn`, `MSX`, `DOS`, `MAME` oder `FBNeo`. Mehrdisc-Playlists werden zusammengefasst. Arcade-/DOS-Archive bleiben als vollständige Sets erhalten. Die Firmware-Prüfung erkennt Dateinamen und grundlegende Größen, ersetzt aber keine Validierung durch den Emulator. MSX benötigt die eigenen blueMSX-Verzeichnisse `Machines` und `Databases`; ganze Firmware-Ordner lassen sich importieren.
 
 ## Downloads und Updates
 
@@ -54,7 +68,7 @@ dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Catego
 
 Tests prüfen Migration der ursprünglichen Datenbank, Erhalt manuell korrigierter Metadaten, Playlist-/Disc-/ZIP-Erkennung, Bibliothekswiederherstellung, Einstellungen, Startargumente, Prüfsummen und Archivpfade. Avalonia-Tests prüfen echte Such-/Filter-/Favoriten-Interaktion und rendern die vier Themes. GitHub Actions erstellt zusätzliche **EmuVora-UI-previews**.
 
-Die Emulatoren bleiben eigene Anwendungen: Kompatibilität einzelner Spiele, BIOS, Grafik-/Audio-Treiber, Speicherstände und Controller-Mapping werden dort konfiguriert. EmuVora enthält weder Emulator-Binaries noch ROMs oder BIOS im Programmpaket.
+Die Emulatoren bleiben eigene Anwendungen: Kompatibilität einzelner Spiele, tatsächliche BIOS-Gültigkeit und spezielle Grafik-/Audio-/Controller-Anpassungen hängen von ihnen ab. Standardinstallation und Xbox-Belegung übernimmt EmuVora. Nintendo DS braucht für Touchaktionen Maus/Touch; Wii nutzt ein Wiimote/Nunchuk-Grundprofil mit rechtem Stick als Zeiger und RB als Schütteln. Manche Wii-Spiele benötigen andere Bewegungsprofile. Heimcomputer, Intellivision und DOS können Tastatur/Maus benötigen. Arcade-ROM-Sets müssen zur Core-Version passen; MAME und FinalBurn Neo sind getrennte Bibliothekskategorien. Vollständig controllerbasierte Bedienung jedes Spiels wird nicht zugesichert. EmuVora enthält weder Emulator-Binaries noch ROMs oder BIOS im Programmpaket.
 
 ## Lizenz
 
