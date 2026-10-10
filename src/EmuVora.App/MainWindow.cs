@@ -352,6 +352,9 @@ public sealed class MainWindow : Window
         panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden vor dem Entpacken mit SHA-256 geprüft. Alte Installationen bleiben erhalten. Bei fehlenden VCRUNTIME/MSVCP-DLLs die Microsoft Visual C++ Runtime installieren. PS1 / PS2 benötigen eigene BIOS-Dateien. Controller, Grafik und Speicherstände werden im Emulator eingerichtet.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
         panel.Children.Add(AsyncButton("Jetzt auf Updates prüfen",()=>CheckUpdatesAsync()));
+        panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="Gespeicherte ROM-Ordner",FontWeight=FontWeight.Bold});
+        var folders=new ListBox {ItemsSource=settings.RomFolders.ToArray(),MaxHeight=150};panel.Children.Add(folders);
+        panel.Children.Add(ActionButton("Ordner aus dem Neu-Scan entfernen",()=>{if(folders.SelectedItem is string folder){settings.RomFolders.Remove(folder);settingsStore.Save(settings);folders.ItemsSource=settings.RomFolders.ToArray();status.Text="Ordner aus dem Neu-Scan entfernt. Spiele und Dateien bleiben erhalten.";}}));
         var dialog=Dialog("EmuVora einrichten",panel);dialog.Height=760;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
     }
     private void ConfigureCores(string executable,string? oldDirectory=null)

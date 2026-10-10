@@ -155,7 +155,7 @@ public sealed class LibraryStore
         using var c=Open();using var tx=c.BeginTransaction();foreach(var game in games)
         {
             if(string.IsNullOrWhiteSpace(game.Title)||string.IsNullOrWhiteSpace(game.Path)||!System.IO.Path.IsPathFullyQualified(game.Path))throw new InvalidDataException("Invalid library entry.");
-            using var cmd=c.CreateCommand();cmd.Transaction=tx;cmd.CommandText="INSERT INTO games(path,title,system,favorite,lastPlayed,playCount,customized) VALUES($p,$t,$s,$f,$d,$n,1) ON CONFLICT(path) DO UPDATE SET title=$t,system=$s,favorite=$f,lastPlayed=$d,playCount=$n,customized=1";
+            using var cmd=c.CreateCommand();cmd.Transaction=tx;cmd.CommandText="UPDATE games SET title=$t,system=$s,favorite=$f,lastPlayed=$d,playCount=$n,customized=1 WHERE path=$p COLLATE NOCASE; INSERT INTO games(path,title,system,favorite,lastPlayed,playCount,customized) SELECT $p,$t,$s,$f,$d,$n,1 WHERE NOT EXISTS(SELECT 1 FROM games WHERE path=$p COLLATE NOCASE)";
             cmd.Parameters.AddWithValue("$p",game.Path);cmd.Parameters.AddWithValue("$t",game.Title);cmd.Parameters.AddWithValue("$s",game.System);cmd.Parameters.AddWithValue("$f",game.Favorite?1:0);cmd.Parameters.AddWithValue("$d",(object?)game.LastPlayed?.ToString("O")??DBNull.Value);cmd.Parameters.AddWithValue("$n",Math.Max(0,game.PlayCount));cmd.ExecuteNonQuery();
         }tx.Commit();
     }
