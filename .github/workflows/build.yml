@@ -34,7 +34,10 @@ jobs:
         run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
       - name: Include installation script and documentation
         shell: pwsh
-        run: Copy-Item README.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1 -Destination publish/
+        run: Copy-Item README.md, STORAGE_AND_THEMES.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
+      - name: Verify selectable installation and update paths
+        shell: pwsh
+        run: ./scripts/test-installation.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: EmuVora-win-x64

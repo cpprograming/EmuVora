@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Themes.Fluent;
 using Avalonia.Controls;
 using Avalonia.Media;
+using EmuVora.Core;
 namespace EmuVora.App;
 public class App : Application
 {
@@ -11,10 +12,19 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            try{desktop.MainWindow=new MainWindow();}
+            var localLocator=Path.Combine(AppContext.BaseDirectory,"emuvora-location.json");
+            var location=new DataLocation(File.Exists(localLocator)?localLocator:DataLocation.BootstrapFile);
+            string? saved=null;
+            void Start(Window window){desktop.MainWindow=window;window.Show();}
+            try
+            {
+                saved=location.Read();
+                if(saved==null)desktop.MainWindow=new LocationWindow(location,Start);
+                else {DataLocation.CheckAvailable(saved);desktop.MainWindow=new MainWindow(saved);}
+            }
             catch(Exception ex)
             {
-                desktop.MainWindow=new Window {Title="EmuVora – Startproblem",Width=650,Height=300,Content=new TextBlock {Margin=new Thickness(24),TextWrapping=TextWrapping.Wrap,Text="EmuVora konnte die Bibliothek nicht öffnen.\n\n"+ex.Message+"\n\nBitte die Dateien in %LOCALAPPDATA%\\EmuVora sichern und Berechtigungen bzw. library.db prüfen. Vorhandene Daten wurden nicht gelöscht."}};
+                desktop.MainWindow=new LocationWindow(location,Start,saved,ex.Message+"\nVorhandene Daten wurden nicht gelöscht.");
             }
         }
         base.OnFrameworkInitializationCompleted();

@@ -18,6 +18,26 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact] public void FirstStartShowsFolderChoiceAndRenders()
+    {
+        using var dir=new TestDirectory();var window=new LocationWindow(new DataLocation(System.IO.Path.Combine(dir.Path,"bootstrap.json")),_=>{},dir.Path);window.Show();
+        Assert.Contains(window.GetVisualDescendants().OfType<Button>(),b=>b.Content as string=="Festplatte / Ordner auswählen …");
+        Assert.Contains(window.GetVisualDescendants().OfType<TextBox>(),t=>t.Text==dir.Path);
+        using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Storage-choice.png"));}window.Close();
+    }
+    [AvaloniaFact] public void ImportedThemeChangesColorAndSvgLogoWithConsoleFilter()
+    {
+        using var dir=new TestDirectory();var theme=System.IO.Path.Combine(dir.Path,"theme");
+        dir.File("theme/nes/theme.xml","<theme><formatVersion>3</formatVersion><view name='detailed'><textlist name='gamelist'><primaryColor>FFCC00</primaryColor></textlist><image name='logo'><path>logo.svg</path></image></view></theme>");
+        dir.File("theme/nes/logo.svg","<svg xmlns='http://www.w3.org/2000/svg' width='160' height='50'><rect width='160' height='50' rx='8' fill='#e43131'/><text x='30' y='35' fill='white' font-size='30'>NES</text></svg>");
+        dir.File("theme/snes/theme.xml","<theme><formatVersion>3</formatVersion><view name='detailed'><textlist name='gamelist'><primaryColor>00FF00</primaryColor></textlist></view></theme>");
+        new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){EmulationStationTheme=theme,CheckUpdatesOnStartup=false});
+        new LibraryStore(System.IO.Path.Combine(dir.Path,"library.db")).Restore([new("Mario","NES",dir.File("Mario.nes")),new("Zelda","SNES",dir.File("Zelda.sfc"))]);
+        var window=new MainWindow(dir.Path);window.Show();var list=window.GetVisualDescendants().OfType<ListBox>().Single();var console=window.GetVisualDescendants().OfType<ComboBox>().First(c=>c.Items.Contains("Alle Konsolen"));console.SelectedItem="NES";
+        Assert.Equal(Avalonia.Media.Color.Parse("#FFCC00"),Assert.IsType<Avalonia.Media.SolidColorBrush>(list.Foreground).Color);Assert.Contains(window.GetVisualDescendants().OfType<Image>(),i=>i.Source!=null&&i.Height==70);
+        using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"ES-theme.png"));}
+        console.SelectedItem="SNES";Assert.Equal(Avalonia.Media.Colors.Lime,Assert.IsType<Avalonia.Media.SolidColorBrush>(list.Foreground).Color);Assert.DoesNotContain(window.GetVisualDescendants().OfType<Image>(),i=>i.Source!=null&&i.Height==70);window.Close();
+    }
     [AvaloniaFact] public void AutomaticSetupAndXboxOptionsAreVisibleInSettings()
     {
         using var dir=new TestDirectory();new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){CheckUpdatesOnStartup=false});

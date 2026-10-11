@@ -7,6 +7,7 @@ EmuVora uses the following independently licensed libraries:
 - [SQLitePCLRaw](https://github.com/ericsink/SQLitePCL.raw): Apache-2.0; SQLite is public domain.
 - [SharpCompress](https://github.com/adamhathcock/sharpcompress): MIT; additional codec notices are maintained by that project.
 - [SkiaSharp](https://github.com/mono/SkiaSharp): MIT; Skia and native dependencies have their own notices.
+- [Svg.Skia](https://github.com/wieslawsoltes/Svg.Skia) 3.0.2: MIT, including its SVG/ShimSkiaSharp dependencies. Imported theme assets remain subject to their authors' licenses; none are bundled.
 - Test-only: xUnit, Microsoft.NET.Test.Sdk, Avalonia.Headless.XUnit, under their respective licenses.
 
 Downloaded emulator packages are provided by their original projects. Their bundled license/notice files remain in each installation directory:
