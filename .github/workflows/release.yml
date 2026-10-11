@@ -14,7 +14,7 @@ jobs:
           dotnet-version: '10.0.x'
       - run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
       - shell: pwsh
-        run: Copy-Item README.md, STORAGE_AND_THEMES.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
+        run: Copy-Item README.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
       - shell: pwsh
         run: Compress-Archive -Path publish/* -DestinationPath EmuVora-win-x64.zip
       - uses: softprops/action-gh-release@v2

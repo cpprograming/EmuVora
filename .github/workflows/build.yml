@@ -16,9 +16,12 @@ jobs:
         run: dotnet restore EmuVora.sln
       - name: Build
         run: dotnet build EmuVora.sln --no-restore -c Release
+      - name: Build process-launch verification helper
+        run: dotnet publish tests/EmuVora.LaunchProbe/EmuVora.LaunchProbe.csproj -c Release -r win-x64 --self-contained false -o launch-probe
       - name: Test
         env:
           EMUVORA_SCREENSHOTS: ${{ github.workspace }}/screenshots
+          EMUVORA_LAUNCH_PROBE: ${{ github.workspace }}/launch-probe/EmuVora.LaunchProbe.exe
         run: dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj --no-build -c Release --filter "Category!=Network"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -34,7 +37,7 @@ jobs:
         run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
       - name: Include installation script and documentation
         shell: pwsh
-        run: Copy-Item README.md, STORAGE_AND_THEMES.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
+        run: Copy-Item README.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
       - name: Verify selectable installation and update paths
         shell: pwsh
         run: ./scripts/test-installation.ps1

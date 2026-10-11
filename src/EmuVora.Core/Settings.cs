@@ -4,6 +4,8 @@ public sealed class AppSettings
 {
     public string Theme {get;set;}="Midnight";
     public string? EmulationStationTheme {get;set;}
+    public string? EsDeExecutable {get;set;}
+    public bool StartInEsDe {get;set;}
     public Dictionary<string,string> EmulatorPaths {get;set;}=[];
     public Dictionary<string,string> CorePaths {get;set;}=[];
     public Dictionary<string,string> Covers {get;set;}=[];
