@@ -38,8 +38,8 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
     }
     private async Task<IndexedCover[]> Index(string repository,CancellationToken token)
     {
-        if(indexes.TryGetValue(repository,out var cached))return cached;
         if(unavailable.TryGetValue(repository,out var error))throw new IOException(error);
+        if(indexes.TryGetValue(repository,out var cached))return cached;
         var file=Path.Combine(cacheDirectory,repository+".json");string[]? names=null;
         if(File.Exists(file)&&new FileInfo(file).Length<=12_000_000&&File.GetLastWriteTimeUtc(file)>DateTime.UtcNow.AddDays(-30))
             try{names=JsonSerializer.Deserialize<string[]>(await File.ReadAllTextAsync(file,token));}catch(JsonException){ }
@@ -70,6 +70,7 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
         var name=Match(game.Title,await Index(repository,token),region);if(name==null)return null;
         var url=$"https://raw.githubusercontent.com/libretro-thumbnails/{repository}/master/Named_Boxarts/{Uri.EscapeDataString(name)}";
         using var response=await http.GetAsync(url,HttpCompletionOption.ResponseHeadersRead,token);if(response.StatusCode==HttpStatusCode.NotFound)return null;
+        if(response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests){var error="GitHub-Coverlimit erreicht. Später erneut versuchen; vorhandene Cover bleiben erhalten.";unavailable[repository]=error;throw new IOException(error);}
         var image=await ReadBounded(response,10_000_000,token);
         if(image.Length<24||!image.AsSpan(0,8).SequenceEqual(new byte[]{137,80,78,71,13,10,26,10}))throw new IOException("Die Coverquelle liefert kein PNG-Bild.");
         var width=BinaryPrimitives.ReadUInt32BigEndian(image.AsSpan(16,4));var height=BinaryPrimitives.ReadUInt32BigEndian(image.AsSpan(20,4));

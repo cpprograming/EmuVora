@@ -312,6 +312,7 @@ public sealed class MainWindow : Window
             if(file==null){status.Text="Kein passender Cover-Titel. Titel / Konsole prüfen oder eigenes Cover wählen.";return;}
             try{using var stream=File.OpenRead(file);using var image=Bitmap.DecodeToWidth(stream,480);}
             catch{File.Delete(file);throw;}
+            if(coverImages.Remove(file,out var previousImage))previousImage.Dispose();
             settings.Covers[game.Path]=file;settingsStore.Save(settings);Refresh(game.Path);status.Text="Cover gespeichert · Quelle: libretro-thumbnails.";
         });
     }
@@ -596,7 +597,7 @@ public sealed class MainWindow : Window
     private static void PreserveConfiguration(string previous,string next)
     {
         var source=Path.GetDirectoryName(previous)!;var destination=Path.GetDirectoryName(next)!;
-        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","retroarch-core-options.cfg.emuvora-defaults.json","portable.ini","portable.txt","settings.ini","retroarch.cfg.emuvora-defaults.json","settings.ini.emuvora-defaults.json",".emuvora-configured"})if(File.Exists(Path.Combine(source,name))&&(File.GetAttributes(Path.Combine(source,name))&FileAttributes.ReparsePoint)==0)File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
+        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","retroarch-core-options.cfg.emuvora-defaults.json","portable.ini","portable.txt","settings.ini","retroarch.cfg.emuvora-defaults.json","settings.ini.emuvora-defaults.json",".emuvora-configured",".emuvora-video-profile","retroarch.cfg.emuvora-video-original.bak","settings.ini.emuvora-video-original.bak"})if(File.Exists(Path.Combine(source,name))&&(File.GetAttributes(Path.Combine(source,name))&FileAttributes.ReparsePoint)==0)File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
         foreach(var name in new[]{"memstick","inis","memcards","sstates","bios","system","saves","states","config","autoconfig","playlists","cheats","User"})
         {
             var folder=Path.Combine(source,name);if(!Directory.Exists(folder)||(File.GetAttributes(folder)&FileAttributes.ReparsePoint)!=0)continue;
