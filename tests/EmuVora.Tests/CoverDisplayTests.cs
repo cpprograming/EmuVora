@@ -12,6 +12,7 @@ public class CoverDisplayTests
         Assert.Equal(names[1],CoverCatalog.Match("Super Mario World [!].sfc".Replace(".sfc",""),names));
         Assert.Equal(names[0],CoverCatalog.Match("Super Mario World (USA)",names));Assert.Null(CoverCatalog.Match("Super Mario",names));
         Assert.Equal(names[2],CoverCatalog.Match("Super Mario World 2: Yoshi’s Island",names));
+        Assert.Equal("Legend of Zelda, The (USA).png",CoverCatalog.Match("The Legend of Zelda",["Legend of Zelda, The (USA).png"]));
     }
     private sealed class Source:HttpMessageHandler
     {
@@ -62,6 +63,12 @@ public class CoverDisplayTests
         var ps2=File.ReadAllText(Path.Combine(dir.Path,"pcsx2/inis/PCSX2.ini"));Assert.Contains("AspectRatio = Auto 4:3/3:2",ps2);Assert.Contains("upscale_multiplier = 2",ps2);
         var dolphin=File.ReadAllText(Path.Combine(dir.Path,"dolphin/User/Config/GFX.ini"));Assert.Contains("AspectRatio = 0",dolphin);Assert.Contains("InternalResolution = 2",dolphin);
         var psp=File.ReadAllText(Path.Combine(dir.Path,"ppsspp/memstick/PSP/SYSTEM/ppsspp.ini"));Assert.Contains("[DisplayLayout.Landscape]",psp);Assert.Contains("DisplayStretch = False",psp);Assert.Contains("BufferFiltering = 2",psp);
+    }
+    [Fact] public void AGameWidescreenOverrideReturnsToAutomaticForTheNextGame()
+    {
+        using var dir=new TestDirectory();var executable=dir.File("ps2/program.exe");var settings=new AppSettings();settings.GameAspectRatios["wide.iso"]="16:9";
+        DisplayProfiles.Apply("pcsx2",executable,"PS2",null,settings,gamePath:"wide.iso");var file=Path.Combine(dir.Path,"ps2/inis/PCSX2.ini");Assert.Contains("AspectRatio = 16:9",File.ReadAllText(file));
+        DisplayProfiles.Apply("pcsx2",executable,"PS2",null,settings,gamePath:"normal.iso");Assert.Contains("AspectRatio = Auto 4:3/3:2",File.ReadAllText(file));
     }
     [Fact][Trait("Category","Network")] public async Task RealCoverIndexResolvesARegionalTitleAndDownloadsPng()
     {

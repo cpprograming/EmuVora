@@ -15,7 +15,7 @@ public sealed class ManagedGameLauncher
 {
     public static Game FindGame(EsDeLaunchRequest request,LibraryStore store)
         =>store.GetAll().FirstOrDefault(g=>EsDeFrontend.GameId(g)==request.GameId)??throw new IOException("Das Spiel ist nicht mehr in der EmuVora-Bibliothek. Bitte den ES-DE-Modus neu öffnen, um die Liste abzugleichen.");
-    public static async Task RunAsync(EsDeLaunchRequest request,int firstController,Action started,IProgress<DownloadProgress>? progress=null,CancellationToken token=default)
+    public static async Task RunAsync(EsDeLaunchRequest request,int firstController,Action started,IProgress<DownloadProgress>? progress=null,CancellationToken token=default,DisplayInfo? monitor=null)
     {
         DataLocation.CheckAvailable(request.DataDirectory);
         // Serialize launches across ES-DE processes. Never execute commands from the stub.
@@ -51,7 +51,7 @@ public sealed class ManagedGameLauncher
         if(settings.Packages.TryGetValue(definition.Id,out var managed)&&managed.ExecutablePath==executable)
         {
             if(settings.AutomaticSetup)EmulatorSetup.Configure(definition.Id,executable,request.DataDirectory,settings.XboxDefaults,settings.Fullscreen,firstController:firstController);
-            DisplayProfiles.Apply(definition.Id,executable,game.System,DisplayDetection.Current(),settings);
+            DisplayProfiles.Apply(definition.Id,executable,game.System,monitor??DisplayDetection.Current(),settings,gamePath:game.Path);
             var hint=EmulatorSetup.FirmwareHint(game.System,request.DataDirectory,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,request.DataDirectory));if(hint!=null)throw new IOException(hint);
         }
         progress?.Report(new("Spiel wird gestartet …"));

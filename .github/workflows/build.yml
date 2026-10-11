@@ -23,16 +23,17 @@ jobs:
           EMUVORA_SCREENSHOTS: ${{ github.workspace }}/screenshots
           EMUVORA_LAUNCH_PROBE: ${{ github.workspace }}/launch-probe/EmuVora.LaunchProbe.exe
         run: dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj --no-build -c Release --filter "Category!=Network"
+      - name: Verify real official emulator archives
+        env:
+          EMUVORA_PACKAGE_CATALOG: ${{ github.workspace }}/catalog/packages.json
+          EMUVORA_SCREENSHOTS: ${{ github.workspace }}/screenshots
+        run: dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj --no-build -c Release --filter "Category=Network"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: EmuVora-UI-previews
           path: screenshots/
           if-no-files-found: ignore
-      - name: Verify real official emulator archives
-        env:
-          EMUVORA_PACKAGE_CATALOG: ${{ github.workspace }}/catalog/packages.json
-        run: dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj --no-build -c Release --filter "Category=Network"
       - name: Publish Windows portable
         run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
       - name: Include installation script and documentation
@@ -48,6 +49,9 @@ jobs:
           Compress-Archive -Path publish/* -DestinationPath portable.zip
           New-Item -ItemType Directory setup-output | Out-Null
           ./installer/build-setup.ps1 -PackageZip portable.zip -OutputPath setup-output/EmuVora-Setup-v0.6.exe
+      - name: Verify setup EXE installation and data retention
+        shell: pwsh
+        run: ./scripts/test-setup-exe.ps1 -SetupExe setup-output/EmuVora-Setup-v0.6.exe
       - uses: actions/upload-artifact@v4
         with:
           name: EmuVora-Setup-win-x64

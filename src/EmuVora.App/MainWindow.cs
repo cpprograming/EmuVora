@@ -82,7 +82,7 @@ public sealed class MainWindow : Window
         sidebar.Children.Add(new TextBlock {Text="DEINE BIBLIOTHEK",FontSize=11,Opacity=0.65});
         foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt"})
         {
-            var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;sidebar.Children.Add(item);
+            var item=ActionButton(name,()=>{view=name;systems.SelectedItem="Alle Konsolen";Refresh();});item.HorizontalContentAlignment=HorizontalAlignment.Left;viewButtons[name]=item;sidebar.Children.Add(item);
         }
         sidebar.Children.Add(new TextBlock{Text="KONSOLEN",FontSize=11,Opacity=0.65,Margin=new(0,16,0,4)});sidebar.Children.Add(consoleNavigation);
         sidebar.Children.Add(new Separator {Margin=new(0,12)});
@@ -92,7 +92,7 @@ public sealed class MainWindow : Window
         sidebar.Children.Add(AsyncButton("Einstellungen",()=>ShowSettingsAsync()));
         sidebar.Children.Add(AsyncButton("AlekFull NX · ES-DE öffnen",()=>OpenEsDeAsync()));
         var tools=new StackPanel{Spacing=6};foreach(var name in new[]{"Konsole zuordnen","Fehlende Dateien"}){var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;tools.Children.Add(item);}
-        tools.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));tools.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));tools.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));sidebar.Children.Add(new Expander{Header="Bibliothek verwalten",Content=tools});
+        tools.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));tools.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));tools.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));sidebar.Children.Add(new Expander{Header="Verwaltung",Content=tools});
         sidebar.Children.Add(controllerStatus);
         sidebar.Children.Add(themeStatus);
         sidebar.Children.Add(new TextBlock {Text="Windows · v0.6\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
@@ -177,7 +177,7 @@ public sealed class MainWindow : Window
     {
         var previous=systems.SelectedItem as string;var choices=new[]{"Alle Konsolen"}.Concat(allGames.Select(g=>g.System).Distinct().Order()).ToArray();
         systems.ItemsSource=choices;systems.SelectedItem=previous!=null&&choices.Contains(previous)?previous:"Alle Konsolen";
-        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console+" · "+group.Count(),()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});consoleNavigation.Children.Add(item);}
+        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console+" · "+group.Count(),()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});item.Tag=console;item.HorizontalContentAlignment=HorizontalAlignment.Left;consoleNavigation.Children.Add(item);}
     }
     private void Reload(string? selected=null)
     {allGames=store.GetAll();UpdateSystems();Refresh(selected);}
@@ -191,7 +191,8 @@ public sealed class MainWindow : Window
         empty.IsVisible=result.Length==0;empty.Text=allGames.Count==0?"Deine Bibliothek ist leer.\nImportiere einen Ordner mit deinen ROMs.":"Hier sind keine Spiele.\nPasse Suche, Konsole oder Bibliotheksansicht an.";
         summary.Text=$"{view}\n{result.Length} von {allGames.Count} Spielen";UpdateSelected();
         ApplyExternalTheme();
-        foreach(var(name,button)in viewButtons)button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;
+        var selectedBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D2E1FA":"#29405F");foreach(var(name,button)in viewButtons){button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;button.Background=name==view?selectedBrush:Brushes.Transparent;}
+        foreach(var button in consoleNavigation.Children.OfType<Button>())button.Background=button.Tag as string==console?selectedBrush:Brushes.Transparent;
     }
     private Control Artwork(Game game,int width)
     {
@@ -220,7 +221,7 @@ public sealed class MainWindow : Window
         detailTitle.Text=game?.Title??"Spiel auswählen";detailCover.Content=game==null?null:Artwork(game,220);
         favorite.Content=game?.Favorite==true?"★ Favorit entfernen":"☆ Als Favorit merken";
         detailInfo.Text=game==null?"Wähle ein Spiel, um zu starten oder Details zu bearbeiten.":$"{game.System}\n{game.PlayCount} Starts · {(game.LastPlayed is{} last?last.ToLocalTime().ToString("g"):"Noch nicht gespielt")}";
-        ToolTip.SetTip(detailInfo,game?.Path);displayStatus.Text=game==null?"":DisplayProfiles.Description(game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings);
+        ToolTip.SetTip(detailInfo,game?.Path);displayStatus.Text=game==null?"":DisplayProfiles.Description(game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,game.Path);
         ApplyExternalTheme();
     }
     private async Task<bool> BusyAsync(Func<CancellationToken,Task> action)
@@ -251,7 +252,8 @@ public sealed class MainWindow : Window
     {
         if(Selected is not{} game)return;var title=new TextBox {Text=game.Title};var console=new ComboBox {ItemsSource=EmulatorCatalog.Systems,SelectedItem=game.System};
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Spieldetails",FontSize=24});panel.Children.Add(new TextBlock {Text="Titel"});panel.Children.Add(title);panel.Children.Add(new TextBlock {Text="Konsole"});panel.Children.Add(console);
-        var dialog=Dialog("Spieldetails",panel);panel.Children.Add(ActionButton("Speichern",()=>{if(string.IsNullOrWhiteSpace(title.Text)||console.SelectedItem is not string system){status.Text="Titel und Konsole wählen.";return;}store.Update(game with {Title=title.Text.Trim(),System=system});Reload(game.Path);dialog.Close();}));await dialog.ShowDialog(this);
+        panel.Children.Add(new TextBlock{Text="Bildformat für dieses Spiel"});var aspect=new ComboBox{ItemsSource=new[]{"Automatisch · Originalformat","4:3","16:9"},SelectedIndex=settings.GameAspectRatios.GetValueOrDefault(game.Path) switch{"4:3"=>1,"16:9"=>2,_=>0}};panel.Children.Add(aspect);panel.Children.Add(new TextBlock{Text="Bei PS2-Breitbildspielen 16:9 hier und im Spiel wählen. Für andere Spiele bleibt die Formaterkennung des Emulators aktiv. Gilt für verwaltete Downloads mit aktivem Bildprofil.",TextWrapping=TextWrapping.Wrap});
+        var dialog=Dialog("Spieldetails",panel);panel.Children.Add(ActionButton("Speichern",()=>{if(string.IsNullOrWhiteSpace(title.Text)||console.SelectedItem is not string system){status.Text="Titel und Konsole wählen.";return;}store.Update(game with {Title=title.Text.Trim(),System=system});if(aspect.SelectedIndex==0)settings.GameAspectRatios.Remove(game.Path);else settings.GameAspectRatios[game.Path]=aspect.SelectedIndex==1?"4:3":"16:9";settingsStore.Save(settings);Reload(game.Path);dialog.Close();}));await dialog.ShowDialog(this);
     }
     private Window Dialog(string title,Control content)
     {
@@ -291,7 +293,7 @@ public sealed class MainWindow : Window
             if(string.IsNullOrEmpty(executable)||!File.Exists(executable)){status.Text=$"{definition.Name} zuerst unter „Emulatoren einrichten“ installieren oder auswählen.";await ShowSettingsAsync(definition.Id);return;}
             if(settings.Packages.TryGetValue(definition.Id,out var managed)&&managed.ExecutablePath==executable)
             {
-                DisplayProfiles.Apply(definition.Id,executable,game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings);
+                DisplayProfiles.Apply(definition.Id,executable,game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,gamePath:game.Path);
                 var hint=EmulatorSetup.FirmwareHint(game.System,dataDir,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,dataDir));
                 if(hint!=null){status.Text=hint;await ShowSettingsAsync(definition.Id);return;}
             }

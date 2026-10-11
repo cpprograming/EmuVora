@@ -18,7 +18,7 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
     private static readonly Regex Tags=new(@"\([^)]*\)|\[[^]]*\]",RegexOptions.Compiled);
     public static string Normalize(string title)
     {
-        var text=Tags.Replace(title,"").Normalize(NormalizationForm.FormD);
+        var text=Tags.Replace(title,"").Trim();text=Regex.Replace(text,@"^(the|a|an)\s+", "",RegexOptions.IgnoreCase);text=Regex.Replace(text,@",\s*(the|a|an)\s*$", "",RegexOptions.IgnoreCase);text=text.Normalize(NormalizationForm.FormD);
         return new string(text.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
     }
     public static string? Match(string title,IEnumerable<string> names,string region="Europe")=>Match(title,names.Select(n=>new IndexedCover(n,Normalize(Path.GetFileNameWithoutExtension(n)))).ToArray(),region);

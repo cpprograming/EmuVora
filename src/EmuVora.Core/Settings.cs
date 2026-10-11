@@ -24,6 +24,7 @@ public sealed class AppSettings
     public bool AutomaticDisplay {get;set;}=true;
     public string DisplayMode {get;set;}="Automatic";
     public int MaximumRenderScale {get;set;}=3;
+    public Dictionary<string,string> GameAspectRatios {get;set;}=[];
 }
 public record InstalledPackage(string Version,string ExecutablePath,string? PreviousExecutablePath=null);
 public sealed class SettingsStore(string file)
@@ -37,6 +38,7 @@ public sealed class SettingsStore(string file)
         {
             var settings=JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(file),JsonOptions)??new();
             settings.EmulatorPaths??=[];settings.CorePaths??=[];settings.Covers??=[];settings.PreferredEmulators??=[];settings.Packages??=[];settings.RomFolders??=[];
+            settings.GameAspectRatios??=[];
             if(settings.CorePaths.TryGetValue("retroarch",out var legacy))foreach(var system in EmulatorCatalog.Get("retroarch").Systems)settings.CorePaths.TryAdd(system,legacy);
             return settings;
         }

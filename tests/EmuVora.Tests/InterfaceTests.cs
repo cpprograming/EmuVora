@@ -18,6 +18,15 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact][Trait("Category","Network")] public async Task RealDownloadedCoversRenderInTheUnifiedLibrary()
+    {
+        using var dir=new TestDirectory();using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,System.IO.Path.Combine(dir.Path,"cache"));var settings=new AppSettings{CheckUpdatesOnStartup=false,AutoDownloadCovers=false};
+        var games=new[]{new Game("Super Mario World","SNES",dir.File("Mario.sfc"),true),new Game("Super Metroid","SNES",dir.File("Metroid.sfc")),new Game("Donkey Kong Country","SNES",dir.File("DKC.sfc"))};
+        foreach(var game in games){var cover=await source.DownloadAsync(game,System.IO.Path.Combine(dir.Path,"covers"));Assert.NotNull(cover);settings.Covers[game.Path]=cover!;}
+        new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(settings);new LibraryStore(dir.File("library.db","")).Restore(games);
+        var window=new MainWindow(dir.Path);window.Show();window.GetVisualDescendants().OfType<ListBox>().Single().SelectedIndex=0;Dispatcher.UIThread.RunJobs();Assert.True(window.GetVisualDescendants().OfType<Image>().Count(i=>i.Source!=null)>=3);
+        using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Library-real-covers.png"));}window.Close();
+    }
     [AvaloniaFact] public void LibraryAndDisplayOptionsPersistAndRenderInTheirOwnTabs()
     {
         using var dir=new TestDirectory();var store=new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json"));store.Save(new(){CheckUpdatesOnStartup=false,AutoDownloadCovers=false});
@@ -25,7 +34,7 @@ public class InterfaceTests
         var dialog=Assert.Single(window.OwnedWindows);var tabs=dialog.GetVisualDescendants().OfType<TabControl>().Single();Assert.Equal(4,tabs.ItemCount);
         var covers=dialog.GetVisualDescendants().OfType<CheckBox>().First(c=>c.Content as string=="Fehlende Cover beim Start und nach einem Import automatisch laden");covers.IsChecked=true;Assert.True(store.Load().AutoDownloadCovers);
         tabs.SelectedIndex=1;Dispatcher.UIThread.RunJobs();var mode=dialog.GetVisualDescendants().OfType<ComboBox>().First(c=>c.Items.Contains("Pixelgenau · ganze Skalierungsstufen"));mode.SelectedIndex=1;Assert.Equal("PixelPerfect",store.Load().DisplayMode);
-        using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Display-options.png"));}dialog.Close();window.Close();
+        Dispatcher.UIThread.RunJobs();using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Display-options.png"));}dialog.Close();window.Close();
     }
     [AvaloniaFact] public void NativeGameLaunchFailureShowsSetupAndReturnActions()
     {
