@@ -40,6 +40,6 @@ public class StorageThemeTests
     }
     [AvaloniaFact] public void StandardSvgDoctypeIsIgnoredWithoutResolvingExternalDtd()
     {
-        using var dir=new TestDirectory();var svg=dir.File("standard.svg","<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'https://invalid.example/unavailable.dtd'><svg xmlns='http://www.w3.org/2000/svg' width='120' height='60'><rect width='120' height='60' fill='#ff0000'/></svg>");using var image=ThemeArtwork.Load(svg);Assert.True(image.PixelSize.Width>0);
+        using var dir=new TestDirectory();var svg=dir.File("standard.svg","<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'https://invalid.example/unavailable.dtd' [<!ENTITY ns_extend 'http://ns.adobe.com/Extensibility/1.0/'>]><svg xmlns='http://www.w3.org/2000/svg' xmlns:x='&ns_extend;' width='120' height='60'><rect width='120' height='60' fill='#ff0000'/></svg>");using var image=ThemeArtwork.Load(svg);Assert.True(image.PixelSize.Width>0);
     }
 }

@@ -14,10 +14,11 @@ public static class ThemeArtwork
         if(new FileInfo(file).Length>16*1024*1024)throw new IOException("Theme-Bild ist zu groß.");
         if(!Path.GetExtension(file).Equals(".svg",StringComparison.OrdinalIgnoreCase))
         {using var stream=File.OpenRead(file);return Bitmap.DecodeToWidth(stream,1920);}
-        // Illustrator/Inkscape logos commonly declare the public SVG DTD. Ignore it;
-        // never resolve external DTDs/entities. Serialize the parsed document without it.
-        using var reader=XmlReader.Create(file,new(){DtdProcessing=DtdProcessing.Ignore,XmlResolver=null,MaxCharactersInDocument=16*1024*1024});
+        // Illustrator logos define local namespace entities in their DOCTYPE.
+        // Bound expansion and disable external resolution, then remove the DTD.
+        using var reader=XmlReader.Create(file,new(){DtdProcessing=DtdProcessing.Parse,XmlResolver=null,MaxCharactersFromEntities=65536,MaxCharactersInDocument=16*1024*1024});
         var document=XDocument.Load(reader);
+        document.DocumentType?.Remove();
         foreach(var instruction in document.DescendantNodes().OfType<XProcessingInstruction>().ToArray())instruction.Remove();
         foreach(var node in document.Descendants())
         {
