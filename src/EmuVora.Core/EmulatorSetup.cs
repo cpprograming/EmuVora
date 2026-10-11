@@ -45,7 +45,7 @@ public static class EmulatorSetup
                 ["Display"]=new(){{"StartFullscreen",fullscreen?"true":"false"}}
             };
             if(!duck)sections.Remove("BIOS");
-            if(!duck&&FindPlayStationBios("PS2",firmware) is{} ps2Bios)sections["EmuCore"]=new(){{"BiosFilename",Path.GetFileName(ps2Bios)}};
+            if(!duck&&FindPlayStationBios("PS2",firmware) is{} ps2Bios)sections["Filenames"]=new(){{"BIOS",Path.GetFileName(ps2Bios)}};
             if(xbox)
             {
                 sections["InputSources"]=new(){{"XInput","true"},{"SDL","false"}};
@@ -66,6 +66,7 @@ public static class EmulatorSetup
                     var p=new Dictionary<string,string>{{"Device",$"XInput/{(firstController+port-1)%4}/Gamepad"},{"Main Stick/Dead Zone","15.0"},{"C-Stick/Dead Zone","15.0"},{"Rumble/Motor","`Motor L` | `Motor R`"}};
                     foreach(var (button,value) in new Dictionary<string,string>{{"Buttons/A","Button A"},{"Buttons/B","Button B"},{"Buttons/X","Button X"},{"Buttons/Y","Button Y"},{"Buttons/Z","Shoulder R"},{"Buttons/Start","Start"},{"D-Pad/Up","Pad N"},{"D-Pad/Down","Pad S"},{"D-Pad/Left","Pad W"},{"D-Pad/Right","Pad E"},{"Main Stick/Up","Left Y+"},{"Main Stick/Down","Left Y-"},{"Main Stick/Left","Left X-"},{"Main Stick/Right","Left X+"},{"C-Stick/Up","Right Y+"},{"C-Stick/Down","Right Y-"},{"C-Stick/Left","Right X-"},{"C-Stick/Right","Right X+"},{"Triggers/L","Trigger L"},{"Triggers/R","Trigger R"}})p[button]="`"+value+"`";
                     pads[$"GCPad{port}"]=p;
+                    p["Triggers/L-Analog"]="`Trigger L`";p["Triggers/R-Analog"]="`Trigger R`";
                 }
                 Merge(Path.Combine(root,"User/Config/GCPadNew.ini"),pads,replace);
                 var wii=new Dictionary<string,string>{{"Device",$"XInput/{firstController}/Gamepad"},{"Source","1"},{"Extension","Nunchuk"},{"Buttons/A","`Button A`"},{"Buttons/B","`Trigger R`"},{"Buttons/1","`Button X`"},{"Buttons/2","`Button Y`"},{"Buttons/+","`Start`"},{"Buttons/-","`Back`"},{"Buttons/Home","`Thumb R`"},{"D-Pad/Up","`Pad N`"},{"D-Pad/Down","`Pad S`"},{"D-Pad/Left","`Pad W`"},{"D-Pad/Right","`Pad E`"},{"Nunchuk/Buttons/C","`Shoulder L`"},{"Nunchuk/Buttons/Z","`Trigger L`"},{"Nunchuk/Stick/Up","`Left Y+`"},{"Nunchuk/Stick/Down","`Left Y-`"},{"Nunchuk/Stick/Left","`Left X-`"},{"Nunchuk/Stick/Right","`Left X+`"},{"Shake/X","`Shoulder R`"},{"Shake/Y","`Shoulder R`"},{"Shake/Z","`Shoulder R`"},{"IR/Up","`Right Y+`"},{"IR/Down","`Right Y-`"},{"IR/Left","`Right X-`"},{"IR/Right","`Right X+`"},{"IR/Relative Input","True"}};

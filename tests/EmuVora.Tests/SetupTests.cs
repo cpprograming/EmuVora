@@ -44,6 +44,11 @@ public class SetupTests
         using var dir=new TestDirectory();var exe=dir.File("retro/program.exe");var config=dir.File("retro/retroarch.cfg","input_joypad_driver = \"sdl2\"\nsystem_directory = \"../my-bios\"\n");
         EmulatorSetup.Configure("retroarch",exe,dir.Path);Assert.Contains("input_joypad_driver = \"sdl2\"",System.IO.File.ReadAllText(config));Assert.Equal(System.IO.Path.GetFullPath(System.IO.Path.Combine(dir.Path,"my-bios")),EmulatorSetup.ConfiguredFirmwareDirectory("retroarch",exe,dir.Path));
     }
+    [Fact] public void Pcsx2SelectsImportedBiosUsingTheOfficialFilenamesSetting()
+    {
+        using var dir=new TestDirectory();var exe=dir.File("pcsx2/program.exe");var firmware=EmulatorSetup.FirmwareDirectory(dir.Path);Directory.CreateDirectory(firmware);System.IO.File.WriteAllBytes(System.IO.Path.Combine(firmware,"ps2.bin"),new byte[4*1024*1024]);
+        EmulatorSetup.Configure("pcsx2",exe,dir.Path);var config=System.IO.File.ReadAllText(System.IO.Path.Combine(dir.Path,"pcsx2/inis/PCSX2.ini"));Assert.Contains("[Filenames]",config);Assert.Contains("BIOS = ps2.bin",config);Assert.Null(EmulatorSetup.FirmwareHint("PS2",dir.Path));
+    }
     [Fact] public void FirmwareImportRoutesSubdirectoriesAndChecksAdditionalFiles()
     {
         using var dir=new TestDirectory();var data=System.IO.Path.Combine(dir.Path,"data");var file=dir.File("sources/dc_boot.bin","firmware");
