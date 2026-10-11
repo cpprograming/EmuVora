@@ -14,8 +14,11 @@ public static class ThemeArtwork
         if(new FileInfo(file).Length>16*1024*1024)throw new IOException("Theme-Bild ist zu groß.");
         if(!Path.GetExtension(file).Equals(".svg",StringComparison.OrdinalIgnoreCase))
         {using var stream=File.OpenRead(file);return Bitmap.DecodeToWidth(stream,1920);}
-        using var reader=XmlReader.Create(file,new(){DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=16*1024*1024});
+        // Illustrator/Inkscape logos commonly declare the public SVG DTD. Ignore it;
+        // never resolve external DTDs/entities. Serialize the parsed document without it.
+        using var reader=XmlReader.Create(file,new(){DtdProcessing=DtdProcessing.Ignore,XmlResolver=null,MaxCharactersInDocument=16*1024*1024});
         var document=XDocument.Load(reader);
+        foreach(var instruction in document.DescendantNodes().OfType<XProcessingInstruction>().ToArray())instruction.Remove();
         foreach(var node in document.Descendants())
         {
             if(node.Name.LocalName is "script" or "image" or "foreignObject")throw new IOException("SVG mit externen/aktiven Inhalten wird nicht geladen.");
