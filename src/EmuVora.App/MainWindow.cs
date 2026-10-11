@@ -42,6 +42,12 @@ public sealed class MainWindow : Window
     private readonly Button reveal=new(){Content="ROM-Ordner öffnen",IsEnabled=false};
     private readonly Border sideBorder=new();
     private readonly Border detailBorder=new();
+    private readonly Image themeBackground=new(){Stretch=Stretch.UniformToFill,Opacity=0.25,IsHitTestVisible=false};
+    private readonly Image themeLogo=new(){Height=70,MaxWidth=200,Stretch=Stretch.Uniform,IsVisible=false};
+    private readonly Dictionary<string,Bitmap> themeImages=new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string,EmulationStationTheme> loadedThemes=new(StringComparer.OrdinalIgnoreCase);
+    private string? currentThemeSystem;
+    private readonly TextBlock themeStatus=new(){TextWrapping=TextWrapping.Wrap,FontSize=12};
     private readonly Grid main=new(){RowDefinitions=new("Auto,Auto,*,Auto,Auto"),RowSpacing=16,Margin=new(24)};
     private readonly Dictionary<string,Bitmap> coverImages=new(StringComparer.OrdinalIgnoreCase);
     private IReadOnlyList<Game> allGames=[];
@@ -81,16 +87,17 @@ public sealed class MainWindow : Window
         sidebar.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));
         sidebar.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));
         sidebar.Children.Add(controllerStatus);
-        sidebar.Children.Add(new TextBlock {Text="Windows · v0.3\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
+        sidebar.Children.Add(themeStatus);
+        sidebar.Children.Add(new TextBlock {Text="Windows · v0.4\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
-        var header=new Grid {ColumnDefinitions=new("*,Auto")};
-        header.Children.Add(new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold});Grid.SetColumn(summary,1);header.Children.Add(summary);main.Children.Add(header);
+        var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=12};
+        header.Children.Add(themeLogo);var heading=new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold};Grid.SetColumn(heading,1);header.Children.Add(heading);Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
         var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),ColumnSpacing=10};filters.Children.Add(search);Grid.SetColumn(systems,1);filters.Children.Add(systems);Grid.SetColumn(sort,2);filters.Children.Add(sort);AddRow(main,filters,1);
         gamesList.ItemsPanel=new FuncTemplate<Panel?>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
         ScrollViewer.SetHorizontalScrollBarVisibility(gamesList,Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
         var library=new Grid();library.Children.Add(gamesList);library.Children.Add(empty);AddRow(main,library,2);
         AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);AddRow(main,footer,4);
-        Grid.SetColumn(main,1);layout.Children.Add(main);
+        var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
         var details=new StackPanel {Spacing=14,Margin=new(18)};details.Children.Add(detailCover);details.Children.Add(detailTitle);details.Children.Add(detailInfo);
         foreach(var button in new[]{play,favorite,cover,onlineCover,edit,reveal,remove})details.Children.Add(button);
         detailBorder.Child=new ScrollViewer {Content=details};Grid.SetColumn(detailBorder,2);layout.Children.Add(detailBorder);Content=layout;
@@ -105,7 +112,7 @@ public sealed class MainWindow : Window
         status.Text=settingsStore.LoadWarning??"ROM-Ordner importieren oder Emulatoren einrichten, um zu starten.";
         Opened+=async(_,_)=>{if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
-        Closed+=(_,_)=>{gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();};
+        Closed+=(_,_)=>{gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
     private Button ActionButton(string text,Action action)
@@ -123,6 +130,37 @@ public sealed class MainWindow : Window
         RequestedThemeVariant=settings.Theme=="Classic Light"?ThemeVariant.Light:ThemeVariant.Dark;
         Background=Brush.Parse(palette.Item1);Foreground=Brush.Parse(palette.Item2);sideBorder.Background=detailBorder.Background=Brush.Parse(palette.Item3);status.Foreground=Brush.Parse(palette.Item4);
         gamesList.Background=Brushes.Transparent;
+        gamesList.Foreground=Foreground;detailTitle.Foreground=Foreground;detailInfo.Foreground=Foreground;
+        currentThemeSystem=null;ApplyExternalTheme();
+    }
+    private void ApplyExternalTheme()
+    {
+        var system=systems.SelectedItem as string; if(system is null or "Alle Konsolen")system=Selected?.System??allGames.FirstOrDefault()?.System??"NES";
+        if(currentThemeSystem==system)return;currentThemeSystem=system;
+        themeBackground.Source=null;themeLogo.Source=null;themeLogo.IsVisible=false;themeStatus.Text="";
+        gamesList.Foreground=Foreground;detailTitle.Foreground=Foreground;detailInfo.Foreground=Foreground;detailTitle.FontSize=24;detailInfo.FontSize=13;
+        if(settings.EmulationStationTheme==null)return;
+        try
+        {
+            if(!loadedThemes.TryGetValue(system,out var external)){external=EmulationStationTheme.Load(settings.EmulationStationTheme,system);loadedThemes[system]=external;}
+            Bitmap? ImageFor(ThemeElement? element)
+            {
+                var path=element?.Properties.GetValueOrDefault("path");if(string.IsNullOrEmpty(path)||!File.Exists(path))return null;
+                if(!themeImages.TryGetValue(path,out var bitmap)){bitmap=ThemeArtwork.Load(path);themeImages[path]=bitmap;}return bitmap;
+            }
+            IBrush? ColorFor(ThemeElement? element,string key)
+            {
+                var value=element?.Properties.GetValueOrDefault(key)?.TrimStart('#');if(value==null)return null;
+                if(value.Length==8)value=value[6..]+value[..6];
+                return (value.Length is 6 or 8)&&Color.TryParse("#"+value,out var color)?new SolidColorBrush(color):null;
+            }
+            ThemeElement? Find(string name)=>external.Elements.LastOrDefault(e=>e.Name==name);
+            themeBackground.Source=ImageFor(Find("background"));themeLogo.Source=ImageFor(Find("logo"));themeLogo.IsVisible=themeLogo.Source!=null;
+            var gameList=Find("gamelist");gamesList.Foreground=ColorFor(gameList,"primaryColor")??Foreground;
+            detailTitle.Foreground=ColorFor(Find("md_name"),"color")??Foreground;detailInfo.Foreground=ColorFor(Find("md_description")??Find("description"),"color")??Foreground;
+            themeStatus.Text="ES-Theme · "+system+"\nFarben / Hintergrund / Logo"+(external.Warnings.Count>0?"\n"+string.Join(" ",external.Warnings.Distinct()):"");
+        }
+        catch(Exception ex){themeStatus.Text="Theme konnte nicht geladen werden: "+ex.Message;Log(ex);}
     }
     private void UpdateSystems()
     {
@@ -140,6 +178,7 @@ public sealed class MainWindow : Window
         gamesList.ItemsSource=result;gamesList.SelectedItem=result.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));
         empty.IsVisible=result.Length==0;empty.Text=allGames.Count==0?"Deine Bibliothek ist leer.\nImportiere einen Ordner mit deinen ROMs.":"Hier sind keine Spiele.\nPasse Suche, Konsole oder Bibliotheksansicht an.";
         summary.Text=$"{view}\n{result.Length} von {allGames.Count} Spielen";UpdateSelected();
+        ApplyExternalTheme();
         foreach(var(name,button)in viewButtons)button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;
     }
     private Control Artwork(Game game,int width)
@@ -169,6 +208,7 @@ public sealed class MainWindow : Window
         detailTitle.Text=game?.Title??"Spiel auswählen";detailCover.Content=game==null?null:Artwork(game,220);
         favorite.Content=game?.Favorite==true?"★ Favorit entfernen":"☆ Als Favorit merken";
         detailInfo.Text=game==null?"Wähle ein Spiel, um zu starten oder Details zu bearbeiten.":$"{game.System}\n{game.PlayCount} Starts · {(game.LastPlayed is{} last?last.ToLocalTime().ToString("g"):"Noch nicht gespielt")}\n\n{game.Path}";
+        ApplyExternalTheme();
     }
     private async Task<bool> BusyAsync(Func<CancellationToken,Task> action)
     {
@@ -354,6 +394,16 @@ public sealed class MainWindow : Window
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Emulatoren & Einstellungen",FontSize=25,FontWeight=FontWeight.Bold});
         if(initialEmulator!=null)panel.Children.Add(new TextBlock {Text=status.Text,TextWrapping=TextWrapping.Wrap});
         var theme=new ComboBox {ItemsSource=new[]{"Midnight","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
+        panel.Children.Add(new TextBlock {Text="Datenordner: "+dataDir,TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
+        panel.Children.Add(new TextBlock {Text="Klassische EmulationStation-Themes: importierter Hintergrund, PNG/JPEG/SVG-Konsolenlogo und Listen-/Detailfarben. EmuVora behält sein Layout und seine Bedienelemente. Eigene Schriftdateien, Animationen, Videos, Extras und ES-DE-Varianten sind noch nicht kompatibel.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(AsyncButton("EmulationStation-Theme importieren …",async()=>
+        {
+            var folders=await StorageProvider.OpenFolderPickerAsync(new(){Title="Theme-Set mit theme.xml oder Konsolen-Unterordnern",AllowMultiple=false});
+            if(folders.Count==0||folders[0].TryGetLocalPath() is not{} path)return;
+            await BusyAsync(async token=>{var imported=await Task.Run(()=>EmulationStationTheme.Import(path,dataDir),token);settings.EmulationStationTheme=imported;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();status.Text="EmulationStation-Theme importiert. Darstellung wechselt mit dem Konsolenfilter.";});
+        }));
+        panel.Children.Add(ActionButton("EmuVora-Standarddarstellung verwenden",()=>{settings.EmulationStationTheme=null;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();}));
         var fullscreen=new CheckBox {Content="Spiele im Vollbild starten (wenn unterstützt)",IsChecked=settings.Fullscreen};var auto=new CheckBox {Content="Beim Start auf Updates prüfen",IsChecked=settings.CheckUpdatesOnStartup};panel.Children.Add(fullscreen);panel.Children.Add(auto);
         var autoInstall=new CheckBox {Content="Updates für verwaltete Installationen automatisch installieren",IsChecked=settings.AutoInstallUpdates};panel.Children.Add(autoInstall);
         autoInstall.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoInstallUpdates=autoInstall.IsChecked==true;settingsStore.Save(settings);});

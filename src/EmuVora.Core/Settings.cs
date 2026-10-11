@@ -3,6 +3,7 @@ namespace EmuVora.Core;
 public sealed class AppSettings
 {
     public string Theme {get;set;}="Midnight";
+    public string? EmulationStationTheme {get;set;}
     public Dictionary<string,string> EmulatorPaths {get;set;}=[];
     public Dictionary<string,string> CorePaths {get;set;}=[];
     public Dictionary<string,string> Covers {get;set;}=[];

@@ -4,6 +4,8 @@ Windows-Spielbibliothek für RetroArch, DuckStation, PCSX2, Dolphin und PPSSPP. 
 
 ## Windows-Version starten
 
+Neu in v0.4: **Installationslaufwerk / Datenordner auswählen** und klassische **EmulationStation-Theme-Gestaltung importieren**. Einrichtung und genaue Kompatibilitätsgrenzen: [Speicherorte und Themes](STORAGE_AND_THEMES.md).
+
 Unter [GitHub Actions](https://github.com/cpprograming/EmuVora/actions) den neuesten erfolgreichen **Build and test** öffnen und **EmuVora-win-x64** herunterladen. ZIP vollständig entpacken und `EmuVora.App.exe` starten. .NET muss für dieses portable Paket nicht installiert werden. Optional richtet `Install-EmuVora.ps1` das Programm und eine Startmenü-Verknüpfung im Benutzerkonto ein.
 
 1. **ROM-Ordner importieren**. Unterordner werden mitgescannt; nicht lesbare Ordner werden gemeldet.
