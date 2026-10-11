@@ -20,7 +20,7 @@ public class InterfaceTests
 {
     [AvaloniaFact][Trait("Category","Network")] public async Task RealDownloadedCoversRenderInTheUnifiedLibrary()
     {
-        using var dir=new TestDirectory();using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,System.IO.Path.Combine(dir.Path,"cache"));var settings=new AppSettings{CheckUpdatesOnStartup=false,AutoDownloadCovers=false};
+        using var dir=new TestDirectory();using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,System.IO.Path.Combine(dir.Path,"cache"),apiToken:Environment.GetEnvironmentVariable("EMUVORA_COVER_TOKEN"));var settings=new AppSettings{CheckUpdatesOnStartup=false,AutoDownloadCovers=false};
         var games=new[]{new Game("Super Mario World","SNES",dir.File("Mario.sfc"),true),new Game("Super Metroid","SNES",dir.File("Metroid.sfc")),new Game("Donkey Kong Country","SNES",dir.File("DKC.sfc"))};
         foreach(var game in games){var cover=await source.DownloadAsync(game,System.IO.Path.Combine(dir.Path,"covers"));Assert.NotNull(cover);settings.Covers[game.Path]=cover!;}
         new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(settings);new LibraryStore(dir.File("library.db","")).Restore(games);

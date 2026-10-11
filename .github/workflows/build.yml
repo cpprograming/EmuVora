@@ -27,6 +27,7 @@ jobs:
         env:
           EMUVORA_PACKAGE_CATALOG: ${{ github.workspace }}/catalog/packages.json
           EMUVORA_SCREENSHOTS: ${{ github.workspace }}/screenshots
+          EMUVORA_COVER_TOKEN: ${{ github.token }}
         run: dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj --no-build -c Release --filter "Category=Network"
       - uses: actions/upload-artifact@v4
         if: always()

@@ -10,7 +10,7 @@ public record CoverBatchProgress(int Completed,int Total,int Found,int Missing,i
 public record CoverBatchResult(int Found,int Missing,int Failed,IReadOnlyList<string> Report);
 
 // Only whole normalized titles match: no fuzzy guesses that confuse sequels.
-public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string region="Europe")
+public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string region="Europe",string? apiToken=null)
 {
     private readonly Dictionary<string,IndexedCover[]> indexes=[];
     private readonly Dictionary<string,string> unavailable=[];
@@ -48,6 +48,9 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
             try
             {
                 using var request=new HttpRequestMessage(HttpMethod.Get,$"https://api.github.com/repos/libretro-thumbnails/{repository}/git/trees/master?recursive=1");request.Headers.UserAgent.ParseAdd("EmuVora/0.6");
+                // Optional CI authentication applies only to api.github.com, never
+                // to artwork requests or redirects configured on another client.
+                if(!string.IsNullOrEmpty(apiToken))request.Headers.Authorization=new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",apiToken);
                 using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,token);
                 if(response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests)throw new IOException("GitHub-Coverlimit erreicht. Später erneut versuchen; vorhandene Cover bleiben erhalten.");
                 if(response.StatusCode==HttpStatusCode.NotFound){names=[];}

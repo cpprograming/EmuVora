@@ -79,7 +79,7 @@ public class CoverDisplayTests
     }
     [Fact][Trait("Category","Network")] public async Task RealCoverIndexResolvesARegionalTitleAndDownloadsPng()
     {
-        using var dir=new TestDirectory();using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,Path.Combine(dir.Path,"cache"));
+        using var dir=new TestDirectory();using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,Path.Combine(dir.Path,"cache"),apiToken:Environment.GetEnvironmentVariable("EMUVORA_COVER_TOKEN"));
         var file=await source.DownloadAsync(new("Super Mario World","SNES","game.sfc"),Path.Combine(dir.Path,"covers"));Assert.NotNull(file);Assert.True(new FileInfo(file!).Length>1000);
     }
 }
