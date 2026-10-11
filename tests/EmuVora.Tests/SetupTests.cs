@@ -49,6 +49,11 @@ public class SetupTests
         using var dir=new TestDirectory();var exe=dir.File("pcsx2/program.exe");var firmware=EmulatorSetup.FirmwareDirectory(dir.Path);Directory.CreateDirectory(firmware);System.IO.File.WriteAllBytes(System.IO.Path.Combine(firmware,"ps2.bin"),new byte[4*1024*1024]);
         EmulatorSetup.Configure("pcsx2",exe,dir.Path);var config=System.IO.File.ReadAllText(System.IO.Path.Combine(dir.Path,"pcsx2/inis/PCSX2.ini"));Assert.Contains("[Filenames]",config);Assert.Contains("BIOS = ps2.bin",config);Assert.Null(EmulatorSetup.FirmwareHint("PS2",dir.Path));
     }
+    [Fact] public void RetroArchLaunchUsesItsManagedConfigAndKeepsPathsWithSpacesIntact()
+    {
+        using var dir=new TestDirectory();var exe=dir.File("my emulator/retroarch.exe");var config=System.IO.Path.GetFullPath(dir.File("my emulator/retroarch.cfg"));var core=dir.File("my cores/nes.dll");var game=new Game("Game","NES",dir.File("my games/game.nes"));
+        var start=new ExternalEmulatorAdapter(EmulatorCatalog.Get("retroarch")).CreateStartInfo(game,exe,core);Assert.Equal("--config",start.ArgumentList[0]);Assert.Equal(config,start.ArgumentList[1]);Assert.Equal(game.Path,start.ArgumentList.Last());
+    }
     [Fact] public void FirmwareImportRoutesSubdirectoriesAndChecksAdditionalFiles()
     {
         using var dir=new TestDirectory();var data=System.IO.Path.Combine(dir.Path,"data");var file=dir.File("sources/dc_boot.bin","firmware");

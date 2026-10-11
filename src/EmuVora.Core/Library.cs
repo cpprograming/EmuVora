@@ -188,6 +188,8 @@ public sealed class ExternalEmulatorAdapter(EmulatorDefinition definition)
         if(definition.Id=="retroarch")
         {
             if(string.IsNullOrWhiteSpace(corePath)||!File.Exists(corePath))throw new InvalidOperationException($"Für {game.System} zuerst einen RetroArch-Core einrichten.");
+            var config=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(executablePath)!,"retroarch.cfg");
+            if(File.Exists(config)){psi.ArgumentList.Add("--config");psi.ArgumentList.Add(config);}
             psi.ArgumentList.Add("-L");psi.ArgumentList.Add(corePath);if(fullscreen)psi.ArgumentList.Add("--fullscreen");
         }
         if(definition.Id=="duckstation"){psi.ArgumentList.Add("-batch");if(fullscreen)psi.ArgumentList.Add("-fullscreen");}
