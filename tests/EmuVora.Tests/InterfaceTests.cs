@@ -34,9 +34,9 @@ public class InterfaceTests
         new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){EmulationStationTheme=theme,CheckUpdatesOnStartup=false});
         new LibraryStore(System.IO.Path.Combine(dir.Path,"library.db")).Restore([new("Mario","NES",dir.File("Mario.nes")),new("Zelda","SNES",dir.File("Zelda.sfc"))]);
         var window=new MainWindow(dir.Path);window.Show();var list=window.GetVisualDescendants().OfType<ListBox>().Single();var console=window.GetVisualDescendants().OfType<ComboBox>().First(c=>c.Items.Contains("Alle Konsolen"));console.SelectedItem="NES";
-        Assert.Equal("#ffffcc00",list.Foreground!.ToString()!.ToLowerInvariant());Assert.Contains(window.GetVisualDescendants().OfType<Image>(),i=>i.Source!=null&&i.Height==70);
+        Assert.Equal(Avalonia.Media.Color.Parse("#FFCC00"),Assert.IsType<Avalonia.Media.SolidColorBrush>(list.Foreground).Color);Assert.Contains(window.GetVisualDescendants().OfType<Image>(),i=>i.Source!=null&&i.Height==70);
         using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"ES-theme.png"));}
-        console.SelectedItem="SNES";Assert.Equal("#ff00ff00",list.Foreground!.ToString()!.ToLowerInvariant());Assert.DoesNotContain(window.GetVisualDescendants().OfType<Image>(),i=>i.Source!=null&&i.Height==70);window.Close();
+        console.SelectedItem="SNES";Assert.Equal(Avalonia.Media.Colors.Lime,Assert.IsType<Avalonia.Media.SolidColorBrush>(list.Foreground).Color);Assert.DoesNotContain(window.GetVisualDescendants().OfType<Image>(),i=>i.Source!=null&&i.Height==70);window.Close();
     }
     [AvaloniaFact] public void AutomaticSetupAndXboxOptionsAreVisibleInSettings()
     {

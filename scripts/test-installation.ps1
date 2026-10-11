@@ -9,7 +9,9 @@ if(!(Test-Path -LiteralPath $taskExe)){throw 'The selected program directory was
 $taskLocator=Get-Content -Raw -LiteralPath (Join-Path $taskInstall 'App/emuvora-location.json') | ConvertFrom-Json
 if($taskLocator.DataDirectory -ne $taskData){throw 'The separate data directory was ignored.'}
 'retain saves' | Set-Content -LiteralPath (Join-Path $taskData 'save-test.txt')
-& $taskScript -DestinationPath $taskInstall -DataPath $taskData -SkipShortcuts
+& $taskScript -DestinationPath $taskInstall -SkipShortcuts
+$taskUpdatedLocator=Get-Content -Raw -LiteralPath (Join-Path $taskInstall 'App/emuvora-location.json') | ConvertFrom-Json
+if($taskUpdatedLocator.DataDirectory -ne $taskData){throw 'Update forgot the existing separate data directory.'}
 if((Get-Content -LiteralPath (Join-Path $taskData 'save-test.txt')) -ne 'retain saves'){throw 'Update changed user data.'}
 if(@(Get-ChildItem -LiteralPath $taskInstall -Filter 'App-backup-*').Count -ne 1){throw 'The old program directory was not retained.'}
 $taskRejected=$false

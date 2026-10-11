@@ -20,8 +20,8 @@ public class StorageThemeTests
         dir.File("Original theme/nes/theme.xml","<theme><formatVersion>3</formatVersion><variables><art>../images/${system}.svg</art></variables><include>../common.xml</include><view name='detailed'><textlist name='gamelist'><primaryColor>FF0000</primaryColor></textlist><image name='logo'><path>${art}</path></image></view></theme>");
         dir.File("Original theme/images/nes.svg","<svg xmlns='http://www.w3.org/2000/svg' width='120' height='60'><rect width='120' height='60' fill='#ff0000'/></svg>");
         var imported=EmulationStationTheme.Import(source,System.IO.Path.Combine(dir.Path,"data"));Directory.Delete(source,true);
-        var theme=EmulationStationTheme.Load(imported,"NES");var list=Assert.Single(theme.Elements.Where(e=>e.Type=="textlist"));Assert.Equal("FF0000",list.Properties["primaryColor"]);Assert.Equal("0.03",list.Properties["fontSize"]);
-        var logo=Assert.Single(theme.Elements.Where(e=>e.Type=="image"));Assert.StartsWith(imported,logo.Properties["path"]);using var image=ThemeArtwork.Load(logo.Properties["path"]);Assert.True(image.PixelSize.Width>0);
+        var theme=EmulationStationTheme.Load(imported,"NES");var list=Assert.Single(theme.Elements,e=>e.Type=="textlist");Assert.Equal("FF0000",list.Properties["primaryColor"]);Assert.Equal("0.03",list.Properties["fontSize"]);
+        var logo=Assert.Single(theme.Elements,e=>e.Type=="image");Assert.StartsWith(imported,logo.Properties["path"]);using var image=ThemeArtwork.Load(logo.Properties["path"]);Assert.True(image.PixelSize.Width>0);
         Assert.NotEmpty(EmulationStationTheme.Load(imported,"SNES").Warnings);
     }
     [Theory][InlineData("<include>../outside.xml</include>")][InlineData("<include>theme.xml</include>")][InlineData("<view name='detailed'><image name='logo'><path>https://example.com/logo.svg</path></image></view>")]

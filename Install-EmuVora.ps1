@@ -16,7 +16,11 @@ $taskRoot=[IO.Path]::GetFullPath($DestinationPath).TrimEnd('\')
 if($taskRoot -eq [IO.Path]::GetPathRoot($taskRoot).TrimEnd('\')){throw 'Bitte einen Unterordner statt eines gesamten Laufwerks wählen.'}
 if($taskRoot -eq $taskSource -or $taskRoot.StartsWith($taskSource+'\',[StringComparison]::OrdinalIgnoreCase) -or $taskSource.StartsWith($taskRoot+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Installations- und entpackter Quellordner dürfen sich nicht überlappen.'}
 $taskDestination=Join-Path $taskRoot 'App'
-if(!$DataPath){$DataPath=Join-Path $taskRoot 'Data'}
+if(!$DataPath){
+    $taskPreviousLocator=Join-Path $taskDestination 'emuvora-location.json'
+    if(Test-Path -LiteralPath $taskPreviousLocator){$DataPath=(Get-Content -Raw -LiteralPath $taskPreviousLocator | ConvertFrom-Json).DataDirectory}
+    if(!$DataPath){$DataPath=Join-Path $taskRoot 'Data'}
+}
 if(!(Test-EmuVoraAbsolutePath $DataPath)){throw 'Ein vollständiger Datenpfad ist erforderlich.'}
 $taskData=[IO.Path]::GetFullPath($DataPath).TrimEnd('\')
 if($taskData -eq [IO.Path]::GetPathRoot($taskData).TrimEnd('\') -or $taskData -eq $taskDestination -or $taskData.StartsWith($taskDestination+'\',[StringComparison]::OrdinalIgnoreCase) -or $taskDestination.StartsWith($taskData+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Der Datenordner muss außerhalb des Programmordners liegen und darf kein Laufwerksstamm sein.'}
