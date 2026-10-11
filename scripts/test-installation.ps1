@@ -3,7 +3,8 @@ $taskTestRoot=Join-Path $env:RUNNER_TEMP ('EmuVora-install-'+[Guid]::NewGuid().T
 $taskInstall=Join-Path $taskTestRoot 'Selected drive with spaces'
 $taskData=Join-Path $taskTestRoot 'Separate library'
 $taskScript=Join-Path $PSScriptRoot '../publish/Install-EmuVora.ps1'
-& $taskScript -DestinationPath $taskInstall -DataPath $taskData -SkipShortcuts
+& powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File $taskScript -DestinationPath $taskInstall -DataPath $taskData -SkipShortcuts
+if($LASTEXITCODE -ne 0){throw 'Windows PowerShell 5.1 installation failed.'}
 $taskExe=Join-Path $taskInstall 'App/EmuVora.App.exe'
 if(!(Test-Path -LiteralPath $taskExe)){throw 'The selected program directory was ignored.'}
 $taskLocator=Get-Content -Raw -LiteralPath (Join-Path $taskInstall 'App/emuvora-location.json') | ConvertFrom-Json

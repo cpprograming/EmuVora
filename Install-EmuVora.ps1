@@ -1,4 +1,4 @@
-param([string]$DestinationPath,[string]$DataPath,[switch]$DesktopShortcut,[switch]$SkipShortcuts)
+﻿param([string]$DestinationPath,[string]$DataPath,[switch]$DesktopShortcut,[switch]$SkipShortcuts)
 $ErrorActionPreference='Stop'
 function Test-EmuVoraAbsolutePath([string]$Value){return $Value -match '^(?:[A-Za-z]:[\\/]|\\\\[^\\/]+[\\/][^\\/]+)'}
 $taskSource=[IO.Path]::GetFullPath($PSScriptRoot).TrimEnd('\')
