@@ -13,8 +13,7 @@ public sealed class PackageManager : IDisposable
 {
     public const string CatalogUrl="https://raw.githubusercontent.com/cpprograming/EmuVora/main/catalog/packages.json";
     private readonly HttpClient http;
-    public static readonly Dictionary<string,string> CoreIds=new()
-    { ["NES"]="fceumm",["SNES"]="snes9x",["GB"]="gambatte",["GBC"]="gambatte",["GBA"]="mgba",["N64"]="mupen64plus_next",["Mega Drive"]="genesis_plus_gx",["Master System"]="genesis_plus_gx" };
+    public static readonly Dictionary<string,string> CoreIds=SystemCatalog.RetroSystems.ToDictionary(s=>s.Name,s=>s.Core);
     public PackageManager(HttpMessageHandler? handler=null)
     {
         http=handler==null?new(new HttpClientHandler {AllowAutoRedirect=false}):new(handler);
@@ -26,6 +25,11 @@ public sealed class PackageManager : IDisposable
         var text=await response.Content.ReadAsStringAsync(token);
         var catalog=JsonSerializer.Deserialize<PackageCatalog>(text.TrimStart('\uFEFF'),SettingsStore.JsonOptions)??throw new InvalidDataException("Download-Katalog ist leer.");
         if(catalog.SchemaVersion!=1||catalog.Packages.Length>32)throw new InvalidDataException("Unbekannter Download-Katalog.");
+        foreach(var package in catalog.Packages)ValidatePackage(package);
+        return await ResolveCurrentReleasesAsync(catalog,token);
+    }
+    public async Task<PackageCatalog> ResolveCurrentReleasesAsync(PackageCatalog catalog,CancellationToken token=default)
+    {
         foreach(var package in catalog.Packages)ValidatePackage(package);
         // Mutable GitHub tags (notably DuckStation's "latest") must be resolved again
         // so a previously published catalog cannot silently install different bytes.

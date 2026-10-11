@@ -54,6 +54,10 @@ public sealed class MainWindow : Window
     private readonly Dictionary<string,Button> viewButtons=[];
     private readonly DispatcherTimer gamepadTimer=new(){Interval=TimeSpan.FromMilliseconds(100)};
     private ushort previousButtons;
+    private readonly TextBlock controllerStatus=new(){TextWrapping=TextWrapping.Wrap,FontSize=12};
+    private long repeatAt;
+    private ushort previousDirection;
+    private int controllerIndex=-1;
     private bool dialogOpen;
     public MainWindow():this(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"EmuVora")){ }
     public MainWindow(string directory)
@@ -76,7 +80,8 @@ public sealed class MainWindow : Window
         sidebar.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));
         sidebar.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));
         sidebar.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));
-        sidebar.Children.Add(new TextBlock {Text="Windows · v0.2\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
+        sidebar.Children.Add(controllerStatus);
+        sidebar.Children.Add(new TextBlock {Text="Windows · v0.3\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
         var header=new Grid {ColumnDefinitions=new("*,Auto")};
         header.Children.Add(new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold});Grid.SetColumn(summary,1);header.Children.Add(summary);main.Children.Add(header);
@@ -165,11 +170,11 @@ public sealed class MainWindow : Window
         favorite.Content=game?.Favorite==true?"★ Favorit entfernen":"☆ Als Favorit merken";
         detailInfo.Text=game==null?"Wähle ein Spiel, um zu starten oder Details zu bearbeiten.":$"{game.System}\n{game.PlayCount} Starts · {(game.LastPlayed is{} last?last.ToLocalTime().ToString("g"):"Noch nicht gespielt")}\n\n{game.Path}";
     }
-    private async Task BusyAsync(Func<CancellationToken,Task> action)
+    private async Task<bool> BusyAsync(Func<CancellationToken,Task> action)
     {
-        if(operation!=null){status.Text="Bitte den aktuellen Vorgang abschließen oder abbrechen.";return;}
+        if(operation!=null){status.Text="Bitte den aktuellen Vorgang abschließen oder abbrechen.";return false;}
         operation=new();foreach(var button in operationButtons)button.IsEnabled=false;cancel.IsVisible=progress.IsVisible=true;progress.IsIndeterminate=true;UpdateSelected();
-        try{await action(operation.Token);}catch(OperationCanceledException){status.Text="Vorgang abgebrochen.";}catch(Exception ex){ShowError(ex);}
+        try{await action(operation.Token);return true;}catch(OperationCanceledException){status.Text="Vorgang abgebrochen.";return false;}catch(Exception ex){ShowError(ex);return false;}
         finally{operation.Dispose();operation=null;foreach(var button in operationButtons)button.IsEnabled=true;cancel.IsVisible=progress.IsVisible=false;UpdateSelected();}
     }
     private IProgress<DownloadProgress> DownloadProgress()=>new Progress<DownloadProgress>(p=>{status.Text=p.Message;progress.IsIndeterminate=p.Fraction==null;if(p.Fraction is{} value)progress.Value=value*100;});
@@ -225,9 +230,15 @@ public sealed class MainWindow : Window
         {
             var id=settings.PreferredEmulators.GetValueOrDefault(game.System);var definition=EmulatorCatalog.Known.FirstOrDefault(e=>e.Id==id&&e.Systems.Contains(game.System))??EmulatorCatalog.Known.FirstOrDefault(e=>e.Systems.Contains(game.System));
             if(definition==null){status.Text="Zuerst die Konsole des Spiels zuordnen.";return;}
-            var executable=settings.EmulatorPaths.GetValueOrDefault(definition.Id);
-            if(string.IsNullOrEmpty(executable)){status.Text=$"{definition.Name} zuerst unter „Emulatoren einrichten“ installieren oder auswählen.";await ShowSettingsAsync(definition.Id);return;}
             if(runningEmulators.Contains(definition.Id)){status.Text="Das laufende Spiel zuerst im Emulator beenden.";return;}
+            if(settings.AutomaticSetup&&!await BusyAsync(async token=>await EnsureReadyAsync(definition.Id,game.System,token)))return;
+            var executable=settings.EmulatorPaths.GetValueOrDefault(definition.Id);
+            if(string.IsNullOrEmpty(executable)||!File.Exists(executable)){status.Text=$"{definition.Name} zuerst unter „Emulatoren einrichten“ installieren oder auswählen.";await ShowSettingsAsync(definition.Id);return;}
+            if(settings.Packages.TryGetValue(definition.Id,out var managed)&&managed.ExecutablePath==executable)
+            {
+                var hint=EmulatorSetup.FirmwareHint(game.System,dataDir,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,dataDir));
+                if(hint!=null){status.Text=hint;await ShowSettingsAsync(definition.Id);return;}
+            }
             var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen);running[game.Path]=process;runningEmulators.Add(definition.Id);
             store.MarkPlayed(game);Reload(game.Path);status.Text=$"{game.Title} läuft mit {definition.Name}.";
             _=TrackProcessAsync(process,game,definition.Id);
@@ -268,13 +279,50 @@ public sealed class MainWindow : Window
     }
     private async Task HandleGamepadAsync()
     {
-        var buttons=Gamepad.ReadButtons();var pressed=buttons&~previousButtons;previousButtons=buttons;
+        var pads=Gamepad.Read();controllerStatus.Text=pads.Length==0?"Xbox-Controller: nicht verbunden":"Xbox-Controller: "+pads.Length+" verbunden\nStick / D-Pad: wählen · A: spielen\nY: Favorit · LB/RB: System";
+        var active=pads.FirstOrDefault(p=>Gamepad.NavigationButtons(p)!=0);if(active==default&&pads.Length>0)active=pads[0];
+        if(active.Index!=controllerIndex){previousButtons=0;previousDirection=0;controllerIndex=active.Index;}
+        var buttons=Gamepad.NavigationButtons(active);var pressed=buttons&~previousButtons;previousButtons=buttons;
+        var direction=(ushort)(buttons&15);var now=Environment.TickCount64;
+        if(direction!=previousDirection){previousDirection=direction;repeatAt=now+400;}
+        else if(direction!=0&&now>=repeatAt){pressed|=direction;repeatAt=now+140;}
         if(!IsActive||dialogOpen||operation!=null||running.Count>0||pressed==0)return;
+        if((pressed&0x300)!=0&&systems.ItemCount>0)systems.SelectedIndex=(systems.SelectedIndex+((pressed&0x200)!=0?1:systems.ItemCount-1))%systems.ItemCount;
+        if((pressed&0x2000)!=0){view="Alle Spiele";search.Text="";systems.SelectedIndex=0;Refresh();}
         var count=gamesList.ItemCount;if(count==0)return;var index=Math.Max(0,gamesList.SelectedIndex);var columns=Math.Max(1,(int)(gamesList.Bounds.Width/174));
         if((pressed&1)!=0)index-=columns;if((pressed&2)!=0)index+=columns;if((pressed&4)!=0)index--;if((pressed&8)!=0)index++;
         gamesList.SelectedIndex=Math.Clamp(index,0,count-1);gamesList.ScrollIntoView(gamesList.SelectedItem!);
         if((pressed&0x1000)!=0)await PlayAsync();
         if((pressed&0x8000)!=0&&Selected is{} game)Guard(()=>{store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);});
+    }
+    private async Task InstallManagedAsync(string id,CancellationToken token)
+    {
+        catalog??=await packages.GetCatalogAsync(token);var package=catalog.Packages.First(p=>p.Id==id);
+        if(settings.Packages.TryGetValue(id,out var same)&&same.Version==package.Version&&File.Exists(same.ExecutablePath))
+        {
+            if(id=="retroarch-cores")ConfigureCores(same.ExecutablePath);
+            else{settings.EmulatorPaths[id]=same.ExecutablePath;EmulatorSetup.Configure(id,same.ExecutablePath,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.Read().FirstOrDefault().Index);}
+            return;
+        }
+        var executable=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
+        var previous=id=="retroarch-cores"?settings.Packages.GetValueOrDefault(id)?.ExecutablePath:settings.EmulatorPaths.GetValueOrDefault(id);
+        if(id=="retroarch-cores")ConfigureCores(executable,previous==null?null:Path.GetDirectoryName(previous));
+        else
+        {
+            if(previous!=null&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
+            EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.Read().FirstOrDefault().Index);
+            settings.EmulatorPaths[id]=executable;
+        }
+        settings.Packages[id]=new(package.Version,executable,previous);settingsStore.Save(settings);
+    }
+    private async Task EnsureReadyAsync(string id,string system,CancellationToken token)
+    {
+        var executable=settings.EmulatorPaths.GetValueOrDefault(id);
+        if(executable==null||!File.Exists(executable))await InstallManagedAsync(id,token);
+        if(id=="retroarch"&&(!settings.CorePaths.TryGetValue(system,out var core)||!File.Exists(core)))await InstallManagedAsync("retroarch-cores",token);
+        executable=settings.EmulatorPaths.GetValueOrDefault(id);
+        if(executable!=null&&settings.Packages.TryGetValue(id,out var managed)&&managed.ExecutablePath==executable)EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.Read().FirstOrDefault().Index);
+        settingsStore.Save(settings);
     }
     private async Task CheckUpdatesAsync()
     {
@@ -293,7 +341,7 @@ public sealed class MainWindow : Window
                     settings.Packages[package.Id]=new(package.Version,path,old.ExecutablePath);
                     if(package.Id=="retroarch-cores")
                     {ConfigureCores(path,Path.GetDirectoryName(old.ExecutablePath));}
-                    else settings.EmulatorPaths[package.Id]=path;
+                    else{EmulatorSetup.Configure(package.Id,path,dataDir,settings.XboxDefaults,settings.Fullscreen);settings.EmulatorPaths[package.Id]=path;}
                     settingsStore.Save(settings);
                 }
                 status.Text="Verfügbare Updates installiert. Vorige Emulator-Versionen bleiben erhalten.";
@@ -304,10 +352,12 @@ public sealed class MainWindow : Window
     private async Task ShowSettingsAsync(string? initialEmulator=null)
     {
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Emulatoren & Einstellungen",FontSize=25,FontWeight=FontWeight.Bold});
+        if(initialEmulator!=null)panel.Children.Add(new TextBlock {Text=status.Text,TextWrapping=TextWrapping.Wrap});
         var theme=new ComboBox {ItemsSource=new[]{"Midnight","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
         var fullscreen=new CheckBox {Content="Spiele im Vollbild starten (wenn unterstützt)",IsChecked=settings.Fullscreen};var auto=new CheckBox {Content="Beim Start auf Updates prüfen",IsChecked=settings.CheckUpdatesOnStartup};panel.Children.Add(fullscreen);panel.Children.Add(auto);
         var autoInstall=new CheckBox {Content="Updates für verwaltete Installationen automatisch installieren",IsChecked=settings.AutoInstallUpdates};panel.Children.Add(autoInstall);
         autoInstall.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoInstallUpdates=autoInstall.IsChecked==true;settingsStore.Save(settings);});
+        AddAutomaticSetupControls(panel);
         theme.SelectionChanged+=(_,_)=>Guard(()=>{settings.Theme=theme.SelectedItem as string??"Midnight";settingsStore.Save(settings);ApplyTheme();Refresh();});fullscreen.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.Fullscreen=fullscreen.IsChecked==true;settingsStore.Save(settings);});auto.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckUpdatesOnStartup=auto.IsChecked==true;settingsStore.Save(settings);});
         var emulator=new ComboBox {ItemsSource=EmulatorCatalog.Known.Select(e=>e.Name).ToArray(),SelectedIndex=Math.Max(0,Array.FindIndex(EmulatorCatalog.Known,e=>e.Id==initialEmulator))};panel.Children.Add(new Separator());panel.Children.Add(emulator);
         var path=new TextBox {Watermark="Pfad zur Emulator-EXE"};var packageInfo=new TextBlock {TextWrapping=TextWrapping.Wrap};panel.Children.Add(path);panel.Children.Add(packageInfo);
@@ -330,10 +380,17 @@ public sealed class MainWindow : Window
                 var executable=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
                 var previous=settings.EmulatorPaths.GetValueOrDefault(id);
                 if(!string.IsNullOrEmpty(previous)&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
-                settings.Packages[id]=new(package.Version,executable,previous);settings.EmulatorPaths[id]=executable;settingsStore.Save(settings);Load();status.Text=Current().Name+" installiert. BIOS und Controller im Emulator einrichten.";
+                EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.Read().FirstOrDefault().Index);
+                settings.Packages[id]=new(package.Version,executable,previous);settings.EmulatorPaths[id]=executable;settingsStore.Save(settings);Load();status.Text=Current().Name+" automatisch eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";
             });
         }));
         panel.Children.Add(ActionButton("Zur vorigen Version zurück",()=>{var id=Current().Id;if(!settings.Packages.TryGetValue(id,out var installed)||!File.Exists(installed.PreviousExecutablePath)){status.Text="Keine vorige Installation vorhanden.";return;}settings.EmulatorPaths[id]=installed.PreviousExecutablePath!;settings.Packages[id]=installed with {Version="rollback",ExecutablePath=installed.PreviousExecutablePath!,PreviousExecutablePath=installed.ExecutablePath};settingsStore.Save(settings);Load();status.Text="Vorige Version aktiviert.";}));
+        panel.Children.Add(AsyncButton("Xbox-Standardprofil erneut anwenden",async()=>
+        {
+            var id=Current().Id;if(runningEmulators.Contains(id)){status.Text="Emulator zuerst schließen.";return;}
+            if(!settings.Packages.TryGetValue(id,out var installed)||settings.EmulatorPaths.GetValueOrDefault(id)!=installed.ExecutablePath){status.Text="Automatische Profile sind für verwaltete Downloads verfügbar.";return;}
+            if(await ConfirmAsync("Xbox-Standardprofil erneut anwenden? Die bisherigen Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{EmulatorSetup.Configure(id,installed.ExecutablePath,dataDir,true,settings.Fullscreen,true,Gamepad.Read().FirstOrDefault().Index);status.Text="Xbox-Profil angewendet.";});
+        }));
         var downloadStatus=new TextBlock {TextWrapping=TextWrapping.Wrap};
         void FollowStatus(object? sender,AvaloniaPropertyChangedEventArgs e){if(e.Property==TextBlock.TextProperty)downloadStatus.Text=status.Text;}
         status.PropertyChanged+=FollowStatus;panel.Children.Add(downloadStatus);
@@ -349,7 +406,7 @@ public sealed class MainWindow : Window
             var system=(string)coreSystem.SelectedItem!;await BusyAsync(async token=>
             {catalog=await packages.GetCatalogAsync(token);var id="retroarch-cores";var package=catalog.Packages.First(p=>p.Id==id);var path=settings.Packages.TryGetValue(id,out var installed)&&installed.Version==package.Version&&File.Exists(installed.ExecutablePath)?installed.ExecutablePath:await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);ConfigureCores(path);settings.Packages[id]=new(package.Version,path,installed?.ExecutablePath);settingsStore.Save(settings);LoadCore();status.Text="Cores für alle unterstützten RetroArch-Konsolen eingerichtet.";});
         }));
-        panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden vor dem Entpacken mit SHA-256 geprüft. Alte Installationen bleiben erhalten. Bei fehlenden VCRUNTIME/MSVCP-DLLs die Microsoft Visual C++ Runtime installieren. PS1 / PS2 benötigen eigene BIOS-Dateien. Controller, Grafik und Speicherstände werden im Emulator eingerichtet.",TextWrapping=TextWrapping.Wrap,FontSize=12});
+        panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden mit SHA-256 geprüft. Alte Installationen bleiben erhalten. Bei fehlenden VCRUNTIME/MSVCP-DLLs die Microsoft Visual C++ Runtime installieren. BIOS-Dateien werden nicht heruntergeladen. Heimcomputer, DS-Touchscreen und spezielle Controller können zusätzliche Eingaben benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
         panel.Children.Add(AsyncButton("Jetzt auf Updates prüfen",()=>CheckUpdatesAsync()));
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="Gespeicherte ROM-Ordner",FontWeight=FontWeight.Bold});
@@ -357,12 +414,38 @@ public sealed class MainWindow : Window
         panel.Children.Add(ActionButton("Ordner aus dem Neu-Scan entfernen",()=>{if(folders.SelectedItem is string folder){settings.RomFolders.Remove(folder);settingsStore.Save(settings);folders.ItemsSource=settings.RomFolders.ToArray();status.Text="Ordner aus dem Neu-Scan entfernt. Spiele und Dateien bleiben erhalten.";}}));
         var dialog=Dialog("EmuVora einrichten",panel);dialog.Height=760;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
     }
+    private void AddAutomaticSetupControls(StackPanel panel)
+    {
+        var automaticSetup=new CheckBox {Content="Beim Spielen fehlende Emulatoren und Cores automatisch einrichten",IsChecked=settings.AutomaticSetup};panel.Children.Add(automaticSetup);
+        automaticSetup.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutomaticSetup=automaticSetup.IsChecked==true;settingsStore.Save(settings);});
+        var xbox=new CheckBox {Content="Xbox-Standardbelegung bei neuer Einrichtung verwenden",IsChecked=settings.XboxDefaults};panel.Children.Add(xbox);
+        xbox.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.XboxDefaults=xbox.IsChecked==true;settingsStore.Save(settings);});
+        panel.Children.Add(AsyncButton("Alle Emulatoren + Cores automatisch einrichten",async()=>
+        {
+            if(running.Count>0){status.Text="Laufende Spiele zuerst schließen.";return;}
+            await BusyAsync(async token=>{catalog=await packages.GetCatalogAsync(token);foreach(var id in EmulatorCatalog.Known.Select(e=>e.Id).Append("retroarch-cores"))await InstallManagedAsync(id,token);status.Text="Emulatoren, Cores und Xbox-Standardbelegung eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";});
+        }));
+        panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch / PS1 / PS2: View + Menu beendet das Spiel; View + RB öffnet das Menü. Dolphin: View + Menu beendet; PPSSPP: LT öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
+        panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await StorageProvider.OpenFilePickerAsync(new(){Title="Eigene BIOS-/Firmware-Dateien",AllowMultiple=true});Guard(()=>{foreach(var file in files)if(file.TryGetLocalPath() is{} source)EmulatorSetup.ImportFirmware(source,dataDir);status.Text=$"{files.Count} Firmware-Dateien importiert. PS1 / PS2: BIOS im Emulator prüfen und auswählen.";});}));
+        panel.Children.Add(AsyncButton("Firmware-Ordner importieren (z. B. MSX)",async()=>
+        {
+            var folders=await StorageProvider.OpenFolderPickerAsync(new(){Title="Ordner mit eigenen Firmware-Dateien"});if(folders.Count==0||folders[0].TryGetLocalPath() is not{} folder)return;
+            if(await BusyAsync(async token=>await Task.Run(()=>EmulatorSetup.ImportFirmwareFolder(folder,dataDir,token),token)))status.Text="Firmware-Ordner importiert.";
+        }));
+        panel.Children.Add(ActionButton("BIOS-/Firmware-Ordner öffnen",()=>{Directory.CreateDirectory(EmulatorSetup.FirmwareDirectory(dataDir));OpenPath(EmulatorSetup.FirmwareDirectory(dataDir));}));
+        panel.Children.Add(new TextBlock {Text="Systemhinweise",FontWeight=FontWeight.Bold});
+        var hints=new ComboBox {ItemsSource=SystemCatalog.RetroSystems.Select(s=>s.Name).ToArray(),SelectedIndex=0};var hintText=new TextBlock {TextWrapping=TextWrapping.Wrap};
+        if(Selected is{} selectedGame&&SystemCatalog.Find(selectedGame.System)!=null)hints.SelectedItem=selectedGame.System;
+        void LoadHint(){var system=SystemCatalog.Find((string)hints.SelectedItem!)!;hintText.Text=(EmulatorSetup.FirmwareHint(system.Name,dataDir)??"Firmware-Prüfung: keine fehlende Pflichtdatei erkannt.")+"\n"+system.Note+"\nDateien: "+system.Extensions+" · Ordner: "+system.Aliases.Split('|')[0];}
+        hints.SelectionChanged+=(_,_)=>LoadHint();LoadHint();panel.Children.Add(hints);panel.Children.Add(hintText);
+    }
     private void ConfigureCores(string executable,string? oldDirectory=null)
     {
         var directory=Path.GetDirectoryName(executable)!;
         foreach(var (system,id) in PackageManager.CoreIds)
         {
             var current=settings.CorePaths.GetValueOrDefault(system);
+            if(oldDirectory==null&&current!=null&&File.Exists(current))continue;
             if(oldDirectory!=null&&current!=null&&!Path.GetFullPath(current).StartsWith(Path.GetFullPath(oldDirectory)+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))continue;
             var file=Directory.EnumerateFiles(directory,id+"_libretro.dll",SearchOption.AllDirectories).FirstOrDefault();
             if(file!=null)settings.CorePaths[system]=file;
@@ -371,18 +454,19 @@ public sealed class MainWindow : Window
     private static void PreserveConfiguration(string previous,string next)
     {
         var source=Path.GetDirectoryName(previous)!;var destination=Path.GetDirectoryName(next)!;
-        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","portable.ini","portable.txt","settings.ini"})if(File.Exists(Path.Combine(source,name))&&(File.GetAttributes(Path.Combine(source,name))&FileAttributes.ReparsePoint)==0)File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
+        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","retroarch-core-options.cfg.emuvora-defaults.json","portable.ini","portable.txt","settings.ini","retroarch.cfg.emuvora-defaults.json","settings.ini.emuvora-defaults.json",".emuvora-configured"})if(File.Exists(Path.Combine(source,name))&&(File.GetAttributes(Path.Combine(source,name))&FileAttributes.ReparsePoint)==0)File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
         foreach(var name in new[]{"memstick","inis","memcards","sstates","bios","system","saves","states","config","autoconfig","playlists","cheats","User"})
         {
             var folder=Path.Combine(source,name);if(!Directory.Exists(folder)||(File.GetAttributes(folder)&FileAttributes.ReparsePoint)!=0)continue;
             foreach(var file in Directory.EnumerateFiles(folder,"*",new EnumerationOptions {RecurseSubdirectories=true,AttributesToSkip=FileAttributes.ReparsePoint}))
             {var target=Path.Combine(destination,name,Path.GetRelativePath(folder,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);File.Copy(file,target,true);}
         }
+        var marker=Path.Combine(destination,".emuvora-configured");
+        if(!File.Exists(marker))AtomicFile.WriteText(marker,"Existing settings preserved; only missing defaults will be added.");
     }
     private void ShowHelp()
     {
-        var text=new TextBlock {TextWrapping=TextWrapping.Wrap,Margin=new(24),Text="EmuVora – Erste Schritte\n\n1. ROM-Ordner importieren. Unterstützte Dateien werden rekursiv aufgenommen. Mehrdisc-M3U-Dateien bündeln ihre Discs.\n\n2. Unter „Konsole zuordnen“ unklare Disc-Dateien auswählen und Konsole bearbeiten.\n\n3. Unter „Emulatoren einrichten“ eine vorhandene EXE auswählen oder ein offizielles Paket herunterladen. Für RetroArch pro Konsole einen Core installieren.\n\n4. Emulator öffnen und Controller, Grafik sowie gegebenenfalls eigene BIOS-Dateien einrichten.\n\n5. Spiel wählen und „Spielen“ drücken. Doppelklick / Eingabetaste startet ebenfalls. Strg+F öffnet die Suche.\n\nCover, Favoriten und Startverlauf bleiben gespeichert. Entfernen betrifft nur den Bibliothekseintrag. Erneutes Scannen übernimmt neue Dateien und bewahrt korrigierte Titel und Konsolen.\n\nUpdates werden geprüft und in neuen Ordnern installiert. Bei Problemen lässt sich die vorige Emulator-Version wieder aktivieren. Speicherstände verwaltet der jeweilige Emulator. EmuVora liefert keine ROMs oder BIOS-Dateien.\n\nBibliothek sichern exportiert Titel, Pfade, Konsolen, Favoriten und Startverlauf. Für eine vollständige Sicherung auch den EmuVora-Datenordner kopieren (Einstellungen → Datenordner öffnen)."};
+        var text=new TextBlock {TextWrapping=TextWrapping.Wrap,Margin=new(24),Text="EmuVora – Erste Schritte\n\n1. ROM-Ordner importieren. Unterstützte Dateien werden rekursiv aufgenommen. Mehrdisc-M3U-Dateien bündeln ihre Discs.\n\n2. Unter „Konsole zuordnen“ unklare Disc-Dateien auswählen und Konsole bearbeiten.\n\n3. Unter „Emulatoren einrichten“ eine vorhandene EXE auswählen oder ein offizielles Paket herunterladen. Fehlende Emulatoren und Cores werden beim ersten Spielstart automatisch heruntergeladen und eingerichtet.\n\n4. Xbox-Controller anschließen. Eigene BIOS-Dateien bei Bedarf in den Einstellungen importieren. DS, Wii und Heimcomputer können zusätzliche Eingaben benötigen.\n\n5. Spiel wählen und „Spielen“ drücken. Doppelklick / Eingabetaste startet ebenfalls. Strg+F öffnet die Suche.\n\nCover, Favoriten und Startverlauf bleiben gespeichert. Entfernen betrifft nur den Bibliothekseintrag. Erneutes Scannen übernimmt neue Dateien und bewahrt korrigierte Titel und Konsolen.\n\nUpdates werden geprüft und in neuen Ordnern installiert. Bei Problemen lässt sich die vorige Emulator-Version wieder aktivieren. Speicherstände verwaltet der jeweilige Emulator. EmuVora liefert keine ROMs oder BIOS-Dateien.\n\nBibliothek sichern exportiert Titel, Pfade, Konsolen, Favoriten und Startverlauf. Für eine vollständige Sicherung auch den EmuVora-Datenordner kopieren (Einstellungen → Datenordner öffnen)."};
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
-
