@@ -16,7 +16,7 @@ public class CoverDisplayTests
     }
     private sealed class Source:HttpMessageHandler
     {
-        public int IndexRequests,ImageRequests;public bool RateLimit;
+        public int IndexRequests,ImageRequests;public bool RateLimit,Alias,Cycle;
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken token)
         {
             if(request.RequestUri!.Host=="api.github.com")
@@ -24,7 +24,8 @@ public class CoverDisplayTests
                 IndexRequests++;if(RateLimit)return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Forbidden));
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent("{\"truncated\":false,\"tree\":[{\"type\":\"blob\",\"path\":\"Named_Boxarts/Mario (Europe).png\"},{\"type\":\"blob\",\"path\":\"Named_Boxarts/Zelda (USA).png\"}]}",Encoding.UTF8,"application/json")});
             }
-            ImageRequests++;return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jX1EAAAAASUVORK5CYII="))});
+            ImageRequests++;if(Alias&&(Cycle||request.RequestUri.AbsolutePath.Contains("Mario")))return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(request.RequestUri.AbsolutePath.Contains("Mario")?"Zelda (USA).png":"Mario (Europe).png")});
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jX1EAAAAASUVORK5CYII="))});
         }
     }
     [Fact] public async Task BatchSkipsOwnCoversCachesTheIndexAndKeepsResultsOnCancellation()
@@ -42,6 +43,12 @@ public class CoverDisplayTests
         using var dir=new TestDirectory();var handler=new Source{RateLimit=true};using var http=new HttpClient(handler);var source=new CoverCatalog(http,Path.Combine(dir.Path,"cache"));
         var result=await source.DownloadMissingAsync([new("Mario","SNES","1"),new("Zelda","SNES","2")],[],dir.Path,(_,_)=>{});
         Assert.Equal(2,result.Failed);Assert.Equal(1,handler.IndexRequests);Assert.All(result.Report,r=>Assert.Contains("Coverlimit",r));
+    }
+    [Fact] public async Task IndexedCoverAliasesAreFollowedAndCyclesAreRejected()
+    {
+        using var dir=new TestDirectory();var handler=new Source{Alias=true};using var http=new HttpClient(handler);var source=new CoverCatalog(http,Path.Combine(dir.Path,"cache"));
+        var image=await source.DownloadAsync(new("Mario","SNES","game.sfc"),dir.Path);Assert.NotNull(image);Assert.Equal(2,handler.ImageRequests);
+        handler.Cycle=true;await Assert.ThrowsAsync<IOException>(()=>source.DownloadAsync(new("Mario","SNES","game.sfc"),dir.Path));Assert.Equal(4,handler.ImageRequests);
     }
     [Theory][InlineData(1080,480,3,3)][InlineData(2160,480,3,3)][InlineData(2160,480,6,5)][InlineData(600,272,3,3)][InlineData(0,480,3,1)]
     public void InternalResolutionFollowsMonitorHeightAndPerformanceLimit(int height,int native,int maximum,int expected)=>Assert.Equal(expected,DisplayProfiles.RenderScale(height,native,maximum));

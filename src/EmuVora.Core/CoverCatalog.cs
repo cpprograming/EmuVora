@@ -67,11 +67,21 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
     public async Task<string?> DownloadAsync(Game game,string folder,CancellationToken token=default)
     {
         var repository=CoverLookup.Repository(game.System);if(repository==null)return null;
-        var name=Match(game.Title,await Index(repository,token),region);if(name==null)return null;
-        var url=$"https://raw.githubusercontent.com/libretro-thumbnails/{repository}/master/Named_Boxarts/{Uri.EscapeDataString(name)}";
-        using var response=await http.GetAsync(url,HttpCompletionOption.ResponseHeadersRead,token);if(response.StatusCode==HttpStatusCode.NotFound)return null;
-        if(response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests){var error="GitHub-Coverlimit erreicht. Später erneut versuchen; vorhandene Cover bleiben erhalten.";unavailable[repository]=error;throw new IOException(error);}
-        var image=await ReadBounded(response,10_000_000,token);
+        var index=await Index(repository,token);var name=Match(game.Title,index,region);if(name==null)return null;
+        byte[] image=[];var visited=new HashSet<string>(StringComparer.Ordinal);
+        for(var hop=0;hop<5;hop++)
+        {
+            if(!visited.Add(name))throw new IOException("Zyklischer Cover-Verweis in der Quelle.");
+            var url=$"https://raw.githubusercontent.com/libretro-thumbnails/{repository}/master/Named_Boxarts/{Uri.EscapeDataString(name)}";
+            using var response=await http.GetAsync(url,HttpCompletionOption.ResponseHeadersRead,token);if(response.StatusCode==HttpStatusCode.NotFound)return null;
+            if(response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests){var error="GitHub-Coverlimit erreicht. Später erneut versuchen; vorhandene Cover bleiben erhalten.";unavailable[repository]=error;throw new IOException(error);}
+            image=await ReadBounded(response,10_000_000,token);
+            if(image.Length>=24&&image.AsSpan(0,8).SequenceEqual(new byte[]{137,80,78,71,13,10,26,10}))break;
+            // raw.githubusercontent.com returns a Git symlink's relative target as
+            // text. Follow only another indexed filename in the same cover folder.
+            var target=image.Length<=512?Encoding.UTF8.GetString(image).Trim():"";
+            if(hop==4||!index.Any(n=>n.Name==target))throw new IOException("Die Coverquelle liefert weder ein PNG noch einen gültigen Cover-Verweis.");name=target;
+        }
         if(image.Length<24||!image.AsSpan(0,8).SequenceEqual(new byte[]{137,80,78,71,13,10,26,10}))throw new IOException("Die Coverquelle liefert kein PNG-Bild.");
         var width=BinaryPrimitives.ReadUInt32BigEndian(image.AsSpan(16,4));var height=BinaryPrimitives.ReadUInt32BigEndian(image.AsSpan(20,4));
         if(width==0||height==0||width>8192||height>8192||width* (long)height>32_000_000)throw new IOException("Ungültige Covergröße.");
