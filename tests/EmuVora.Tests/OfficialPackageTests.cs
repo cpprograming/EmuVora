@@ -13,6 +13,8 @@ public class OfficialPackageTests
         var file=Environment.GetEnvironmentVariable("EMUVORA_PACKAGE_CATALOG")??throw new InvalidOperationException("Network tests require EMUVORA_PACKAGE_CATALOG.");
         var catalog=JsonSerializer.Deserialize<PackageCatalog>(System.IO.File.ReadAllText(file).TrimStart('\uFEFF'),SettingsStore.JsonOptions)!;
         using var dir=new TestDirectory();using var manager=new PackageManager();
+        // "latest" is a mutable official tag: resolve its current producer digest as the app does.
+        catalog=await manager.ResolveCurrentReleasesAsync(catalog);
         foreach(var package in catalog.Packages)
         {
             var path=await manager.InstallAsync(package,dir.Path);Assert.True(System.IO.File.Exists(path),package.Id);

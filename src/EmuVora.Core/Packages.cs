@@ -26,6 +26,11 @@ public sealed class PackageManager : IDisposable
         var catalog=JsonSerializer.Deserialize<PackageCatalog>(text.TrimStart('\uFEFF'),SettingsStore.JsonOptions)??throw new InvalidDataException("Download-Katalog ist leer.");
         if(catalog.SchemaVersion!=1||catalog.Packages.Length>32)throw new InvalidDataException("Unbekannter Download-Katalog.");
         foreach(var package in catalog.Packages)ValidatePackage(package);
+        return await ResolveCurrentReleasesAsync(catalog,token);
+    }
+    public async Task<PackageCatalog> ResolveCurrentReleasesAsync(PackageCatalog catalog,CancellationToken token=default)
+    {
+        foreach(var package in catalog.Packages)ValidatePackage(package);
         // Mutable GitHub tags (notably DuckStation's "latest") must be resolved again
         // so a previously published catalog cannot silently install different bytes.
         var updated=catalog.Packages.ToArray();

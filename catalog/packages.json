@@ -2,8 +2,8 @@
   "Packages": [
     {
       "Executable": "duckstation-qt-x64-ReleaseLTCG.exe",
-      "Sha256": "4813f22823e6aa262c46a4a516f10b01e1e2ddf6fcea82763e359ef9ac812a9d",
-      "Version": "latest-615103794",
+      "Sha256": "7e72b17e40bd0e217e5ea35ad65bc8c89166041c6cfd91287e753285f9d7014c",
+      "Version": "latest-629612346",
       "Id": "duckstation",
       "Url": "https://github.com/stenzek/duckstation/releases/download/latest/duckstation-windows-x64-release.zip"
     },
@@ -43,6 +43,6 @@
       "Executable": "fceumm_libretro.dll"
     }
   ],
-  "GeneratedAt": "2026-10-10T17:09:30.9238316Z",
+  "GeneratedAt": "2026-10-11T06:29:50.6879297+00:00",
   "SchemaVersion": 1
 }
