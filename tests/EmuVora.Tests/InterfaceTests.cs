@@ -18,6 +18,14 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact] public void AutomaticSetupAndXboxOptionsAreVisibleInSettings()
+    {
+        using var dir=new TestDirectory();new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){CheckUpdatesOnStartup=false});
+        var window=new MainWindow(dir.Path);window.Show();var settings=window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Emulatoren einrichten");settings.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();
+        var dialog=Assert.Single(window.OwnedWindows);var controls=dialog.GetVisualDescendants().OfType<CheckBox>().ToArray();Assert.Contains(controls,c=>c.Content as string=="Beim Spielen fehlende Emulatoren und Cores automatisch einrichten"&&c.IsChecked==true);Assert.Contains(controls,c=>c.Content as string=="Xbox-Standardbelegung bei neuer Einrichtung verwenden"&&c.IsChecked==true);
+        using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Automatic-setup.png"));}
+        dialog.Close();window.Close();
+    }
     [AvaloniaFact] public void SearchConsoleAndFavoritesWorkTogetherAndSelectionIsStable()
     {
         using var dir=new TestDirectory();new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){CheckUpdatesOnStartup=false});

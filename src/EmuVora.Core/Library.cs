@@ -48,6 +48,8 @@ public static class RomScanner
                 foreach(var file in Directory.EnumerateFiles(directory))
                 {
                     cancellationToken.ThrowIfCancellationRequested();var extension=System.IO.Path.GetExtension(file);
+                    // CHDs beside Arcade ZIP sets are dependencies, not separate library games.
+                    if(extension.Equals(".chd",StringComparison.OrdinalIgnoreCase)&&DetectFolderSystem(file,root) is{} archiveFolder&&SystemCatalog.Find(archiveFolder)?.ArchiveSet==true)continue;
                     string? system;
                     if(extension.Equals(".zip",StringComparison.OrdinalIgnoreCase))
                     {

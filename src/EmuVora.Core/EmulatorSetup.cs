@@ -28,10 +28,11 @@ public static class EmulatorSetup
                     values[$"input_player{player}_joypad_index"]=Quoted(((firstController+player-1)%4).ToString());
                     values[$"input_player{player}_analog_dpad_mode"]=Quoted("1");
                     foreach(var (button,value) in buttons)values[$"input_player{player}_{button}_btn"]=Quoted(value);
-                    foreach(var (axis,value) in new Dictionary<string,string>{{"l_x_minus","-0"},{"l_x_plus","+0"},{"l_y_minus","-1"},{"l_y_plus","+1"},{"r_x_minus","-2"},{"r_x_plus","+2"},{"r_y_minus","-3"},{"r_y_plus","+3"},{"l2","+4"},{"r2","+5"}})values[$"input_player{player}_{axis}_axis"]=Quoted(value);
+                    foreach(var (axis,value) in new Dictionary<string,string>{{"l_x_minus","-0"},{"l_x_plus","+0"},{"l_y_minus","+1"},{"l_y_plus","-1"},{"r_x_minus","-2"},{"r_x_plus","+2"},{"r_y_minus","+3"},{"r_y_plus","-3"},{"l2","+4"},{"r2","+5"}})values[$"input_player{player}_{axis}_axis"]=Quoted(value);
                 }
             }
             Merge(Path.Combine(root,"retroarch.cfg"),new(){{"",values}},replace);
+            Merge(Path.Combine(root,"retroarch-core-options.cfg"),new(){{"",new(){{"flycast_hle_bios",Quoted(File.Exists(Path.Combine(firmware,"dc/dc_boot.bin"))?"disabled":"enabled")}}}},replace);
         }
         else if(id is "duckstation" or "pcsx2")
         {
@@ -40,7 +41,7 @@ public static class EmulatorSetup
             {
                 ["BIOS"]=new(){{duck?"SearchDirectory":"",firmware}},
                 ["Folders"]=duck?new():new(){{"Bios",firmware}},
-                [duck?"Main":"UI"]=duck?new(){{"SetupWizardIncomplete","false"}}:new(){{"SettingsVersion","1"},{"SetupWizardIncomplete","false"}},
+                [duck?"Main":"UI"]=duck?new(){{"SetupWizardIncomplete","false"},{"ConfirmPowerOff","false"}}:new(){{"SettingsVersion","1"},{"SetupWizardIncomplete","false"},{"ConfirmShutdown","false"}},
                 ["Display"]=new(){{"StartFullscreen",fullscreen?"true":"false"}}
             };
             if(!duck)sections.Remove("BIOS");
@@ -49,13 +50,14 @@ public static class EmulatorSetup
             {
                 sections["InputSources"]=new(){{"XInput","true"},{"SDL","false"}};
                 for(var port=1;port<=2;port++)sections[$"Pad{port}"]=PlayStationPad(duck,(firstController+port-1)%4);
+                sections["Hotkeys"]=new(){{duck?"PowerOff":"ShutdownVM",$"XInput-{firstController}/Back & XInput-{firstController}/Start"},{"OpenPauseMenu",$"XInput-{firstController}/Back & XInput-{firstController}/RightShoulder"}};
             }
             Merge(Path.Combine(root,duck?"settings.ini":"inis/PCSX2.ini"),sections,replace);
         }
         else if(id=="dolphin")
         {
             WriteIfAbsent(Path.Combine(root,"portable.txt"),"");
-            Merge(Path.Combine(root,"User/Config/Dolphin.ini"),new(){{"Display",new(){{"Fullscreen",fullscreen?"True":"False"}}},{"Core",new(){{"SIDevice0","6"}}}},replace);
+            Merge(Path.Combine(root,"User/Config/Dolphin.ini"),new(){{"Display",new(){{"Fullscreen",fullscreen?"True":"False"}}},{"Core",new(){{"SIDevice0","6"}}},{"Interface",new(){{"ConfirmStop","False"}}}},replace);
             if(xbox)
             {
                 var pads=new Dictionary<string,Dictionary<string,string>>();
@@ -68,6 +70,7 @@ public static class EmulatorSetup
                 Merge(Path.Combine(root,"User/Config/GCPadNew.ini"),pads,replace);
                 var wii=new Dictionary<string,string>{{"Device",$"XInput/{firstController}/Gamepad"},{"Source","1"},{"Extension","Nunchuk"},{"Buttons/A","`Button A`"},{"Buttons/B","`Trigger R`"},{"Buttons/1","`Button X`"},{"Buttons/2","`Button Y`"},{"Buttons/+","`Start`"},{"Buttons/-","`Back`"},{"Buttons/Home","`Thumb R`"},{"D-Pad/Up","`Pad N`"},{"D-Pad/Down","`Pad S`"},{"D-Pad/Left","`Pad W`"},{"D-Pad/Right","`Pad E`"},{"Nunchuk/Buttons/C","`Shoulder L`"},{"Nunchuk/Buttons/Z","`Trigger L`"},{"Nunchuk/Stick/Up","`Left Y+`"},{"Nunchuk/Stick/Down","`Left Y-`"},{"Nunchuk/Stick/Left","`Left X-`"},{"Nunchuk/Stick/Right","`Left X+`"},{"Shake/X","`Shoulder R`"},{"Shake/Y","`Shoulder R`"},{"Shake/Z","`Shoulder R`"},{"IR/Up","`Right Y+`"},{"IR/Down","`Right Y-`"},{"IR/Left","`Right X-`"},{"IR/Right","`Right X+`"},{"IR/Relative Input","True"}};
                 Merge(Path.Combine(root,"User/Config/WiimoteNew.ini"),new(){{"Wiimote1",wii}},replace);
+                Merge(Path.Combine(root,"User/Config/Hotkeys.ini"),new(){{"Hotkeys",new(){{"Device",$"XInput/{firstController}/Gamepad"},{"General/Stop","`Back` & `Start`"},{"General/Exit","`Back` & `Thumb R`"}}}},replace);
             }
         }
         else if(id=="ppsspp")
@@ -119,12 +122,14 @@ public static class EmulatorSetup
     public static string? FirmwareHint(string system,string dataDirectory)
     {
         var directory=FirmwareDirectory(dataDirectory);
+        if(system=="Dreamcast")return null; // Flycast provides HLE BIOS; a real BIOS is optional.
+        if(system=="MSX")return new[]{"Machines","Databases"}.All(n=>Directory.Exists(Path.Combine(directory,n))&&Directory.EnumerateFiles(Path.Combine(directory,n),"*",SearchOption.AllDirectories).Any())?null:"MSX: eigenen blueMSX-Datenordner mit Machines und Databases importieren (gemeinsamen übergeordneten Ordner wählen).";
         if(system is "PS1" or "PS2")return FindPlayStationBios(system,directory)!=null?null:$"{system}: eigenes BIOS in den Firmware-Ordner importieren (PS1: 512 KiB, PS2: 4 MiB).";
         var definition=SystemCatalog.Find(system);if(definition?.Firmware==null)return null;
         var names=definition.Firmware.Split('|');
         if(names.Any(n=>File.Exists(Path.Combine(directory,n))&&new FileInfo(Path.Combine(directory,n)).Length>0))
         {
-            var additional=system switch {"Neo Geo CD"=>"neocd/000-lo.lo","Intellivision"=>"grom.bin",_=>null};
+            var additional=system switch {"Intellivision"=>"grom.bin",_=>null};
             if(additional!=null&&!File.Exists(Path.Combine(directory,additional)))return system+": Firmware fehlt: "+additional;
             return null;
         }
@@ -134,7 +139,7 @@ public static class EmulatorSetup
     {
         var name=Path.GetFileName(source);var candidates=SystemCatalog.RetroSystems.Where(s=>s.Firmware!=null).SelectMany(s=>s.Firmware!.Split('|')).Concat(["neocd/000-lo.lo","grom.bin","dc/dc_flash.bin"]);
         var relative=candidates.FirstOrDefault(n=>Path.GetFileName(n).Equals(name,StringComparison.OrdinalIgnoreCase))??name;
-        var destination=Path.Combine(FirmwareDirectory(dataDirectory),relative);Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+        var destination=Path.GetFullPath(Path.Combine(FirmwareDirectory(dataDirectory),relative));Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
         if(!Path.GetFullPath(source).Equals(Path.GetFullPath(destination),StringComparison.OrdinalIgnoreCase)){if(File.Exists(destination))File.Copy(destination,destination+".bak",true);File.Copy(source,destination,true);}return destination;
     }
     public static void ImportFirmwareFolder(string source,string dataDirectory,CancellationToken token=default)

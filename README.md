@@ -20,7 +20,7 @@ Unter [GitHub Actions](https://github.com/cpprograming/EmuVora/actions) den neue
 - Mehrdisc-M3U-Dateien bündeln referenzierte Discs. ZIP-Dateien mit genau einer unterstützten Cartridge-ROM können über RetroArch gestartet werden.
 - Fehlende Dateien anzeigen; Entfernen betrifft nur den Bibliothekseintrag, nicht die ROM-Datei.
 - JSON-Sicherung/Wiederherstellung für Titel, Dateipfade, Konsole, Favoriten und Startverlauf. Cover, Einstellungen und Emulator-Speicherstände sind nicht in dieser JSON enthalten.
-- Tastatur: Eingabetaste startet; Strg+F aktiviert die Suche. Xbox/XInput: Steuerkreuz oder linker Stick navigiert mit Wiederholung; A startet, Y schaltet Favoriten um, LB/RB wechselt den Systemfilter, B setzt die Ansicht zurück. Verbundene Controller werden laufend angezeigt. RetroArch, DuckStation, PCSX2 und Dolphin erhalten automatisch Xbox-Profile mit Analogsticks, Triggern und unterstütztem Rumble. PPSSPP nutzt seine eingebauten Xbox-Defaults. RetroArch: View + Menu beendet, View + RB öffnet das Menü. Profile berücksichtigen den ersten verbundenen XInput-Slot. Eigene geänderte Belegungen bleiben erhalten; unveränderte verwaltete Werte werden bei Bedarf angepasst. **Xbox-Standardprofil erneut anwenden** setzt die Standardbelegung mit Dateisicherung zurück.
+- Tastatur: Eingabetaste startet; Strg+F aktiviert die Suche. Xbox/XInput: Steuerkreuz oder linker Stick navigiert mit Wiederholung; A startet, Y schaltet Favoriten um, LB/RB wechselt den Systemfilter, B setzt die Ansicht zurück. Verbundene Controller werden laufend angezeigt. RetroArch, DuckStation, PCSX2 und Dolphin erhalten automatisch Xbox-Profile mit Analogsticks, Triggern und unterstütztem Rumble. PPSSPP nutzt seine eingebauten Xbox-Defaults. RetroArch / PS1 / PS2: View + Menu beendet, View + RB öffnet das Menü. Dolphin: View + Menu beendet das Spiel, View + rechter Stick-Klick schließt den Emulator. PPSSPP: LT öffnet das Menü. Profile berücksichtigen den ersten verbundenen XInput-Slot. Eigene geänderte Belegungen bleiben erhalten; unveränderte verwaltete Werte werden bei Bedarf angepasst. **Xbox-Standardprofil erneut anwenden** setzt die Standardbelegung mit Dateisicherung zurück.
 
 ## Unterstützte Systeme (47 Einträge)
 
@@ -34,7 +34,7 @@ Unter [GitHub Actions](https://github.com/cpprograming/EmuVora/actions) den neue
 - Computer: Commodore 64, Amiga, Amstrad CPC, ZX Spectrum, MSX, DOS.
 - Arcade: FinalBurn Neo und MAME.
 
-Gemeinsame Formate wie CHD/CUE/ISO, DSK, ROM oder komplette ZIP-ROM-Sets in einen Systemordner legen, z. B. `Saturn`, `MSX`, `DOS`, `MAME` oder `FBNeo`. Mehrdisc-Playlists werden zusammengefasst. Arcade-/DOS-Archive bleiben als vollständige Sets erhalten. Die Firmware-Prüfung erkennt Dateinamen und grundlegende Größen, ersetzt aber keine Validierung durch den Emulator. MSX benötigt die eigenen blueMSX-Verzeichnisse `Machines` und `Databases`; ganze Firmware-Ordner lassen sich importieren.
+Dreamcast nutzt ohne eigene BIOS-Datei automatisch Flycast HLE. Gemeinsame Formate wie CHD/CUE/ISO, DSK, ROM oder komplette ZIP-ROM-Sets in einen Systemordner legen, z. B. `Saturn`, `MSX`, `DOS`, `MAME` oder `FBNeo`. Mehrdisc-Playlists werden zusammengefasst. Arcade-/DOS-Archive bleiben als vollständige Sets erhalten. Die Firmware-Prüfung erkennt Dateinamen und grundlegende Größen, ersetzt aber keine Validierung durch den Emulator. MSX benötigt die eigenen blueMSX-Verzeichnisse `Machines` und `Databases`; ganze Firmware-Ordner lassen sich importieren.
 
 ## Downloads und Updates
 

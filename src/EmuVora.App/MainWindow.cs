@@ -424,7 +424,7 @@ public sealed class MainWindow : Window
             if(running.Count>0){status.Text="Laufende Spiele zuerst schließen.";return;}
             await BusyAsync(async token=>{catalog=await packages.GetCatalogAsync(token);foreach(var id in EmulatorCatalog.Known.Select(e=>e.Id).Append("retroarch-cores"))await InstallManagedAsync(id,token);status.Text="Emulatoren, Cores und Xbox-Standardbelegung eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";});
         }));
-        panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch: View + Menu beendet das Spiel; View + RB öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
+        panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch / PS1 / PS2: View + Menu beendet das Spiel; View + RB öffnet das Menü. Dolphin: View + Menu beendet; PPSSPP: LT öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await StorageProvider.OpenFilePickerAsync(new(){Title="Eigene BIOS-/Firmware-Dateien",AllowMultiple=true});Guard(()=>{foreach(var file in files)if(file.TryGetLocalPath() is{} source)EmulatorSetup.ImportFirmware(source,dataDir);status.Text=$"{files.Count} Firmware-Dateien importiert. PS1 / PS2: BIOS im Emulator prüfen und auswählen.";});}));
         panel.Children.Add(AsyncButton("Firmware-Ordner importieren (z. B. MSX)",async()=>
         {
@@ -451,7 +451,7 @@ public sealed class MainWindow : Window
     private static void PreserveConfiguration(string previous,string next)
     {
         var source=Path.GetDirectoryName(previous)!;var destination=Path.GetDirectoryName(next)!;
-        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","portable.ini","portable.txt","settings.ini","retroarch.cfg.emuvora-defaults.json","settings.ini.emuvora-defaults.json",".emuvora-configured"})if(File.Exists(Path.Combine(source,name))&&(File.GetAttributes(Path.Combine(source,name))&FileAttributes.ReparsePoint)==0)File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
+        foreach(var name in new[]{"retroarch.cfg","retroarch-core-options.cfg","retroarch-core-options.cfg.emuvora-defaults.json","portable.ini","portable.txt","settings.ini","retroarch.cfg.emuvora-defaults.json","settings.ini.emuvora-defaults.json",".emuvora-configured"})if(File.Exists(Path.Combine(source,name))&&(File.GetAttributes(Path.Combine(source,name))&FileAttributes.ReparsePoint)==0)File.Copy(Path.Combine(source,name),Path.Combine(destination,name),true);
         foreach(var name in new[]{"memstick","inis","memcards","sstates","bios","system","saves","states","config","autoconfig","playlists","cheats","User"})
         {
             var folder=Path.Combine(source,name);if(!Directory.Exists(folder)||(File.GetAttributes(folder)&FileAttributes.ReparsePoint)!=0)continue;
