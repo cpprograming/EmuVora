@@ -37,10 +37,21 @@ jobs:
         run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
       - name: Include installation script and documentation
         shell: pwsh
-        run: Copy-Item README.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
+        run: Copy-Item README.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LIBRARY_AND_DISPLAY.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
       - name: Verify selectable installation and update paths
         shell: pwsh
         run: ./scripts/test-installation.ps1
+      - name: Build setup EXE
+        shell: pwsh
+        run: |
+          Copy-Item installer/EmuVora.ico -Destination publish/
+          Compress-Archive -Path publish/* -DestinationPath portable.zip
+          New-Item -ItemType Directory setup-output | Out-Null
+          ./installer/build-setup.ps1 -PackageZip portable.zip -OutputPath setup-output/EmuVora-Setup-v0.6.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EmuVora-Setup-win-x64
+          path: setup-output/
       - uses: actions/upload-artifact@v4
         with:
           name: EmuVora-win-x64

@@ -51,6 +51,7 @@ public sealed class ManagedGameLauncher
         if(settings.Packages.TryGetValue(definition.Id,out var managed)&&managed.ExecutablePath==executable)
         {
             if(settings.AutomaticSetup)EmulatorSetup.Configure(definition.Id,executable,request.DataDirectory,settings.XboxDefaults,settings.Fullscreen,firstController:firstController);
+            DisplayProfiles.Apply(definition.Id,executable,game.System,DisplayDetection.Current(),settings);
             var hint=EmulatorSetup.FirmwareHint(game.System,request.DataDirectory,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,request.DataDirectory));if(hint!=null)throw new IOException(hint);
         }
         progress?.Report(new("Spiel wird gestartet …"));

@@ -20,6 +20,7 @@ public static class CoverLookup
         ["DOS"]="DOS",["Arcade (FinalBurn Neo)"]="FBNeo_-_Arcade_Games",["Arcade (MAME)"]="MAME"
     };
     public static Uri? GetUrl(Game game)=>Repositories.TryGetValue(game.System,out var repository)?new Uri($"https://raw.githubusercontent.com/libretro-thumbnails/{repository}/master/Named_Boxarts/{Uri.EscapeDataString(game.Title)}.png"):null;
+    public static string? Repository(string system)=>Repositories.GetValueOrDefault(system);
     public static async Task<string?> DownloadAsync(Game game,string folder,CancellationToken token=default)
     {
         var url=GetUrl(game);if(url==null)return null;using var http=new HttpClient {Timeout=TimeSpan.FromSeconds(30)};

@@ -11,6 +11,7 @@ public sealed class LocationWindow : Window
 {
     public LocationWindow(DataLocation location, Action<Window> start, string? saved = null, string? error = null)
     {
+        WindowAppearance.Apply(this);Background=Brush.Parse("#101722");Foreground=Brush.Parse("#EAF0FA");
         Title = "EmuVora – Speicherort wählen"; Width = 700; Height = 470; MinWidth = 560; MinHeight = 420;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         var panel = new StackPanel { Margin = new Thickness(28), Spacing = 16 };
