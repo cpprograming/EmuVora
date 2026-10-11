@@ -1,3 +1,7 @@
+## Neu in v0.6
+
+Automatischer Sammeldownload fehlender Cover, regionale Titelvarianten, Monitor-Erkennung und Grafikprofile für verwaltete Emulatoren. Die Bibliothek bietet Konsolen-Navigation, einstellbare Covergröße und Details; die Einstellungen sind in vier Tabs gegliedert. Windows-Builds liefern zusätzlich eine Setup-EXE mit eigenem Symbol und Desktop-/Startmenü-Verknüpfungen. Details: [Bibliothek und Bildqualität](LIBRARY_AND_DISPLAY.md).
+
 # EmuVora
 
 Windows-Spielbibliothek für RetroArch, DuckStation, PCSX2, Dolphin und PPSSPP. EmuVora verwaltet deine eigenen ROMs und startet die offiziellen externen Emulatoren.

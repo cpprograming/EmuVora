@@ -117,7 +117,8 @@ public static class EmulatorSetup
         }
         var content=string.Join(Environment.NewLine,output)+Environment.NewLine;
         if(!File.Exists(file)||File.ReadAllText(file)!=content)AtomicFile.WriteText(file,content);
-        var json=System.Text.Json.JsonSerializer.Serialize(defaults,SettingsStore.JsonOptions);
+        foreach(var(sectionName,values)in defaults){if(!prior.TryGetValue(sectionName,out var sectionValues)){sectionValues=[];prior[sectionName]=sectionValues;}foreach(var(key,value)in values)sectionValues[key]=value;}
+        var json=System.Text.Json.JsonSerializer.Serialize(prior,SettingsStore.JsonOptions);
         if(!File.Exists(manifest)||File.ReadAllText(manifest)!=json)AtomicFile.WriteText(manifest,json);
     }
     public static string? FirmwareHint(string system,string dataDirectory,string? firmwareDirectory=null)

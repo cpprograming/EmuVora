@@ -54,7 +54,7 @@ if(!$SkipShortcuts){
     $taskShell=New-Object -ComObject WScript.Shell
     $taskLinks=@((Join-Path ([Environment]::GetFolderPath('Programs')) 'EmuVora.lnk'))
     if($DesktopShortcut){$taskLinks+=Join-Path ([Environment]::GetFolderPath('Desktop')) 'EmuVora.lnk'}
-    foreach($taskLink in $taskLinks){$taskShortcut=$taskShell.CreateShortcut($taskLink);$taskShortcut.TargetPath=Join-Path $taskDestination 'EmuVora.App.exe';$taskShortcut.WorkingDirectory=$taskDestination;$taskShortcut.Save()}
+    foreach($taskLink in $taskLinks){$taskShortcut=$taskShell.CreateShortcut($taskLink);$taskShortcut.TargetPath=Join-Path $taskDestination 'EmuVora.App.exe';$taskShortcut.WorkingDirectory=$taskDestination;$taskShortcut.Description="EmuVora – Spielebibliothek und Emulatoren";$taskShortcut.IconLocation=Join-Path $taskDestination "EmuVora.ico";$taskShortcut.Save()}
 }
 Write-Host "EmuVora installiert: $taskDestination"
 Write-Host "Bibliothek / Emulatoren / Cores / Cover / Spielstände: $taskData"

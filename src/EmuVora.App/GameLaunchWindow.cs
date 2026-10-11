@@ -12,6 +12,8 @@ public sealed class GameLaunchWindow : Window
 {
     public GameLaunchWindow(EsDeLaunchRequest request)
     {
+        WindowAppearance.Apply(this);Background=Brush.Parse("#101722");Foreground=Brush.Parse("#EAF0FA");
+        var monitor=DisplayDetection.Current();
         Title="EmuVora – Spiel starten";Width=620;Height=420;MinWidth=500;MinHeight=280;WindowStartupLocation=WindowStartupLocation.CenterScreen;RequestedThemeVariant=ThemeVariant.Dark;
         var token=new CancellationTokenSource();var panel=new StackPanel{Margin=new Thickness(26),Spacing=18};
         var status=new TextBlock{Text="Emulator und Spiel werden vorbereitet …",TextWrapping=TextWrapping.Wrap,FontSize=18};var progress=new ProgressBar{IsIndeterminate=true};
@@ -24,7 +26,7 @@ public sealed class GameLaunchWindow : Window
             try
             {
                 var updates=new Progress<DownloadProgress>(value=>{status.Text=value.Message;progress.IsIndeterminate=value.Fraction==null;if(value.Fraction is{} fraction)progress.Value=fraction*100;});
-                await ManagedGameLauncher.RunAsync(request,Gamepad.Read().FirstOrDefault().Index,()=>Hide(),updates,token.Token);Close();
+                await ManagedGameLauncher.RunAsync(request,Gamepad.Read().FirstOrDefault().Index,()=>Hide(),updates,token.Token,monitor);Close();
             }
             catch(OperationCanceledException){Close();}
             catch(Exception ex)
