@@ -39,6 +39,11 @@ public class SetupTests
         using var dir=new TestDirectory();var file=dir.File("settings.ini","[Main]\nCustom = yes\n[Other]\nValue = 1\n");
         EmulatorSetup.Merge(file,new(){{"Main",new(){{"New","2"}}}});var text=System.IO.File.ReadAllText(file);Assert.Equal(1,text.Split("[Main]").Length-1);Assert.True(text.IndexOf("New = 2")<text.IndexOf("[Other]"));Assert.True(System.IO.File.Exists(file+".bak"));
     }
+    [Fact] public void ExistingControllerAndFirmwarePathsAreRetainedWithoutExplicitReset()
+    {
+        using var dir=new TestDirectory();var exe=dir.File("retro/program.exe");var config=dir.File("retro/retroarch.cfg","input_joypad_driver = \"sdl2\"\nsystem_directory = \"../my-bios\"\n");
+        EmulatorSetup.Configure("retroarch",exe,dir.Path);Assert.Contains("input_joypad_driver = \"sdl2\"",System.IO.File.ReadAllText(config));Assert.Equal(System.IO.Path.GetFullPath(System.IO.Path.Combine(dir.Path,"my-bios")),EmulatorSetup.ConfiguredFirmwareDirectory("retroarch",exe,dir.Path));
+    }
     [Fact] public void FirmwareImportRoutesSubdirectoriesAndChecksAdditionalFiles()
     {
         using var dir=new TestDirectory();var data=System.IO.Path.Combine(dir.Path,"data");var file=dir.File("sources/dc_boot.bin","firmware");

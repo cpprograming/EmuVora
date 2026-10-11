@@ -7,7 +7,7 @@ public static class EmulatorSetup
     public static void Configure(string id,string executable,string dataDirectory,bool xbox=true,bool fullscreen=true,bool reset=false,int firstController=0)
     {
         var root=Path.GetDirectoryName(executable)!;var firmware=FirmwareDirectory(dataDirectory);Directory.CreateDirectory(firmware);
-        var marker=Path.Combine(root,".emuvora-configured");var first=!File.Exists(marker);var replace=reset||first;
+        var marker=Path.Combine(root,".emuvora-configured");var replace=reset;
         // Only call this for managed packages. Portable markers keep settings inside the package.
         if(id=="retroarch")
         {
@@ -119,9 +119,9 @@ public static class EmulatorSetup
         var json=System.Text.Json.JsonSerializer.Serialize(defaults,SettingsStore.JsonOptions);
         if(!File.Exists(manifest)||File.ReadAllText(manifest)!=json)AtomicFile.WriteText(manifest,json);
     }
-    public static string? FirmwareHint(string system,string dataDirectory)
+    public static string? FirmwareHint(string system,string dataDirectory,string? firmwareDirectory=null)
     {
-        var directory=FirmwareDirectory(dataDirectory);
+        var directory=firmwareDirectory??FirmwareDirectory(dataDirectory);
         if(system=="Dreamcast")return null; // Flycast provides HLE BIOS; a real BIOS is optional.
         if(system=="MSX")return new[]{"Machines","Databases"}.All(n=>Directory.Exists(Path.Combine(directory,n))&&Directory.EnumerateFiles(Path.Combine(directory,n),"*",SearchOption.AllDirectories).Any())?null:"MSX: eigenen blueMSX-Datenordner mit Machines und Databases importieren (gemeinsamen übergeordneten Ordner wählen).";
         if(system is "PS1" or "PS2")return FindPlayStationBios(system,directory)!=null?null:$"{system}: eigenes BIOS in den Firmware-Ordner importieren (PS1: 512 KiB, PS2: 4 MiB).";
@@ -134,6 +134,25 @@ public static class EmulatorSetup
             return null;
         }
         return system+": Firmware fehlt: "+string.Join(" oder ",names)+". "+definition.Note;
+    }
+    public static string ConfiguredFirmwareDirectory(string id,string executable,string dataDirectory)
+    {
+        var root=Path.GetDirectoryName(executable)!;
+        var (file,expectedSection,key)=id switch
+        {
+            "retroarch"=>("retroarch.cfg","","system_directory"),
+            "duckstation"=>("settings.ini","BIOS","SearchDirectory"),
+            "pcsx2"=>("inis/PCSX2.ini","Folders","Bios"),
+            _=>("","","")
+        };
+        var path=Path.Combine(root,file);var section="";
+        if(File.Exists(path))foreach(var line in File.ReadLines(path))
+        {
+            var text=line.Trim();if(text.StartsWith('[')&&text.EndsWith(']'))section=text[1..^1];
+            var split=text.IndexOf('=');if(split<1||section!=expectedSection||!text[..split].Trim().Equals(key,StringComparison.OrdinalIgnoreCase))continue;
+            var value=text[(split+1)..].Trim().Trim('"');if(value.Length>0&&value!="default")return Path.GetFullPath(Path.Combine(root,value));
+        }
+        return FirmwareDirectory(dataDirectory);
     }
     public static string ImportFirmware(string source,string dataDirectory)
     {

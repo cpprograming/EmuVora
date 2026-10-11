@@ -1,9 +1,12 @@
 using EmuVora.Core;
 using System.Text.Json;
+using System.Runtime.InteropServices;
 using Xunit;
 namespace EmuVora.Tests;
 public class OfficialPackageTests
 {
+    [StructLayout(LayoutKind.Sequential)] private struct CoreInfo {public IntPtr Name,Version,Extensions;public byte NeedFullPath,BlockExtract;}
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void GetSystemInfo(out CoreInfo info);
     [Fact][Trait("Category","Network")]
     public async Task AllOfficialPackagesVerifyExtractAndContainTheirEntryPoints()
     {
@@ -13,7 +16,20 @@ public class OfficialPackageTests
         foreach(var package in catalog.Packages)
         {
             var path=await manager.InstallAsync(package,dir.Path);Assert.True(System.IO.File.Exists(path),package.Id);
-            if(package.Id=="retroarch-cores")foreach(var core in PackageManager.CoreIds.Values.Distinct())Assert.True(System.IO.File.Exists(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path)!,core+"_libretro.dll")),core);
+            if(package.Id=="retroarch-cores")foreach(var core in PackageManager.CoreIds.Values.Distinct())
+            {
+                var file=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path)!,core+"_libretro.dll");Assert.True(System.IO.File.Exists(file),core);
+                if(!OperatingSystem.IsWindows())continue;
+                var library=NativeLibrary.Load(file);
+                try
+                {
+                    Marshal.GetDelegateForFunctionPointer<GetSystemInfo>(NativeLibrary.GetExport(library,"retro_get_system_info"))(out var info);
+                    var extensions=(Marshal.PtrToStringUTF8(info.Extensions)??"").Split('|');
+                    foreach(var system in SystemCatalog.RetroSystems.Where(s=>s.Core==core))Assert.True(extensions.Contains(system.Extensions.Split(' ')[0],StringComparer.OrdinalIgnoreCase),$"{system.Name}: core {core} accepts {string.Join('|',extensions)}");
+                }
+                finally{NativeLibrary.Free(library);}
+            }
+            else EmulatorSetup.Configure(package.Id,path,System.IO.Path.Combine(dir.Path,"data"),reset:true);
         }
     }
 }

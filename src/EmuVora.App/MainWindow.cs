@@ -236,7 +236,7 @@ public sealed class MainWindow : Window
             if(string.IsNullOrEmpty(executable)||!File.Exists(executable)){status.Text=$"{definition.Name} zuerst unter „Emulatoren einrichten“ installieren oder auswählen.";await ShowSettingsAsync(definition.Id);return;}
             if(settings.Packages.TryGetValue(definition.Id,out var managed)&&managed.ExecutablePath==executable)
             {
-                var hint=EmulatorSetup.FirmwareHint(game.System,dataDir);
+                var hint=EmulatorSetup.FirmwareHint(game.System,dataDir,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,dataDir));
                 if(hint!=null){status.Text=hint;await ShowSettingsAsync(definition.Id);return;}
             }
             var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen);running[game.Path]=process;runningEmulators.Add(definition.Id);
@@ -310,7 +310,7 @@ public sealed class MainWindow : Window
         else
         {
             if(previous!=null&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
-            EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.Read().FirstOrDefault().Index);
+            EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.Read().FirstOrDefault().Index);
             settings.EmulatorPaths[id]=executable;
         }
         settings.Packages[id]=new(package.Version,executable,previous);settingsStore.Save(settings);
@@ -379,7 +379,7 @@ public sealed class MainWindow : Window
                 var executable=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
                 var previous=settings.EmulatorPaths.GetValueOrDefault(id);
                 if(!string.IsNullOrEmpty(previous)&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
-                EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.Read().FirstOrDefault().Index);
+                EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.Read().FirstOrDefault().Index);
                 settings.Packages[id]=new(package.Version,executable,previous);settings.EmulatorPaths[id]=executable;settingsStore.Save(settings);Load();status.Text=Current().Name+" automatisch eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";
             });
         }));
