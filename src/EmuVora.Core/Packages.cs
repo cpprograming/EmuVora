@@ -54,7 +54,7 @@ public sealed class PackageManager : IDisposable
     public static void ValidatePackage(EmulatorPackage package)
     {
         if(!Regex.IsMatch(package.Id,"^[a-z0-9_-]+$")||!Regex.IsMatch(package.Sha256,"^[a-fA-F0-9]{64}$"))throw new InvalidDataException("Ungültige Paket-Prüfsumme.");
-        if(!EmulatorCatalog.Known.Any(e=>e.Id==package.Id)&&package.Id!="retroarch-cores")throw new InvalidDataException("Unbekanntes Paket.");
+        if(!EmulatorCatalog.Known.Any(e=>e.Id==package.Id)&&package.Id is not ("retroarch-cores" or "esde" or "alekfull-nx"))throw new InvalidDataException("Unbekanntes Paket.");
         var url=new Uri(package.Url);if(url.Scheme!="https"||url.UserInfo.Length!=0||url.Port!=443)throw new InvalidDataException("Ungültige Download-Adresse.");
         var valid=package.Id switch
         {
@@ -63,17 +63,20 @@ public sealed class PackageManager : IDisposable
             "ppsspp"=>url.Host=="github.com"&&url.AbsolutePath.StartsWith("/hrydgard/ppsspp/releases/download/",StringComparison.Ordinal),
             "dolphin"=>url.Host=="dl.dolphin-emu.org"&&url.AbsolutePath.StartsWith("/releases/",StringComparison.Ordinal),
             "retroarch" or "retroarch-cores"=>url.Host=="buildbot.libretro.com"&&url.AbsolutePath.StartsWith("/stable/",StringComparison.Ordinal),
+            "esde"=>url.Host=="gitlab.com"&&Regex.IsMatch(url.AbsolutePath,@"^/es-de/emulationstation-de/-/package_files/[0-9]+/download$"),
+            "alekfull-nx"=>url.Host=="codeload.github.com"&&Regex.IsMatch(url.AbsolutePath,@"^/anthonycaccese/alekfull-nx-es-de/zip/[a-f0-9]{40}$"),
             _=>false
         };
         if(!valid)throw new InvalidDataException("Der Download stammt nicht aus der offiziellen Paketquelle.");
-        if(Path.GetFileName(package.Executable)!=package.Executable||!Regex.IsMatch(package.Executable,"^[a-zA-Z0-9_.-]+\\.(exe|dll)$",RegexOptions.IgnoreCase))throw new InvalidDataException("Ungültiger Paket-Einstiegspunkt.");
-        if(!url.AbsolutePath.EndsWith(".zip",StringComparison.OrdinalIgnoreCase)&&!url.AbsolutePath.EndsWith(".7z",StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Nur portable ZIP/7z-Pakete werden unterstützt.");
+        if(Path.GetFileName(package.Executable)!=package.Executable||!(Regex.IsMatch(package.Executable,"^[a-zA-Z0-9_.-]+\\.(exe|dll)$",RegexOptions.IgnoreCase)||package.Id=="alekfull-nx"&&package.Executable=="capabilities.xml"))throw new InvalidDataException("Ungültiger Paket-Einstiegspunkt.");
+        if(package.Id is not ("esde" or "alekfull-nx")&&!url.AbsolutePath.EndsWith(".zip",StringComparison.OrdinalIgnoreCase)&&!url.AbsolutePath.EndsWith(".7z",StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Nur portable ZIP/7z-Pakete werden unterstützt.");
     }
     public async Task<string> InstallAsync(EmulatorPackage package,string root,IProgress<DownloadProgress>? progress=null,CancellationToken token=default)
     {
         ValidatePackage(package);var directory=Path.Combine(Path.GetFullPath(root),package.Id);Directory.CreateDirectory(directory);
         var staging=Path.Combine(directory,"staging-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(staging);
-        var archive=Path.Combine(staging,"download"+Path.GetExtension(new Uri(package.Url).AbsolutePath));
+        var extension=package.Id is "esde" or "alekfull-nx"?".zip":Path.GetExtension(new Uri(package.Url).AbsolutePath);
+        var archive=Path.Combine(staging,"download"+extension);
         try
         {
             using(var response=await GetDownloadAsync(new Uri(package.Url),token))
@@ -103,7 +106,7 @@ public sealed class PackageManager : IDisposable
             if((int)response.StatusCode is not (301 or 302 or 303 or 307 or 308))return response;
             var location=response.Headers.Location;response.Dispose();if(location==null)throw new InvalidDataException("Download-Weiterleitung fehlt.");
             url=location.IsAbsoluteUri?location:new Uri(url,location);
-            if(url.Scheme!="https"||url.UserInfo.Length>0||url.Port!=443||!(url.Host is "github.com" or "release-assets.githubusercontent.com" or "objects.githubusercontent.com" or "dl.dolphin-emu.org" or "buildbot.libretro.com"))throw new InvalidDataException("Unzulässige Download-Weiterleitung.");
+            if(url.Scheme!="https"||url.UserInfo.Length>0||url.Port!=443||!(url.Host is "github.com" or "release-assets.githubusercontent.com" or "objects.githubusercontent.com" or "dl.dolphin-emu.org" or "buildbot.libretro.com" or "gitlab.com" or "codeload.github.com"))throw new InvalidDataException("Unzulässige Download-Weiterleitung.");
         }
         throw new InvalidDataException("Zu viele Download-Weiterleitungen.");
     }

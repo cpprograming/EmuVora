@@ -19,7 +19,9 @@ public sealed class MainWindow : Window
     private readonly string dataDir;
     private readonly LibraryStore store;
     private readonly SettingsStore settingsStore;
-    private readonly AppSettings settings;
+    private AppSettings settings;
+    private Process? esDeProcess;
+    private bool isClosed;
     private readonly PackageManager packages=new();
     private readonly ListBox gamesList=new();
     private readonly TextBox search=new(){Watermark="Spiele suchen …"};
@@ -66,7 +68,7 @@ public sealed class MainWindow : Window
     private int controllerIndex=-1;
     private bool dialogOpen;
     public MainWindow():this(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"EmuVora")){ }
-    public MainWindow(string directory)
+    public MainWindow(string directory,bool setupOnly=false)
     {
         dataDir=directory;Directory.CreateDirectory(dataDir);
         settingsStore=new(Path.Combine(dataDir,"settings.json"));settings=settingsStore.Load();store=new(Path.Combine(dataDir,"library.db"));allGames=store.GetAll();
@@ -83,12 +85,13 @@ public sealed class MainWindow : Window
         var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());sidebar.Children.Add(import);operationButtons.Add(import);
         var rescan=AsyncButton("Ordner neu scannen",()=>RescanAsync());sidebar.Children.Add(rescan);operationButtons.Add(rescan);
         sidebar.Children.Add(AsyncButton("Emulatoren einrichten",()=>ShowSettingsAsync()));
+        sidebar.Children.Add(AsyncButton("AlekFull NX · ES-DE öffnen",()=>OpenEsDeAsync()));
         sidebar.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));
         sidebar.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));
         sidebar.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));
         sidebar.Children.Add(controllerStatus);
         sidebar.Children.Add(themeStatus);
-        sidebar.Children.Add(new TextBlock {Text="Windows · v0.4\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
+        sidebar.Children.Add(new TextBlock {Text="Windows · v0.5\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
         var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=12};
         header.Children.Add(themeLogo);var heading=new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold};Grid.SetColumn(heading,1);header.Children.Add(heading);Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
@@ -110,9 +113,9 @@ public sealed class MainWindow : Window
         KeyDown+=(_,e)=>{if(e.Key==Key.F&&e.KeyModifiers.HasFlag(KeyModifiers.Control)){search.Focus();e.Handled=true;}};
         UpdateSystems();ApplyTheme();Refresh();
         status.Text=settingsStore.LoadWarning??"ROM-Ordner importieren oder Emulatoren einrichten, um zu starten.";
-        Opened+=async(_,_)=>{if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();};
+        Opened+=async(_,_)=>{if(setupOnly){await ShowSettingsAsync();return;}if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
-        Closed+=(_,_)=>{gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();};
+        Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
     private Button ActionButton(string text,Action action)
@@ -389,11 +392,47 @@ public sealed class MainWindow : Window
         }
         catch(Exception ex){Log(ex);}
     }
+    private async Task OpenEsDeAsync()
+    {
+        if(esDeProcess!=null||operation!=null){status.Text="ES-DE oder ein anderer Vorgang läuft bereits.";return;}
+        if(running.Count>0){status.Text="Das laufende Spiel zuerst schließen.";return;}
+        if(!allGames.Any(g=>EmulatorCatalog.Systems.Contains(g.System))){status.Text="Zuerst mindestens ein Spiel importieren und seine Konsole zuordnen. Danach AlekFull NX öffnen.";return;}
+        try
+        {
+            if(!await BusyAsync(async token=>
+            {
+                await EsDeFrontend.InstallAsync(dataDir,settings,packages,DownloadProgress(),token);
+                EsDeFrontend.ImportChanges(dataDir,store,settings);
+                var launcher=Environment.ProcessPath??throw new IOException("EmuVora-Programmdatei wurde nicht gefunden.");
+                if(Path.GetFileNameWithoutExtension(launcher).Equals("dotnet",StringComparison.OrdinalIgnoreCase))throw new IOException("Den ES-DE-Modus bitte mit der veröffentlichten EmuVora.App.exe starten.");
+                await Task.Run(()=>EsDeFrontend.Export(dataDir,launcher,store.GetAll(),settings),token);settingsStore.Save(settings);
+            }))return;
+            esDeProcess=Process.Start(EsDeFrontend.CreateStartInfo(settings.EsDeExecutable!,dataDir))??throw new IOException("ES-DE konnte nicht gestartet werden.");
+            Hide();await esDeProcess.WaitForExitAsync();
+            if(esDeProcess.ExitCode!=0)throw new IOException("ES-DE wurde mit Fehlercode "+esDeProcess.ExitCode+" beendet. Protokoll: "+Path.Combine(EsDeFrontend.AppData(dataDir),"logs","es_log.txt"));
+            settings=settingsStore.Load();if(settingsStore.LoadWarning!=null)throw new IOException(settingsStore.LoadWarning);
+            EsDeFrontend.ImportChanges(dataDir,store,settings);settingsStore.Save(settings);
+            status.Text="Zurück aus ES-DE. Favoriten, Cover und Spielverlauf sind abgeglichen.";
+        }
+        catch(Exception ex){ShowError(ex);}
+        finally
+        {
+            esDeProcess?.Dispose();esDeProcess=null;
+            if(!isClosed)
+            {
+                var latest=settingsStore.Load();if(settingsStore.LoadWarning==null)settings=latest;
+                foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();Reload();Show();Activate();
+            }
+        }
+    }
     private async Task ShowSettingsAsync(string? initialEmulator=null)
     {
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Emulatoren & Einstellungen",FontSize=25,FontWeight=FontWeight.Bold});
         if(initialEmulator!=null)panel.Children.Add(new TextBlock {Text=status.Text,TextWrapping=TextWrapping.Wrap});
         var theme=new ComboBox {ItemsSource=new[]{"Midnight","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
+        var esDeStartup=new CheckBox{Content="Beim Start AlekFull NX in ES-DE öffnen",IsChecked=settings.StartInEsDe};esDeStartup.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.StartInEsDe=esDeStartup.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(esDeStartup);
+        panel.Children.Add(new TextBlock{Text="AlekFull NX nutzt die originale ES-DE-Oberfläche mit Varianten, Schriftarten, Sounds und Animationen. Spiele starten über EmuVora mit automatischer Emulator-/Core-Einrichtung. ES-DE und Theme werden beim ersten Öffnen auf dein gewähltes Laufwerk heruntergeladen. Theme-Optionen änderst du in ES-DE unter Menü → UI-Einstellungen.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(AsyncButton("ES-DE + AlekFull NX vorab herunterladen",async()=>{await BusyAsync(async token=>{await EsDeFrontend.InstallAsync(dataDir,settings,packages,DownloadProgress(),token);settingsStore.Save(settings);status.Text="ES-DE und AlekFull NX sind installiert. Links „AlekFull NX · ES-DE öffnen“ wählen.";});}));
         panel.Children.Add(new TextBlock {Text="Datenordner: "+dataDir,TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
         panel.Children.Add(new TextBlock {Text="Klassische EmulationStation-Themes: importierter Hintergrund, PNG/JPEG/SVG-Konsolenlogo und Listen-/Detailfarben. EmuVora behält sein Layout und seine Bedienelemente. Eigene Schriftdateien, Animationen, Videos, Extras und ES-DE-Varianten sind noch nicht kompatibel.",TextWrapping=TextWrapping.Wrap});

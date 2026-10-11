@@ -12,6 +12,9 @@ EmuVora uses the following independently licensed libraries:
 
 Downloaded emulator packages are provided by their original projects. Their bundled license/notice files remain in each installation directory:
 
+- Optional [ES-DE](https://gitlab.com/es-de/emulationstation-de), downloaded as a separate GPL application from its official Windows portable release. Bundled upstream notices remain intact.
+- Optional [AlekFull NX ES-DE](https://github.com/anthonycaccese/alekfull-nx-es-de): fagnerpc / anthonycaccese, CC-BY-NC-SA 2.0. Downloaded at runtime; not included in EmuVora binaries or source packages. Its original README attribution is retained.
+
 - [RetroArch](https://www.retroarch.com/) and libretro cores: licenses vary by core.
 - [DuckStation](https://github.com/stenzek/duckstation).
 - [PCSX2](https://github.com/PCSX2/pcsx2).
