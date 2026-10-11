@@ -352,6 +352,7 @@ public sealed class MainWindow : Window
     private async Task ShowSettingsAsync(string? initialEmulator=null)
     {
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Emulatoren & Einstellungen",FontSize=25,FontWeight=FontWeight.Bold});
+        if(initialEmulator!=null)panel.Children.Add(new TextBlock {Text=status.Text,TextWrapping=TextWrapping.Wrap});
         var theme=new ComboBox {ItemsSource=new[]{"Midnight","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
         var fullscreen=new CheckBox {Content="Spiele im Vollbild starten (wenn unterstützt)",IsChecked=settings.Fullscreen};var auto=new CheckBox {Content="Beim Start auf Updates prüfen",IsChecked=settings.CheckUpdatesOnStartup};panel.Children.Add(fullscreen);panel.Children.Add(auto);
         var autoInstall=new CheckBox {Content="Updates für verwaltete Installationen automatisch installieren",IsChecked=settings.AutoInstallUpdates};panel.Children.Add(autoInstall);
@@ -434,6 +435,7 @@ public sealed class MainWindow : Window
         panel.Children.Add(ActionButton("BIOS-/Firmware-Ordner öffnen",()=>{Directory.CreateDirectory(EmulatorSetup.FirmwareDirectory(dataDir));OpenPath(EmulatorSetup.FirmwareDirectory(dataDir));}));
         panel.Children.Add(new TextBlock {Text="Systemhinweise",FontWeight=FontWeight.Bold});
         var hints=new ComboBox {ItemsSource=SystemCatalog.RetroSystems.Select(s=>s.Name).ToArray(),SelectedIndex=0};var hintText=new TextBlock {TextWrapping=TextWrapping.Wrap};
+        if(Selected is{} selectedGame&&SystemCatalog.Find(selectedGame.System)!=null)hints.SelectedItem=selectedGame.System;
         void LoadHint(){var system=SystemCatalog.Find((string)hints.SelectedItem!)!;hintText.Text=(EmulatorSetup.FirmwareHint(system.Name,dataDir)??"Firmware-Prüfung: keine fehlende Pflichtdatei erkannt.")+"\n"+system.Note+"\nDateien: "+system.Extensions+" · Ordner: "+system.Aliases.Split('|')[0];}
         hints.SelectionChanged+=(_,_)=>LoadHint();LoadHint();panel.Children.Add(hints);panel.Children.Add(hintText);
     }
@@ -443,6 +445,7 @@ public sealed class MainWindow : Window
         foreach(var (system,id) in PackageManager.CoreIds)
         {
             var current=settings.CorePaths.GetValueOrDefault(system);
+            if(oldDirectory==null&&current!=null&&File.Exists(current))continue;
             if(oldDirectory!=null&&current!=null&&!Path.GetFullPath(current).StartsWith(Path.GetFullPath(oldDirectory)+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))continue;
             var file=Directory.EnumerateFiles(directory,id+"_libretro.dll",SearchOption.AllDirectories).FirstOrDefault();
             if(file!=null)settings.CorePaths[system]=file;

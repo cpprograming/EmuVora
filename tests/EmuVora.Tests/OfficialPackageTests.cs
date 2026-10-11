@@ -20,9 +20,9 @@ public class OfficialPackageTests
             var path=await manager.InstallAsync(package,dir.Path);Assert.True(System.IO.File.Exists(path),package.Id);
             if(package.Id=="retroarch-cores")foreach(var core in PackageManager.CoreIds.Values.Distinct())
             {
-                var file=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path)!,core+"_libretro.dll");Assert.True(System.IO.File.Exists(file),core);
+                var coreFile=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path)!,core+"_libretro.dll");Assert.True(System.IO.File.Exists(coreFile),core);
                 if(!OperatingSystem.IsWindows())continue;
-                var library=NativeLibrary.Load(file);
+                var library=NativeLibrary.Load(coreFile);
                 try
                 {
                     Marshal.GetDelegateForFunctionPointer<GetSystemInfo>(NativeLibrary.GetExport(library,"retro_get_system_info"))(out var info);
