@@ -54,6 +54,7 @@ public sealed class ManagedGameLauncher
             var hint=EmulatorSetup.FirmwareHint(game.System,request.DataDirectory,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,request.DataDirectory));if(hint!=null)throw new IOException(hint);
         }
         progress?.Report(new("Spiel wird gestartet …"));
+        token.ThrowIfCancellationRequested();
         using var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen);
         store.MarkPlayed(game);started();await process.WaitForExitAsync(token);
         if(process.ExitCode!=0)throw new IOException($"{definition.Name} wurde mit Fehlercode {process.ExitCode} beendet. BIOS, ROM und Emulator-Protokoll prüfen.");

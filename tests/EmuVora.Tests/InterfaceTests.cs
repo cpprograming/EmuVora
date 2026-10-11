@@ -18,6 +18,14 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact] public void NativeGameLaunchFailureShowsSetupAndReturnActions()
+    {
+        using var dir=new TestDirectory();var game=new Game("Unavailable","PS1",System.IO.Path.Combine(dir.Path,"missing.chd"));new LibraryStore(dir.File("library.db","")).Restore([game]);
+        var window=new GameLaunchWindow(new EsDeLaunchRequest(EsDeFrontend.GameId(game),dir.Path));window.Show();Dispatcher.UIThread.RunJobs();
+        Assert.Contains(window.GetVisualDescendants().OfType<Button>(),b=>b.Content as string=="EmuVora-Einrichtung öffnen"&&b.IsVisible);
+        Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text?.Contains("ROM-Datei ist nicht erreichbar")==true);
+        using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"ES-DE-launch-error.png"));}window.Close();
+    }
     [AvaloniaFact] public void FirstStartShowsFolderChoiceAndRenders()
     {
         using var dir=new TestDirectory();var window=new LocationWindow(new DataLocation(System.IO.Path.Combine(dir.Path,"bootstrap.json")),_=>{},dir.Path);window.Show();

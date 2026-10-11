@@ -79,6 +79,7 @@ public static class EsDeFrontend
                 if(settings.Covers.TryGetValue(game.Path,out var cover)&&File.Exists(cover))
                 {
                     var extension=Path.GetExtension(cover).ToLowerInvariant();if(extension is not (".png" or ".jpg" or ".jpeg" or ".webp"))continue;
+                    if(extension==".jpeg")extension=".jpg";
                     var target=Path.Combine(app,"downloaded_media",native,"covers",id+extension);Directory.CreateDirectory(Path.GetDirectoryName(target)!);
                     if(!Path.GetFullPath(cover).Equals(Path.GetFullPath(target),StringComparison.OrdinalIgnoreCase))File.Copy(cover,target,true);
                 }
@@ -89,7 +90,8 @@ public static class EsDeFrontend
         }
         AtomicFile.WriteText(Path.Combine(app,"custom_systems","es_systems.xml"),new XDocument(systems).ToString());
         var settingsFile=Path.Combine(app,"settings","es_settings.xml");var nativeSettings=File.Exists(settingsFile)?ReadXml(settingsFile):new XElement("config");
-        Set(nativeSettings,"string","ROMDirectory",romRoot);Set(nativeSettings,"string","MediaDirectory",Path.Combine(app,"downloaded_media"));Set(nativeSettings,"string","Theme",ThemeName);
+        Set(nativeSettings,"string","ROMDirectory",romRoot);Set(nativeSettings,"string","MediaDirectory",Path.Combine(app,"downloaded_media"));
+        if(!nativeSettings.Elements("string").Any(e=>(string?)e.Attribute("name")=="Theme"))Set(nativeSettings,"string","Theme",ThemeName);
         Set(nativeSettings,"string","InputControllerType","xbox");Set(nativeSettings,"bool","ParseGamelistOnly","true");Set(nativeSettings,"string","ApplicationLanguage","de_DE");Set(nativeSettings,"bool","ApplicationUpdaterPrereleases","false");
         Set(nativeSettings,"bool","ScraperSearchFileHash","false");Set(nativeSettings,"bool","ScraperSearchMetadataName","true");
         if(!File.Exists(settingsFile)){Set(nativeSettings,"string","ThemeColorScheme","dark-original");Set(nativeSettings,"string","ThemeVariant","gamelist-metadata-on-boxart");Set(nativeSettings,"string","ThemeFontSize","medium");Set(nativeSettings,"string","ThemeAspectRatio","automatic");}

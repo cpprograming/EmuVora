@@ -412,10 +412,18 @@ public sealed class MainWindow : Window
             if(esDeProcess.ExitCode!=0)throw new IOException("ES-DE wurde mit Fehlercode "+esDeProcess.ExitCode+" beendet. Protokoll: "+Path.Combine(EsDeFrontend.AppData(dataDir),"logs","es_log.txt"));
             settings=settingsStore.Load();if(settingsStore.LoadWarning!=null)throw new IOException(settingsStore.LoadWarning);
             EsDeFrontend.ImportChanges(dataDir,store,settings);settingsStore.Save(settings);
-            foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();Reload();status.Text="Zurück aus ES-DE. Favoriten, Cover und Spielverlauf sind abgeglichen.";
+            status.Text="Zurück aus ES-DE. Favoriten, Cover und Spielverlauf sind abgeglichen.";
         }
         catch(Exception ex){ShowError(ex);}
-        finally{esDeProcess?.Dispose();esDeProcess=null;if(!isClosed){Show();Activate();}}
+        finally
+        {
+            esDeProcess?.Dispose();esDeProcess=null;
+            if(!isClosed)
+            {
+                var latest=settingsStore.Load();if(settingsStore.LoadWarning==null)settings=latest;
+                foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();Reload();Show();Activate();
+            }
+        }
     }
     private async Task ShowSettingsAsync(string? initialEmulator=null)
     {
