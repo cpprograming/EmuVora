@@ -31,7 +31,7 @@ public class InterfaceTests
     {
         using var dir=new TestDirectory();var store=new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json"));store.Save(new(){CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});
         var window=new MainWindow(dir.Path);window.Show();window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Einstellungen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();
-        var dialog=Assert.Single(window.OwnedWindows);var tabs=dialog.GetVisualDescendants().OfType<TabControl>().Single();Assert.Equal(4,tabs.ItemCount);
+        var dialog=Assert.Single(window.OwnedWindows);var tabs=dialog.GetVisualDescendants().OfType<TabControl>().Single();Assert.Equal(5,tabs.ItemCount);
         var covers=dialog.GetVisualDescendants().OfType<CheckBox>().First(c=>c.Content as string=="Fehlende Cover beim Start und nach einem Import automatisch laden");covers.IsChecked=true;Assert.True(store.Load().AutoDownloadCovers);
         tabs.SelectedIndex=1;Dispatcher.UIThread.RunJobs();var mode=dialog.GetVisualDescendants().OfType<ComboBox>().First(c=>c.Items.Contains("Pixelgenau · ganze Skalierungsstufen"));mode.SelectedIndex=1;Assert.Equal("PixelPerfect",store.Load().DisplayMode);
         Dispatcher.UIThread.RunJobs();using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Display-options.png"));}dialog.Close();window.Close();
@@ -104,3 +104,4 @@ public class InterfaceTests
         var play=window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="▶ Spielen");Assert.True(play.IsEnabled);window.Close();
     }
 }
+
