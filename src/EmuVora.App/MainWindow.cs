@@ -537,7 +537,7 @@ public sealed class MainWindow : Window
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="Gespeicherte ROM-Ordner",FontWeight=FontWeight.Bold});
         var folders=new ListBox {ItemsSource=settings.RomFolders.ToArray(),MaxHeight=150};panel.Children.Add(folders);
         panel.Children.Add(ActionButton("Ordner aus dem Neu-Scan entfernen",()=>{if(folders.SelectedItem is string folder){settings.RomFolders.Remove(folder);settingsStore.Save(settings);folders.ItemsSource=settings.RomFolders.ToArray();status.Text="Ordner aus dem Neu-Scan entfernt. Spiele und Dateien bleiben erhalten.";}}));
-        var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}},new TabItem{Header="EmuVora-Updates",Content=new ScrollViewer{Content=AppUpdateOptions()}}},SelectedIndex=initialEmulator==null?0:3};
+        var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}},new TabItem{Header="App-Updates",Content=new ScrollViewer{Content=AppUpdateOptions()}}},SelectedIndex=initialEmulator==null?0:3};
         var dialog=Dialog("EmuVora · Einstellungen",tabs);dialog.Width=760;dialog.Height=760;dialog.Content=tabs;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
     }
     private async Task CheckAppUpdatesAsync()
@@ -548,7 +548,7 @@ public sealed class MainWindow : Window
             if(isClosed)return;
             if(appRelease?.Version!=release?.Version)appUpdateFile=null;
             appRelease=release;
-            appUpdateStatus.Text=release==null?"EmuVora ist aktuell · v"+AppVersion.ToString(3):"EmuVora v"+release.Version+" verfügbar · Einstellungen → EmuVora-Updates";
+            appUpdateStatus.Text=release==null?"EmuVora ist aktuell · v"+AppVersion.ToString(3):"EmuVora v"+release.Version+" verfügbar · Einstellungen → App-Updates";
         }
         catch(Exception ex){if(!isClosed)appUpdateStatus.Text="EmuVora-Updateprüfung fehlgeschlagen: "+ex.Message;}
     }
@@ -559,13 +559,13 @@ public sealed class MainWindow : Window
         var automatic=new CheckBox{Content="Beim Start nach neuen EmuVora-Versionen suchen",IsChecked=settings.CheckAppUpdatesOnStartup};
         automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckAppUpdatesOnStartup=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
         var message=new TextBlock{Text=appUpdateStatus.Text,TextWrapping=TextWrapping.Wrap};panel.Children.Add(message);
-        panel.Children.Add(AsyncButton("Jetzt auf EmuVora-Updates prüfen",async()=>{await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;}));
+        panel.Children.Add(AsyncButton("Jetzt auf App-Updates prüfen",async()=>{await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;}));
         panel.Children.Add(AsyncButton("Update herunterladen",async()=>
         {
             if(operation!=null)return;
             await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;if(appRelease==null)return;
             var release=appRelease;
-            await BusyAsync(async token=>{status.Text="EmuVora-Update wird heruntergeladen …";appUpdateFile=await new AppUpdates(updateHttp).DownloadAsync(release,Path.Combine(dataDir,"updates"),new Progress<double>(value=>{progress.IsIndeterminate=false;progress.Value=value;}),token);status.Text="Update geprüft und bereit. Unter EmuVora-Updates neu starten.";});
+            await BusyAsync(async token=>{status.Text="EmuVora-Update wird heruntergeladen …";appUpdateFile=await new AppUpdates(updateHttp).DownloadAsync(release,Path.Combine(dataDir,"updates"),new Progress<double>(value=>{progress.IsIndeterminate=false;progress.Value=value;}),token);status.Text="Update geprüft und bereit. Unter App-Updates neu starten.";});
             message.Text=appUpdateFile==null?status.Text:"Download geprüft · v"+release.Version+" · bereit zum Installieren";
         }));
         panel.Children.Add(AsyncButton("Aktualisieren und neu starten",async()=>

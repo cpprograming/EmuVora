@@ -1,6 +1,6 @@
 # EmuVora updates
 
-Settings → EmuVora-Updates shows the installed version and checks the latest stable
+Settings → App-Updates shows the installed version and checks the latest stable
 GitHub release. Startup checks can be disabled independently of emulator updates.
 Download the update, then select “Aktualisieren und neu starten”. Games and ES-DE
 must be closed first. A failed check never prevents playing offline.

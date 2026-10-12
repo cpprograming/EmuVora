@@ -71,6 +71,7 @@ public class InterfaceTests
         var dialog=Assert.Single(window.OwnedWindows);dialog.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex=4;Dispatcher.UIThread.RunJobs();
         Assert.Contains(dialog.GetVisualDescendants().OfType<Button>(),b=>b.Content as string=="Aktualisieren und neu starten");
         var automatic=dialog.GetVisualDescendants().OfType<CheckBox>().Single(c=>c.Content as string=="Beim Start nach neuen EmuVora-Versionen suchen");automatic.IsChecked=true;Assert.True(saved.Load().CheckAppUpdatesOnStartup);
+        dialog.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();
         using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"EmuVora-updates.png"));}
         dialog.Close();window.Close();
     }
@@ -104,4 +105,3 @@ public class InterfaceTests
         var play=window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="▶ Spielen");Assert.True(play.IsEnabled);window.Close();
     }
 }
-
