@@ -4,6 +4,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: emuvora-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: windows-latest
@@ -12,10 +17,17 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Determine version
+        shell: pwsh
+        run: |
+          $taskBase = ([xml](Get-Content src/EmuVora.App/EmuVora.App.csproj)).Project.PropertyGroup.Version
+          $taskVersion = $taskBase
+          if ('${{ github.event_name }}' -eq 'push' -and '${{ github.ref }}' -eq 'refs/heads/main') { $taskVersion = ([version]$taskBase).ToString(2) + '.${{ github.run_number }}' }
+          "APP_VERSION=$taskVersion" >> $env:GITHUB_ENV
       - name: Restore
         run: dotnet restore EmuVora.sln
       - name: Build
-        run: dotnet build EmuVora.sln --no-restore -c Release
+        run: dotnet build EmuVora.sln --no-restore -c Release -p:Version=${{ env.APP_VERSION }}
       - name: Build process-launch verification helper
         run: dotnet publish tests/EmuVora.LaunchProbe/EmuVora.LaunchProbe.csproj -c Release -r win-x64 --self-contained false -o launch-probe
       - name: Test
@@ -36,10 +48,10 @@ jobs:
           path: screenshots/
           if-no-files-found: ignore
       - name: Publish Windows portable
-        run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+        run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:Version=${{ env.APP_VERSION }} -o publish
       - name: Include installation script and documentation
         shell: pwsh
-        run: Copy-Item README.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LIBRARY_AND_DISPLAY.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
+        run: Copy-Item README.md, APP_UPDATES.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LIBRARY_AND_DISPLAY.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
       - name: Verify selectable installation and update paths
         shell: pwsh
         run: ./scripts/test-installation.ps1
@@ -49,10 +61,10 @@ jobs:
           Copy-Item installer/EmuVora.ico -Destination publish/
           Compress-Archive -Path publish/* -DestinationPath portable.zip
           New-Item -ItemType Directory setup-output | Out-Null
-          ./installer/build-setup.ps1 -PackageZip portable.zip -OutputPath setup-output/EmuVora-Setup-v0.6.exe
+          ./installer/build-setup.ps1 -PackageZip portable.zip -OutputPath setup-output/EmuVora-Setup.exe
       - name: Verify setup EXE installation and data retention
         shell: pwsh
-        run: ./scripts/test-setup-exe.ps1 -SetupExe setup-output/EmuVora-Setup-v0.6.exe
+        run: ./scripts/test-setup-exe.ps1 -SetupExe setup-output/EmuVora-Setup.exe
       - uses: actions/upload-artifact@v4
         with:
           name: EmuVora-Setup-win-x64
@@ -61,3 +73,19 @@ jobs:
         with:
           name: EmuVora-win-x64
           path: publish/
+      - name: Prepare release ZIP
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: pwsh
+        run: Copy-Item portable.zip EmuVora-win-x64.zip
+      - name: Publish tested release after merge into main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.APP_VERSION }}
+          target_commitish: ${{ github.sha }}
+          name: EmuVora v${{ env.APP_VERSION }}
+          generate_release_notes: true
+          make_latest: true
+          files: |
+            setup-output/EmuVora-Setup.exe
+            EmuVora-win-x64.zip
