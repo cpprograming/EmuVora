@@ -13,6 +13,9 @@ public sealed class AppUpdates(HttpClient http)
     public const long MaximumSize = 256 * 1024 * 1024;
     public async Task<AppRelease?> CheckAsync(Version current, CancellationToken token = default)
     {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(token);
+        timeout.CancelAfter(TimeSpan.FromSeconds(20));
+        token = timeout.Token;
         using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/" + Repository + "/releases/latest");
         request.Headers.UserAgent.ParseAdd("EmuVora/0.7");
         using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);

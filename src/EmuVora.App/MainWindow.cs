@@ -100,7 +100,7 @@ public sealed class MainWindow : Window
         tools.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));tools.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));tools.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));sidebar.Children.Add(new Expander{Header="Verwaltung",Content=tools});
         sidebar.Children.Add(appUpdateStatus);sidebar.Children.Add(controllerStatus);
         sidebar.Children.Add(themeStatus);
-        sidebar.Children.Add(new TextBlock {Text="Windows · v0.7\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
+        sidebar.Children.Add(new TextBlock {Text="Windows · v"+AppVersion.ToString(3)+"\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
         var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=12};
         header.Children.Add(themeLogo);var heading=new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold};Grid.SetColumn(heading,1);header.Children.Add(heading);Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
