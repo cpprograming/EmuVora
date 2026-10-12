@@ -21,6 +21,10 @@ public class OnboardingTests
         var window=new MainWindow(dir.Path);window.Show();Click(window,"Einrichtungsassistent");var wizard=Assert.Single(window.OwnedWindows);Click(wizard,"Weiter");Assert.Contains(wizard.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="2 / 5 · Deine Spiele");ControllerUi.Handle(wizard,0x2000);Assert.Contains(wizard.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="1 / 5 · Dein Speicherort");
         for(var i=0;i<3;i++)Click(wizard,"Weiter");Assert.Contains(wizard.GetVisualDescendants().OfType<Button>(),b=>b.Content as string=="Eigene BIOS-Dateien importieren");Capture(wizard,"Setup-assistant.png");Click(wizard,"Weiter");Click(wizard,"Zur Bibliothek");Assert.True(saved.Load().OnboardingCompleted);Assert.Equal("C:\\Own emulator\\duckstation.exe",saved.Load().EmulatorPaths["duckstation"]);Assert.Empty(saved.Load().Packages);window.Close();
     }
+    [Fact] public void FirmwareReadinessUsesTheConfiguredEmulatorDirectory()
+    {
+        using var dir=new TestDirectory();var exe=dir.File("PS1/duckstation.exe");var bios=Path.Combine(dir.Path,"own-bios");Directory.CreateDirectory(bios);File.WriteAllBytes(Path.Combine(bios,"scph5501.bin"),new byte[512*1024]);dir.File("PS1/settings.ini","[BIOS]\nSearchDirectory="+bios);var settings=new AppSettings{EmulatorPaths=new(){{"duckstation",exe}}};Assert.Null(SetupPlan.FirmwareHint("PS1",Path.Combine(dir.Path,"data"),settings));Assert.NotNull(SetupPlan.FirmwareHint("PS2",Path.Combine(dir.Path,"data"),settings));
+    }
     [AvaloniaFact] public void FirstStartShowsWizardAndLaterChoiceIsRemembered()
     {
         using var dir=new TestDirectory();var saved=new SettingsStore(Path.Combine(dir.Path,"settings.json"));saved.Save(new(){CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});var window=new MainWindow(dir.Path);window.Show();Dispatcher.UIThread.RunJobs();var wizard=Assert.Single(window.OwnedWindows);Click(wizard,"Später einrichten");Assert.True(saved.Load().OnboardingCompleted);window.Close();
@@ -30,7 +34,8 @@ public class OnboardingTests
     {
         var panel=new StackPanel();var button=new Button{Content="Test"};var check=new CheckBox{Content="Option"};var combo=new ComboBox{ItemsSource=new[]{"First","Second"},SelectedIndex=0};var text=new TextBox{Text="Original"};panel.Children.Add(button);panel.Children.Add(check);panel.Children.Add(combo);panel.Children.Add(text);var window=new Window{Content=panel,Width=500,Height=400};window.Show();bool clicked=false;button.Click+=(_,_)=>clicked=true;button.Focus();ControllerUi.Handle(window,0x1000);Assert.True(clicked);check.Focus();ControllerUi.Handle(window,0x1000);Assert.True(check.IsChecked);combo.Focus();ControllerUi.Handle(window,8);Assert.Equal(1,combo.SelectedIndex);
         text.Focus();ControllerUi.Handle(window,0x1000);Dispatcher.UIThread.RunJobs();var keyboard=Assert.Single(window.OwnedWindows);Click(keyboard,"A");ControllerUi.Handle(keyboard,0x2000);Assert.Equal("Original",text.Text);
-        text.Focus();ControllerUi.Handle(window,0x1000);Dispatcher.UIThread.RunJobs();keyboard=Assert.Single(window.OwnedWindows);Click(keyboard,"A");Click(keyboard,"Übernehmen");Assert.Equal("Originala",text.Text);window.Close();
+        text.Focus();ControllerUi.Handle(window,0x1000);Dispatcher.UIThread.RunJobs();keyboard=Assert.Single(window.OwnedWindows);Click(keyboard,"A");Click(keyboard,"Übernehmen");Assert.Equal("Originala",text.Text);
+        var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="One",Content=new Button{Content="One"}},new TabItem{Header="Two",Content=new Button{Content="Two"}}},SelectedIndex=0};window.Content=tabs;window.UpdateLayout();ControllerUi.Handle(window,0x200);Assert.Equal(1,tabs.SelectedIndex);ControllerUi.Handle(window,0x100);Assert.Equal(0,tabs.SelectedIndex);window.Close();
     }
     [AvaloniaFact] public void ControllerPickerFiltersFilesAndCanBeCancelled()
     {

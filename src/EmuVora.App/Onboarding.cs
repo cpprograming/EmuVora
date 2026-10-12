@@ -54,11 +54,10 @@ public sealed partial class MainWindow
             {
                 Text(allGames.Count+" Spiele in deiner Bibliothek. "+(settings.AutoDownloadCovers?"Fehlende Cover werden automatisch gesucht.":"Cover kannst du später herunterladen."));
                 Text("Einstellungen → Einrichtungsassistent öffnet diese Schritte erneut. Bei Problemen zeigt EmuVora konkrete Hinweise; eigene Einstellungen werden bei Updates bewahrt.");
-                foreach(var system in allGames.Select(g=>g.System).Distinct().Order()){var definition=EmulatorCatalog.Known.FirstOrDefault(e=>e.Systems.Contains(system));var installed=definition!=null&&File.Exists(settings.EmulatorPaths.GetValueOrDefault(definition.Id));Text(system+": "+(installed?"Emulator vorhanden":"Emulator beim ersten Start einrichten")+(EmulatorSetup.FirmwareHint(system,dataDir) is{} hint?" · "+hint:""));}
+                foreach(var system in allGames.Select(g=>g.System).Distinct().Order()){var definition=EmulatorCatalog.Known.FirstOrDefault(e=>e.Systems.Contains(system));var installed=definition!=null&&File.Exists(settings.EmulatorPaths.GetValueOrDefault(definition.Id));Text(system+": "+(installed?"Emulator vorhanden":"Emulator beim ersten Start einrichten")+(SetupPlan.FirmwareHint(system,dataDir,settings) is{} hint?" · "+hint:""));}
             }
         }
         var timer=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(250)};timer.Tick+=(_,_)=>{var connected=Gamepad.Read();pad.Text=connected.Length==0?"Xbox-Controller: noch nicht verbunden":"Xbox-Controller: "+connected.Length+" verbunden · Eingabe: "+string.Join(", ",connected.Select(p=>"#"+(p.Index+1)+" · "+Gamepad.NavigationButtons(p).ToString("X4")));if(operation!=null)feedback.Text=status.Text;};
         dialog.Opened+=(_,_)=>timer.Start();dialog.Closed+=(_,_)=>timer.Stop();dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();feedback.Text="Vorgang wird abgebrochen …";}};Render();await dialog.ShowDialog(this);
     }
 }
-

@@ -342,7 +342,7 @@ public sealed partial class MainWindow : Window
         try
         {
             await process.WaitForExitAsync();var code=process.ExitCode;
-            Dispatcher.UIThread.Post(()=>{running.Remove(game.Path);if(!running.Values.Any(p=>!p.HasExited))runningEmulators.Clear();else runningEmulators.Remove(emulator);process.Dispose();UpdateSelected();if(!isClosed){Show();Activate();gamesList.Focus();}status.Text=code==0?$"{game.Title} beendet.":$"Emulator beendet (Code {code}). BIOS, Grafiktreiber und Emulator-Einstellungen prüfen.";});
+            Dispatcher.UIThread.Post(()=>{running.Remove(game.Path);if(!running.Values.Any(p=>!p.HasExited))runningEmulators.Clear();else runningEmulators.Remove(emulator);process.Dispose();UpdateSelected();if(!isClosed&&running.Count==0&&esDeProcess==null&&!dialogOpen){Show();Activate();gamesList.Focus();}status.Text=code==0?$"{game.Title} beendet.":$"Emulator beendet (Code {code}). BIOS, Grafiktreiber und Emulator-Einstellungen prüfen.";});
         }
         catch(Exception ex){Log(ex);}
     }
