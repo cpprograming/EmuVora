@@ -11,7 +11,7 @@ public sealed class LocationWindow : Window
 {
     public LocationWindow(DataLocation location, Action<Window> start, string? saved = null, string? error = null)
     {
-        WindowAppearance.Apply(this);Background=Brush.Parse("#101722");Foreground=Brush.Parse("#EAF0FA");
+        WindowAppearance.Apply(this);ControllerUi.Attach(this);Background=Brush.Parse("#101722");Foreground=Brush.Parse("#EAF0FA");
         Title = "EmuVora – Speicherort wählen"; Width = 700; Height = 470; MinWidth = 560; MinHeight = 420;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         var panel = new StackPanel { Margin = new Thickness(28), Spacing = 16 };
@@ -20,7 +20,7 @@ public sealed class LocationWindow : Window
         var path = new TextBox { Text = saved ?? (File.Exists(Path.Combine(DataLocation.LegacyDirectory, "library.db")) ? DataLocation.LegacyDirectory : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EmuVora")) };
         panel.Children.Add(path);
         var browse = new Button { Content = "Festplatte / Ordner auswählen …" };
-        browse.Click += async (_, _) => { var folders = await StorageProvider.OpenFolderPickerAsync(new() { Title = "EmuVora-Datenordner", AllowMultiple = false }); if (folders.Count > 0) path.Text = folders[0].TryGetLocalPath(); };
+        browse.Click += async (_, _) => { var folders = await new ControllerPicker(this).OpenFolderPickerAsync(new() { Title = "EmuVora-Datenordner", AllowMultiple = false }); if (folders.Count > 0) path.Text = folders[0].TryGetLocalPath(); };
         panel.Children.Add(browse);
         var message = new TextBlock { Text = error ?? "Vorhandene Bibliothek? Wähle ihren bisherigen Datenordner. Ein neuer Ordner startet eine neue Bibliothek; bestehende Daten werden nicht gelöscht.", TextWrapping = TextWrapping.Wrap }; panel.Children.Add(message);
         var open = new Button { Content = "Diesen Speicherort verwenden", HorizontalAlignment = HorizontalAlignment.Stretch };

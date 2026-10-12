@@ -12,7 +12,7 @@ public sealed class GameLaunchWindow : Window
 {
     public GameLaunchWindow(EsDeLaunchRequest request)
     {
-        WindowAppearance.Apply(this);Background=Brush.Parse("#101722");Foreground=Brush.Parse("#EAF0FA");
+        WindowAppearance.Apply(this);ControllerUi.Attach(this);Background=Brush.Parse("#101722");Foreground=Brush.Parse("#EAF0FA");
         var monitor=DisplayDetection.Current();
         Title="EmuVora – Spiel starten";Width=620;Height=420;MinWidth=500;MinHeight=280;WindowStartupLocation=WindowStartupLocation.CenterScreen;RequestedThemeVariant=ThemeVariant.Dark;
         var token=new CancellationTokenSource();var panel=new StackPanel{Margin=new Thickness(26),Spacing=18};

@@ -14,7 +14,7 @@ using System.Text.Json;
 
 namespace EmuVora.App;
 
-public sealed class MainWindow : Window
+public sealed partial class MainWindow : Window
 {
     private readonly string dataDir;
     private readonly LibraryStore store;
@@ -75,6 +75,7 @@ public sealed class MainWindow : Window
     private ushort previousDirection;
     private int controllerIndex=-1;
     private bool dialogOpen;
+    private bool controllerUiMode;
     public MainWindow():this(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"EmuVora")){ }
     public MainWindow(string directory,bool setupOnly=false)
     {
@@ -94,6 +95,7 @@ public sealed class MainWindow : Window
         var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());sidebar.Children.Add(import);operationButtons.Add(import);
         var rescan=AsyncButton("Ordner neu scannen",()=>RescanAsync());sidebar.Children.Add(rescan);operationButtons.Add(rescan);
         var covers=AsyncButton("Fehlende Cover laden",()=>FetchAllCoversAsync());sidebar.Children.Add(covers);operationButtons.Add(covers);
+        sidebar.Children.Add(AsyncButton("Einrichtungsassistent",()=>ShowOnboardingAsync()));
         sidebar.Children.Add(AsyncButton("Einstellungen",()=>ShowSettingsAsync()));
         sidebar.Children.Add(AsyncButton("AlekFull NX · ES-DE öffnen",()=>OpenEsDeAsync()));
         var tools=new StackPanel{Spacing=6};foreach(var name in new[]{"Konsole zuordnen","Fehlende Dateien"}){var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;tools.Children.Add(item);}
@@ -124,7 +126,7 @@ public sealed class MainWindow : Window
         UpdateSystems();ApplyTheme();Refresh();
         PropertyChanged+=(_,e)=>{if(e.Property==ClientSizeProperty)ApplyLayout();};
         status.Text=settingsStore.LoadWarning??"ROM-Ordner importieren oder Emulatoren einrichten, um zu starten.";
-        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
+        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
         Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
@@ -239,7 +241,7 @@ public sealed class MainWindow : Window
     private IProgress<DownloadProgress> DownloadProgress()=>new Progress<DownloadProgress>(p=>{status.Text=p.Message;progress.IsIndeterminate=p.Fraction==null;if(p.Fraction is{} value)progress.Value=value*100;});
     private async Task ImportAsync()
     {
-        var folders=await StorageProvider.OpenFolderPickerAsync(new(){Title="ROM-Ordner wählen",AllowMultiple=true});if(folders.Count==0)return;
+        var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="ROM-Ordner wählen",AllowMultiple=true});if(folders.Count==0)return;
         var paths=folders.Select(f=>f.TryGetLocalPath()).Where(p=>p!=null).Cast<string>().ToArray();await ScanAsync(paths,true);
     }
     private async Task RescanAsync()
@@ -262,7 +264,7 @@ public sealed class MainWindow : Window
     }
     private Window Dialog(string title,Control content)
     {
-        var dialog=new Window {Title=title,Width=640,Height=640,MinWidth=520,MinHeight=220,WindowStartupLocation=WindowStartupLocation.CenterOwner,Content=new ScrollViewer {Content=content},RequestedThemeVariant=RequestedThemeVariant,Background=Background,Foreground=Foreground};WindowAppearance.Apply(dialog);
+        var dialog=new Window {Title=title,Width=640,Height=640,MinWidth=520,MinHeight=220,WindowStartupLocation=WindowStartupLocation.CenterOwner,Content=new ScrollViewer {Content=content},RequestedThemeVariant=RequestedThemeVariant,Background=Background,Foreground=Foreground};WindowAppearance.Apply(dialog);ControllerUi.Attach(dialog);
         dialog.Opened+=(_,_)=>{var screen=Screens.ScreenFromWindow(this);if(screen!=null){dialog.Width=Math.Min(dialog.Width,Math.Max(dialog.MinWidth,screen.WorkingArea.Width/screen.Scaling-32));dialog.Height=Math.Min(dialog.Height,Math.Max(dialog.MinHeight,screen.WorkingArea.Height/screen.Scaling-48));}};
         dialog.Opened+=(_,_)=>dialogOpen=true;dialog.Closed+=(_,_)=>dialogOpen=false;return dialog;
     }
@@ -276,7 +278,7 @@ public sealed class MainWindow : Window
     private async Task ChooseCoverAsync()
     {
         if(Selected is not{} game)return;
-        var files=await StorageProvider.OpenFilePickerAsync(new(){Title="Cover auswählen",AllowMultiple=false,FileTypeFilter=[new("Bilder"){Patterns=["*.png","*.jpg","*.jpeg","*.webp","*.bmp"]}]});if(files.Count==0)return;
+        var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="Cover auswählen",AllowMultiple=false,FileTypeFilter=[new("Bilder"){Patterns=["*.png","*.jpg","*.jpeg","*.webp","*.bmp"]}]});if(files.Count==0)return;
         Guard(()=>
         {
             var source=files[0].TryGetLocalPath()??throw new InvalidOperationException("Bitte eine lokale Bilddatei auswählen.");
@@ -340,24 +342,24 @@ public sealed class MainWindow : Window
         try
         {
             await process.WaitForExitAsync();var code=process.ExitCode;
-            Dispatcher.UIThread.Post(()=>{running.Remove(game.Path);if(!running.Values.Any(p=>!p.HasExited))runningEmulators.Clear();else runningEmulators.Remove(emulator);process.Dispose();UpdateSelected();status.Text=code==0?$"{game.Title} beendet.":$"Emulator beendet (Code {code}). BIOS, Grafiktreiber und Emulator-Einstellungen prüfen.";});
+            Dispatcher.UIThread.Post(()=>{running.Remove(game.Path);if(!running.Values.Any(p=>!p.HasExited))runningEmulators.Clear();else runningEmulators.Remove(emulator);process.Dispose();UpdateSelected();if(!isClosed&&running.Count==0&&esDeProcess==null&&!dialogOpen){Show();Activate();gamesList.Focus();}status.Text=code==0?$"{game.Title} beendet.":$"Emulator beendet (Code {code}). BIOS, Grafiktreiber und Emulator-Einstellungen prüfen.";});
         }
         catch(Exception ex){Log(ex);}
     }
     private static void OpenPath(string path)=>Process.Start(new ProcessStartInfo(path){UseShellExecute=true});
     private async Task ExportAsync()
     {
-        var file=await StorageProvider.SaveFilePickerAsync(new(){Title="Bibliothek sichern",SuggestedFileName="EmuVora-Bibliothek.json",DefaultExtension="json"});if(file==null)return;
+        var file=await new ControllerPicker(this).SaveFilePickerAsync(new(){Title="Bibliothek sichern",SuggestedFileName="EmuVora-Bibliothek.json",DefaultExtension="json"});if(file==null)return;
         Guard(()=>{var path=file.TryGetLocalPath()??throw new InvalidOperationException("Lokale Datei wählen.");AtomicFile.WriteText(path,JsonSerializer.Serialize(allGames,SettingsStore.JsonOptions));status.Text="Bibliothek gesichert. Cover und Emulator-Einstellungen bleiben im EmuVora-Datenordner.";});
     }
     private async Task RestoreAsync()
     {
-        var files=await StorageProvider.OpenFilePickerAsync(new(){Title="Bibliothek wiederherstellen",AllowMultiple=false,FileTypeFilter=[new("Bibliothek"){Patterns=["*.json"]}]});if(files.Count==0)return;
+        var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="Bibliothek wiederherstellen",AllowMultiple=false,FileTypeFilter=[new("Bibliothek"){Patterns=["*.json"]}]});if(files.Count==0)return;
         if(await ConfirmAsync("Bibliothek aus der Sicherung ergänzen? Vorhandene Einträge mit gleichem Dateipfad werden ersetzt."))Guard(()=>{var games=JsonSerializer.Deserialize<Game[]>(File.ReadAllText(files[0].TryGetLocalPath()!),SettingsStore.JsonOptions)??throw new InvalidDataException("Sicherung ist leer.");store.Restore(games);Reload();status.Text="Bibliothek wiederhergestellt.";});
     }
     private async Task HandleGamepadAsync()
     {
-        var pads=Gamepad.Read();controllerStatus.Text=pads.Length==0?"Xbox-Controller: nicht verbunden":"Xbox-Controller: "+pads.Length+" verbunden\nStick / D-Pad: wählen · A: spielen\nY: Favorit · LB/RB: System";
+        var pads=Gamepad.Read();controllerStatus.Text=pads.Length==0?"Xbox-Controller: nicht verbunden":"Xbox-Controller: "+pads.Length+" verbunden\nD-Pad: wählen · A: spielen · Y: Favorit\nLB/RB: System · Menu: Einstellungen\nView: Bedienelemente · B: Spieleliste";
         var active=pads.FirstOrDefault(p=>Gamepad.NavigationButtons(p)!=0);if(active==default&&pads.Length>0)active=pads[0];
         if(active.Index!=controllerIndex){previousButtons=0;previousDirection=0;controllerIndex=active.Index;}
         var buttons=Gamepad.NavigationButtons(active);var pressed=buttons&~previousButtons;previousButtons=buttons;
@@ -365,8 +367,11 @@ public sealed class MainWindow : Window
         if(direction!=previousDirection){previousDirection=direction;repeatAt=now+400;}
         else if(direction!=0&&now>=repeatAt){pressed|=direction;repeatAt=now+140;}
         if(!IsActive||dialogOpen||operation!=null||running.Count>0||pressed==0)return;
+        if((pressed&0x10)!=0){await ShowSettingsAsync();return;}
+        if((pressed&0x20)!=0){controllerUiMode=!controllerUiMode;if(controllerUiMode)ControllerUi.Handle(this,2);else gamesList.Focus();return;}
+        if(controllerUiMode){if((pressed&0x2000)!=0){controllerUiMode=false;gamesList.Focus();}else ControllerUi.Handle(this,(ushort)pressed);return;}
         if((pressed&0x300)!=0&&systems.ItemCount>0)systems.SelectedIndex=(systems.SelectedIndex+((pressed&0x200)!=0?1:systems.ItemCount-1))%systems.ItemCount;
-        if((pressed&0x2000)!=0){view="Alle Spiele";search.Text="";systems.SelectedIndex=0;Refresh();}
+        if((pressed&0x2000)!=0){search.Text="";gamesList.Focus();return;}
         var count=gamesList.ItemCount;if(count==0)return;var index=Math.Max(0,gamesList.SelectedIndex);var columns=Math.Max(1,(int)(gamesList.Bounds.Width/174));
         if((pressed&1)!=0)index-=columns;if((pressed&2)!=0)index+=columns;if((pressed&4)!=0)index--;if((pressed&8)!=0)index++;
         gamesList.SelectedIndex=Math.Clamp(index,0,count-1);gamesList.ScrollIntoView(gamesList.SelectedItem!);
@@ -473,7 +478,7 @@ public sealed class MainWindow : Window
         panel.Children.Add(new TextBlock {Text="Klassische EmulationStation-Themes: importierter Hintergrund, PNG/JPEG/SVG-Konsolenlogo und Listen-/Detailfarben. EmuVora behält sein Layout und seine Bedienelemente. Eigene Schriftdateien, Animationen, Videos, Extras und ES-DE-Varianten sind noch nicht kompatibel.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(AsyncButton("EmulationStation-Theme importieren …",async()=>
         {
-            var folders=await StorageProvider.OpenFolderPickerAsync(new(){Title="Theme-Set mit theme.xml oder Konsolen-Unterordnern",AllowMultiple=false});
+            var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="Theme-Set mit theme.xml oder Konsolen-Unterordnern",AllowMultiple=false});
             if(folders.Count==0||folders[0].TryGetLocalPath() is not{} path)return;
             await BusyAsync(async token=>{var imported=await Task.Run(()=>EmulationStationTheme.Import(path,dataDir),token);settings.EmulationStationTheme=imported;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();status.Text="EmulationStation-Theme importiert. Darstellung wechselt mit dem Konsolenfilter.";});
         }));
@@ -489,7 +494,7 @@ public sealed class MainWindow : Window
         EmulatorDefinition Current()=>EmulatorCatalog.Known[emulator.SelectedIndex];
         void Load(){path.Text=settings.EmulatorPaths.GetValueOrDefault(Current().Id)??"";packageInfo.Text=settings.Packages.TryGetValue(Current().Id,out var installed)?"Installiert: "+installed.Version:"Noch keine verwaltete Installation. Eigene EXE wählen oder offiziell herunterladen.";}
         emulator.SelectionChanged+=(_,_)=>{if(emulator.SelectedIndex>=0)Load();};Load();
-        panel.Children.Add(AsyncButton("Vorhandene EXE auswählen",async()=>{var files=await StorageProvider.OpenFilePickerAsync(new(){Title="Emulator-EXE",AllowMultiple=false,FileTypeFilter=[new("Windows-Programme"){Patterns=["*.exe"]}]});if(files.Count>0)path.Text=files[0].TryGetLocalPath();}));
+        panel.Children.Add(AsyncButton("Vorhandene EXE auswählen",async()=>{var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="Emulator-EXE",AllowMultiple=false,FileTypeFilter=[new("Windows-Programme"){Patterns=["*.exe"]}]});if(files.Count>0)path.Text=files[0].TryGetLocalPath();}));
         panel.Children.Add(ActionButton("EXE-Pfad speichern",()=>{var full=Path.GetFullPath(path.Text?.Trim().Trim('"')??"");new ExternalEmulatorAdapter(Current()).CreateStartInfo(null,full);settings.EmulatorPaths[Current().Id]=full;settingsStore.Save(settings);status.Text="Emulator gespeichert.";}));
         panel.Children.Add(ActionButton("Emulator öffnen · BIOS / Controller einrichten",()=>{using var process=new ExternalEmulatorAdapter(Current()).Launch(null,settings.EmulatorPaths.GetValueOrDefault(Current().Id)??"");}));
         panel.Children.Add(ActionButton("Offizielle Webseite / Lizenz",()=>OpenPath(Current().Homepage)));
@@ -524,7 +529,7 @@ public sealed class MainWindow : Window
         var coreSystem=new ComboBox {ItemsSource=EmulatorCatalog.Get("retroarch").Systems,SelectedIndex=0};var corePath=new TextBox();panel.Children.Add(coreSystem);panel.Children.Add(corePath);
         void LoadCore()=>corePath.Text=settings.CorePaths.GetValueOrDefault((string)coreSystem.SelectedItem!)??"";
         coreSystem.SelectionChanged+=(_,_)=>LoadCore();LoadCore();
-        panel.Children.Add(AsyncButton("Core-Datei wählen",async()=>{var files=await StorageProvider.OpenFilePickerAsync(new(){Title="RetroArch-Core",FileTypeFilter=[new("Core"){Patterns=["*.dll"]}]});if(files.Count>0)corePath.Text=files[0].TryGetLocalPath();}));
+        panel.Children.Add(AsyncButton("Core-Datei wählen",async()=>{var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="RetroArch-Core",FileTypeFilter=[new("Core"){Patterns=["*.dll"]}]});if(files.Count>0)corePath.Text=files[0].TryGetLocalPath();}));
         panel.Children.Add(ActionButton("Core-Pfad speichern",()=>{if(!File.Exists(corePath.Text)||Path.GetExtension(corePath.Text)!=".dll")throw new InvalidOperationException("Gültige Core-DLL wählen.");settings.CorePaths[(string)coreSystem.SelectedItem!]=corePath.Text!;settingsStore.Save(settings);status.Text="Core gespeichert.";}));
         panel.Children.Add(AsyncButton("Stabiles Core-Paket herunterladen / aktualisieren",async()=>
         {
@@ -595,7 +600,7 @@ public sealed class MainWindow : Window
     }
     private StackPanel LibraryOptions()
     {
-        var panel=new StackPanel{Spacing=14,Margin=new(24)};panel.Children.Add(new TextBlock{Text="Deine Bibliothek",FontSize=25,FontWeight=FontWeight.Bold});
+        var panel=new StackPanel{Spacing=14,Margin=new(24)};panel.Children.Add(new TextBlock{Text="Deine Bibliothek",FontSize=25,FontWeight=FontWeight.Bold});panel.Children.Add(AsyncButton("Einrichtungsassistent öffnen",()=>ShowOnboardingAsync()));
         var automatic=new CheckBox{Content="Fehlende Cover beim Start und nach einem Import automatisch laden",IsChecked=settings.AutoDownloadCovers};automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoDownloadCovers=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
         panel.Children.Add(new TextBlock{Text="Quelle: libretro-thumbnails auf GitHub, ohne Konto. Vorhandene Cover bleiben erhalten. Titelvarianten werden erkannt; ähnliche Spielnamen und Fortsetzungen werden nicht geraten. Nicht jeder Titel ist verfügbar.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(new TextBlock{Text="Bevorzugte Cover-Region"});var region=new ComboBox{ItemsSource=new[]{"Europe","Germany","USA","Japan","World"},SelectedItem=settings.CoverRegion};region.SelectionChanged+=(_,_)=>Guard(()=>{settings.CoverRegion=region.SelectedItem as string??"Europe";settingsStore.Save(settings);});panel.Children.Add(region);
@@ -627,10 +632,10 @@ public sealed class MainWindow : Window
             await BusyAsync(async token=>{catalog=await packages.GetCatalogAsync(token);foreach(var id in EmulatorCatalog.Known.Select(e=>e.Id).Append("retroarch-cores"))await InstallManagedAsync(id,token);status.Text="Emulatoren, Cores und Xbox-Standardbelegung eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";});
         }));
         panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch / PS1 / PS2: View + Menu beendet das Spiel; View + RB öffnet das Menü. Dolphin: View + Menu beendet; PPSSPP: LT öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
-        panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await StorageProvider.OpenFilePickerAsync(new(){Title="Eigene BIOS-/Firmware-Dateien",AllowMultiple=true});Guard(()=>{foreach(var file in files)if(file.TryGetLocalPath() is{} source)EmulatorSetup.ImportFirmware(source,dataDir);status.Text=$"{files.Count} Firmware-Dateien importiert. PS1 / PS2: BIOS im Emulator prüfen und auswählen.";});}));
+        panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="Eigene BIOS-/Firmware-Dateien",AllowMultiple=true});Guard(()=>{foreach(var file in files)if(file.TryGetLocalPath() is{} source)EmulatorSetup.ImportFirmware(source,dataDir);status.Text=$"{files.Count} Firmware-Dateien importiert. PS1 / PS2: BIOS im Emulator prüfen und auswählen.";});}));
         panel.Children.Add(AsyncButton("Firmware-Ordner importieren (z. B. MSX)",async()=>
         {
-            var folders=await StorageProvider.OpenFolderPickerAsync(new(){Title="Ordner mit eigenen Firmware-Dateien"});if(folders.Count==0||folders[0].TryGetLocalPath() is not{} folder)return;
+            var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="Ordner mit eigenen Firmware-Dateien"});if(folders.Count==0||folders[0].TryGetLocalPath() is not{} folder)return;
             if(await BusyAsync(async token=>await Task.Run(()=>EmulatorSetup.ImportFirmwareFolder(folder,dataDir,token),token)))status.Text="Firmware-Ordner importiert.";
         }));
         panel.Children.Add(ActionButton("BIOS-/Firmware-Ordner öffnen",()=>{Directory.CreateDirectory(EmulatorSetup.FirmwareDirectory(dataDir));OpenPath(EmulatorSetup.FirmwareDirectory(dataDir));}));
@@ -671,5 +676,4 @@ public sealed class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
-
 
