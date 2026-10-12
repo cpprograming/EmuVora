@@ -366,7 +366,13 @@ public sealed partial class MainWindow : Window
         var direction=(ushort)(buttons&15);var now=Environment.TickCount64;
         if(direction!=previousDirection){previousDirection=direction;repeatAt=now+400;}
         else if(direction!=0&&now>=repeatAt){pressed|=direction;repeatAt=now+140;}
-        if(!IsActive||dialogOpen||operation!=null||running.Count>0||pressed==0)return;
+        if(!IsActive||dialogOpen||running.Count>0||pressed==0)return;
+        await HandleLibraryControllerAsync((ushort)pressed);
+    }
+    public async Task HandleLibraryControllerAsync(ushort pressed)
+    {
+        if(operation!=null){if((pressed&0x2000)!=0)operation.Cancel();return;}
+        if(running.Count>0||pressed==0)return;
         if((pressed&0x10)!=0){await ShowSettingsAsync();return;}
         if((pressed&0x20)!=0){controllerUiMode=!controllerUiMode;if(controllerUiMode)ControllerUi.Handle(this,2);else gamesList.Focus();return;}
         if(controllerUiMode){if((pressed&0x2000)!=0){controllerUiMode=false;gamesList.Focus();}else ControllerUi.Handle(this,(ushort)pressed);return;}

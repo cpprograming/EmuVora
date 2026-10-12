@@ -42,5 +42,13 @@ public class OnboardingTests
         using var dir=new TestDirectory();dir.File("Cover.png");dir.File("Other.txt");Directory.CreateDirectory(Path.Combine(dir.Path,"ROMs"));var window=new Window{Width=500,Height=400};window.Show();var pending=new ControllerPicker(window,dir.Path).OpenFilePickerAsync(new(){Title="Cover",FileTypeFilter=[new("Images"){Patterns=["*.png"]}]});Dispatcher.UIThread.RunJobs();var picker=Assert.Single(window.OwnedWindows);var list=picker.GetVisualDescendants().OfType<ListBox>().Single();Assert.Equal(2,list.ItemCount);Assert.DoesNotContain(list.Items,item=>item?.ToString()?.Contains("Other.txt")==true);Capture(picker,"Xbox-file-picker.png");ControllerUi.Handle(picker,0x2000);Dispatcher.UIThread.RunJobs();Assert.True(pending.IsCompletedSuccessfully);Assert.Empty(pending.Result);window.Close();
     }
     private static void Click(Window window,string label){window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string==label).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();}
+    [AvaloniaFact] public async Task LibraryControllerCanCancelAnActiveOperationWithoutClosingTheLibrary()
+    {
+        using var dir=new TestDirectory();new SettingsStore(Path.Combine(dir.Path,"settings.json")).Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});var window=new MainWindow(dir.Path);window.Show();
+        var busy=typeof(MainWindow).GetMethod("BusyAsync",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        var pending=(Task<bool>)busy.Invoke(window,[new Func<CancellationToken,Task>(token=>Task.Delay(Timeout.Infinite,token))])!;
+        await window.HandleLibraryControllerAsync(0x1000);Assert.False(pending.IsCompleted);
+        await window.HandleLibraryControllerAsync(0x2000);Assert.False(await pending);Assert.True(window.IsVisible);window.Close();
+    }
     private static void Capture(Window window,string name){window.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(Path.Combine(screenshots,name));}}
 }
