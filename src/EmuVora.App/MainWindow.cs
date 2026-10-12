@@ -21,6 +21,11 @@ public sealed class MainWindow : Window
     private readonly SettingsStore settingsStore;
     private AppSettings settings;
     private Process? esDeProcess;
+    private readonly HttpClient updateHttp=new(){Timeout=TimeSpan.FromMinutes(10)};
+    private AppRelease? appRelease;
+    private string? appUpdateFile;
+    private readonly TextBlock appUpdateStatus=new(){TextWrapping=TextWrapping.Wrap,Text=""};
+    private static Version AppVersion=>typeof(MainWindow).Assembly.GetName().Version??new Version(0,7,0);
     private bool isClosed;
     private readonly PackageManager packages=new();
     private readonly ListBox gamesList=new();
@@ -93,9 +98,9 @@ public sealed class MainWindow : Window
         sidebar.Children.Add(AsyncButton("AlekFull NX · ES-DE öffnen",()=>OpenEsDeAsync()));
         var tools=new StackPanel{Spacing=6};foreach(var name in new[]{"Konsole zuordnen","Fehlende Dateien"}){var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;tools.Children.Add(item);}
         tools.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));tools.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));tools.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));sidebar.Children.Add(new Expander{Header="Verwaltung",Content=tools});
-        sidebar.Children.Add(controllerStatus);
+        sidebar.Children.Add(appUpdateStatus);sidebar.Children.Add(controllerStatus);
         sidebar.Children.Add(themeStatus);
-        sidebar.Children.Add(new TextBlock {Text="Windows · v0.6\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
+        sidebar.Children.Add(new TextBlock {Text="Windows · v0.7\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
         var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=12};
         header.Children.Add(themeLogo);var heading=new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold};Grid.SetColumn(heading,1);header.Children.Add(heading);Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
@@ -119,9 +124,9 @@ public sealed class MainWindow : Window
         UpdateSystems();ApplyTheme();Refresh();
         PropertyChanged+=(_,e)=>{if(e.Property==ClientSizeProperty)ApplyLayout();};
         status.Text=settingsStore.LoadWarning??"ROM-Ordner importieren oder Emulatoren einrichten, um zu starten.";
-        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
+        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
-        Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();};
+        Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
     private void ApplyLayout(){var show=settings.ShowGameDetails&&(ClientSize.Width==0||ClientSize.Width>=1120);detailBorder.IsVisible=show;layout.ColumnDefinitions[2].Width=new GridLength(show?284:0);}
@@ -532,8 +537,54 @@ public sealed class MainWindow : Window
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="Gespeicherte ROM-Ordner",FontWeight=FontWeight.Bold});
         var folders=new ListBox {ItemsSource=settings.RomFolders.ToArray(),MaxHeight=150};panel.Children.Add(folders);
         panel.Children.Add(ActionButton("Ordner aus dem Neu-Scan entfernen",()=>{if(folders.SelectedItem is string folder){settings.RomFolders.Remove(folder);settingsStore.Save(settings);folders.ItemsSource=settings.RomFolders.ToArray();status.Text="Ordner aus dem Neu-Scan entfernt. Spiele und Dateien bleiben erhalten.";}}));
-        var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}}},SelectedIndex=initialEmulator==null?0:3};
+        var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}},new TabItem{Header="EmuVora-Updates",Content=new ScrollViewer{Content=AppUpdateOptions()}}},SelectedIndex=initialEmulator==null?0:3};
         var dialog=Dialog("EmuVora · Einstellungen",tabs);dialog.Width=760;dialog.Height=760;dialog.Content=tabs;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
+    }
+    private async Task CheckAppUpdatesAsync()
+    {
+        try
+        {
+            var release=await new AppUpdates(updateHttp).CheckAsync(AppVersion);
+            if(isClosed)return;
+            if(appRelease?.Version!=release?.Version)appUpdateFile=null;
+            appRelease=release;
+            appUpdateStatus.Text=release==null?"EmuVora ist aktuell · v"+AppVersion.ToString(3):"EmuVora v"+release.Version+" verfügbar · Einstellungen → EmuVora-Updates";
+        }
+        catch(Exception ex){if(!isClosed)appUpdateStatus.Text="EmuVora-Updateprüfung fehlgeschlagen: "+ex.Message;}
+    }
+    private StackPanel AppUpdateOptions()
+    {
+        var panel=new StackPanel{Spacing=14,Margin=new(24)};
+        panel.Children.Add(new TextBlock{Text="EmuVora · v"+AppVersion.ToString(3),FontSize=25,FontWeight=FontWeight.Bold});
+        var automatic=new CheckBox{Content="Beim Start nach neuen EmuVora-Versionen suchen",IsChecked=settings.CheckAppUpdatesOnStartup};
+        automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckAppUpdatesOnStartup=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
+        var message=new TextBlock{Text=appUpdateStatus.Text,TextWrapping=TextWrapping.Wrap};panel.Children.Add(message);
+        panel.Children.Add(AsyncButton("Jetzt auf EmuVora-Updates prüfen",async()=>{await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;}));
+        panel.Children.Add(AsyncButton("Update herunterladen",async()=>
+        {
+            if(operation!=null)return;
+            await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;if(appRelease==null)return;
+            var release=appRelease;
+            await BusyAsync(async token=>{status.Text="EmuVora-Update wird heruntergeladen …";appUpdateFile=await new AppUpdates(updateHttp).DownloadAsync(release,Path.Combine(dataDir,"updates"),new Progress<double>(value=>{progress.IsIndeterminate=false;progress.Value=value;}),token);status.Text="Update geprüft und bereit. Unter EmuVora-Updates neu starten.";});
+            message.Text=appUpdateFile==null?status.Text:"Download geprüft · v"+release.Version+" · bereit zum Installieren";
+        }));
+        panel.Children.Add(AsyncButton("Aktualisieren und neu starten",async()=>
+        {
+            if(operation!=null||running.Count>0||esDeProcess!=null){message.Text="Downloads, Spiele und ES-DE zuerst beenden.";return;}
+            if(appRelease==null||appUpdateFile==null){message.Text="Zuerst ein verfügbares Update herunterladen.";return;}
+            await AppUpdates.VerifyAsync(appUpdateFile,appRelease);
+            settingsStore.Save(settings);
+            var root=AppUpdates.InstallationRoot(Environment.ProcessPath!);
+            if(root==null)
+            {
+                var start=new ProcessStartInfo(appUpdateFile){UseShellExecute=false};start.ArgumentList.Add("--data-dir");start.ArgumentList.Add(dataDir);start.ArgumentList.Add("--wait-for-pid");start.ArgumentList.Add(Environment.ProcessId.ToString());Process.Start(start);
+            }
+            else Process.Start(AppUpdates.SetupStartInfo(appUpdateFile,root,dataDir,Environment.ProcessId));
+            if(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime lifetime)lifetime.Shutdown();
+        }));
+        panel.Children.Add(ActionButton("Downloadordner öffnen",()=>{var directory=Path.Combine(dataDir,"updates");Directory.CreateDirectory(directory);OpenPath(directory);}));
+        panel.Children.Add(new TextBlock{Text="Stabile Windows-Versionen aus dem offiziellen EmuVora-Repository. Jeder Download wird mit SHA-256 geprüft. Das Setup wartet auf das Programmende, behält den Datenpfad und sichert die vorige App-Version. Bestehende Verknüpfungen bleiben erhalten. Bei einer portablen Version wählst du den Installationsordner im Setup. Ohne Internet kannst du weiterspielen.",TextWrapping=TextWrapping.Wrap});
+        return panel;
     }
     private StackPanel LibraryOptions()
     {
@@ -613,3 +664,4 @@ public sealed class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
+

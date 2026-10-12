@@ -24,14 +24,17 @@ internal static class Setup
     private static int Main(string[] args)
     {
         Application.EnableVisualStyles();
-        string destination = null;
-        bool shortcuts = true, launch = true, unattended = args.Length > 0;
+        string destination = null, data = null;
+        int waitForPid = 0;
+        bool shortcuts = true, launch = true, unattended = Array.IndexOf(args, "--install-dir") >= 0;
         string temporary = Path.Combine(Path.GetTempPath(), "EmuVora-setup-" + Guid.NewGuid().ToString("N"));
         try
         {
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "--install-dir" && i + 1 < args.Length) destination = args[++i];
+                else if (args[i] == "--data-dir" && i + 1 < args.Length) data = args[++i];
+                else if (args[i] == "--wait-for-pid" && i + 1 < args.Length) { if (!int.TryParse(args[++i], out waitForPid) || waitForPid <= 0) throw new ArgumentException("Ungültige Prozess-ID."); }
                 else if (args[i] == "--no-shortcuts") shortcuts = false;
                 else if (args[i] == "--no-launch") launch = false;
                 else throw new ArgumentException("Unbekannter Setup-Parameter: " + args[i]);
@@ -61,6 +64,13 @@ internal static class Setup
                 }
             }
             if (!Path.IsPathRooted(destination)) throw new IOException("Bitte einen vollständigen Installationspfad wählen.");
+            if (data != null && !Path.IsPathRooted(data)) throw new IOException("Vollständiger Datenpfad erforderlich.");
+            if (waitForPid > 0)
+            {
+                Process previous = null;
+                try { previous = Process.GetProcessById(waitForPid); } catch (ArgumentException) { }
+                if (previous != null) using (previous) { if (!previous.WaitForExit(120000)) throw new IOException("EmuVora wurde nicht geschlossen. Update erneut versuchen."); }
+            }
             Directory.CreateDirectory(temporary);
             string archive = Path.Combine(temporary, "package.zip"), package = Path.Combine(temporary, "package");
             using (var input = Assembly.GetExecutingAssembly().GetManifestResourceStream("EmuVora.package.zip"))
@@ -69,7 +79,7 @@ internal static class Setup
             var process = new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "WindowsPowerShell\\v1.0\\powershell.exe"));
             process.UseShellExecute = false; process.CreateNoWindow = true;
             process.RedirectStandardOutput = true; process.RedirectStandardError = true;
-            process.Arguments = "-NoProfile -STA -ExecutionPolicy Bypass -File " + Quote(Path.Combine(package, "Install-EmuVora.ps1")) + " -DestinationPath " + Quote(destination) + (shortcuts ? " -DesktopShortcut" : " -SkipShortcuts");
+            process.Arguments = "-NoProfile -STA -ExecutionPolicy Bypass -File " + Quote(Path.Combine(package, "Install-EmuVora.ps1")) + " -DestinationPath " + Quote(destination) + (shortcuts ? " -DesktopShortcut" : " -SkipShortcuts") + (data == null ? "" : " -DataPath " + Quote(data));
             using (var child = Process.Start(process))
             {
                 var output = child.StandardOutput.ReadToEndAsync(); var error = child.StandardError.ReadToEndAsync();

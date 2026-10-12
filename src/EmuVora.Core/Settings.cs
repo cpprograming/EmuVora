@@ -13,6 +13,7 @@ public sealed class AppSettings
     public Dictionary<string,InstalledPackage> Packages {get;set;}=[];
     public List<string> RomFolders {get;set;}=[];
     public bool Fullscreen {get;set;}=true;
+    public bool CheckAppUpdatesOnStartup {get;set;}=true;
     public bool CheckUpdatesOnStartup {get;set;}=true;
     public bool AutoInstallUpdates {get;set;}=false;
     public bool AutomaticSetup {get;set;}=true;
