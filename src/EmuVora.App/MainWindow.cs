@@ -565,13 +565,18 @@ public sealed class MainWindow : Window
             if(operation!=null)return;
             await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;if(appRelease==null)return;
             var release=appRelease;
-            await BusyAsync(async token=>{status.Text="EmuVora-Update wird heruntergeladen …";appUpdateFile=await new AppUpdates(updateHttp).DownloadAsync(release,Path.Combine(dataDir,"updates"),new Progress<double>(value=>{progress.IsIndeterminate=false;progress.Value=value;}),token);status.Text="Update geprüft und bereit. Unter App-Updates neu starten.";});
+            bool complete=false;message.Text="EmuVora-Update wird heruntergeladen …";
+            try{await BusyAsync(async token=>{status.Text=message.Text;appUpdateFile=await new AppUpdates(updateHttp).DownloadAsync(release,Path.Combine(dataDir,"updates"),new Progress<double>(value=>{if(!complete)message.Text="EmuVora-Update wird heruntergeladen · "+value.ToString("0")+" %";progress.IsIndeterminate=false;progress.Value=value;}),token);status.Text="Update geprüft und bereit. Unter App-Updates neu starten.";});}
+            finally{complete=true;}
             message.Text=appUpdateFile==null?status.Text:"Download geprüft · v"+release.Version+" · bereit zum Installieren";
         }));
+        panel.Children.Add(ActionButton("Download abbrechen",()=>operation?.Cancel()));
         panel.Children.Add(AsyncButton("Aktualisieren und neu starten",async()=>
         {
             if(operation!=null||running.Count>0||esDeProcess!=null){message.Text="Downloads, Spiele und ES-DE zuerst beenden.";return;}
             if(appRelease==null||appUpdateFile==null){message.Text="Zuerst ein verfügbares Update herunterladen.";return;}
+            try
+            {
             await AppUpdates.VerifyAsync(appUpdateFile,appRelease);
             settingsStore.Save(settings);
             var root=AppUpdates.InstallationRoot(Environment.ProcessPath!);
@@ -581,6 +586,8 @@ public sealed class MainWindow : Window
             }
             else Process.Start(AppUpdates.SetupStartInfo(appUpdateFile,root,dataDir,Environment.ProcessId));
             if(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime lifetime)lifetime.Shutdown();
+            }
+            catch(Exception ex){message.Text="Update konnte nicht gestartet werden: "+ex.Message;Log(ex);}
         }));
         panel.Children.Add(ActionButton("Downloadordner öffnen",()=>{var directory=Path.Combine(dataDir,"updates");Directory.CreateDirectory(directory);OpenPath(directory);}));
         panel.Children.Add(new TextBlock{Text="Stabile Windows-Versionen aus dem offiziellen EmuVora-Repository. Jeder Download wird mit SHA-256 geprüft. Das Setup wartet auf das Programmende, behält den Datenpfad und sichert die vorige App-Version. Bestehende Verknüpfungen bleiben erhalten. Bei einer portablen Version wählst du den Installationsordner im Setup. Ohne Internet kannst du weiterspielen.",TextWrapping=TextWrapping.Wrap});
@@ -664,4 +671,5 @@ public sealed class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
+
 
