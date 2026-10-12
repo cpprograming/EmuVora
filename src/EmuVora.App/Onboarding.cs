@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.Platform.Storage;
 using EmuVora.Core;
 
 namespace EmuVora.App;
@@ -13,8 +14,9 @@ public sealed partial class MainWindow
         int step=0;var panel=new StackPanel{Margin=new(24),Spacing=16};var title=new TextBlock{FontSize=26,TextWrapping=TextWrapping.Wrap};var content=new StackPanel{Spacing=12};var feedback=new TextBlock{TextWrapping=TextWrapping.Wrap};var pad=new TextBlock{TextWrapping=TextWrapping.Wrap};var navigation=new StackPanel{Orientation=Orientation.Horizontal,Spacing=12};
         panel.Children.Add(title);panel.Children.Add(content);panel.Children.Add(feedback);panel.Children.Add(navigation);panel.Children.Add(new TextBlock{Text="D-Pad: wählen · A: bestätigen / Texteingabe · B: zurück · LB/RB: Einstellungen-Tabs",TextWrapping=TextWrapping.Wrap,Opacity=0.75});
         var dialog=Dialog("EmuVora · Erste Einrichtung",panel);dialog.Width=760;dialog.Height=690;
+        var previous=new Button{Content="Zurück"};var next=new Button{Content="Weiter"};
+        previous.Click+=(_,_)=>{if(operation==null&&step>0){step--;Render();}};next.Click+=(_,_)=>{if(operation!=null)return;if(step<4){step++;Render();}else{settings.OnboardingCompleted=true;settingsStore.Save(settings);dialog.Close();status.Text="Einrichtung gespeichert. Spiel auswählen und A drücken.";}};
         ControllerUi.SetBack(dialog,()=>{if(operation!=null){operation.Cancel();return;}if(step>0){step--;Render();}else dialog.Close();});
-        var previous=ActionButton("Zurück",()=>{if(operation==null&&step>0){step--;Render();}});var next=ActionButton("Weiter",()=>{if(operation!=null)return;if(step<4){step++;Render();}else{settings.OnboardingCompleted=true;settingsStore.Save(settings);dialog.Close();status.Text="Einrichtung gespeichert. Spiel auswählen und A drücken.";}});
         navigation.Children.Add(previous);navigation.Children.Add(next);navigation.Children.Add(ActionButton("Später einrichten",()=>{if(operation!=null){operation.Cancel();return;}settings.OnboardingCompleted=true;settingsStore.Save(settings);dialog.Close();}));
         void Text(string value)=>content.Children.Add(new TextBlock{Text=value,TextWrapping=TextWrapping.Wrap});
         void Render()
@@ -59,3 +61,4 @@ public sealed partial class MainWindow
         dialog.Opened+=(_,_)=>timer.Start();dialog.Closed+=(_,_)=>timer.Stop();dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();feedback.Text="Vorgang wird abgebrochen …";}};Render();await dialog.ShowDialog(this);
     }
 }
+
