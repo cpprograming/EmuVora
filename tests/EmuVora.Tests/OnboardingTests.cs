@@ -1,0 +1,41 @@
+using Avalonia.Controls;
+using Avalonia.Headless;
+using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
+using EmuVora.App;
+using EmuVora.Core;
+using Xunit;
+
+namespace EmuVora.Tests;
+public class OnboardingTests
+{
+    [Fact] public void SetupPlanOnlyIncludesImportedConsolesAndDeduplicatesRetroArch()
+    {
+        var settings=new AppSettings();Assert.Equal(new[]{"retroarch","pcsx2"},SetupPlan.RequiredEmulators(["NES","SNES","PS2","Unknown"],settings).Select(e=>e.Id));Assert.Single(SetupPlan.RequiredEmulators([],settings));Assert.Empty(SetupPlan.RequiredEmulators(["Unknown"],settings));
+    }
+    [AvaloniaFact] public void WizardCanGoBackAndFinishWithoutDownloadingOrChangingExistingPaths()
+    {
+        using var dir=new TestDirectory();var saved=new SettingsStore(Path.Combine(dir.Path,"settings.json"));saved.Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false,EmulatorPaths=new(){{"duckstation","C:\\Own emulator\\duckstation.exe"}}});
+        var window=new MainWindow(dir.Path);window.Show();Click(window,"Einrichtungsassistent");var wizard=Assert.Single(window.OwnedWindows);Click(wizard,"Weiter");Assert.Contains(wizard.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="2 / 5 · Deine Spiele");ControllerUi.Handle(wizard,0x2000);Assert.Contains(wizard.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="1 / 5 · Dein Speicherort");
+        for(var i=0;i<3;i++)Click(wizard,"Weiter");Assert.Contains(wizard.GetVisualDescendants().OfType<Button>(),b=>b.Content as string=="Eigene BIOS-Dateien importieren");Capture(wizard,"Setup-assistant.png");Click(wizard,"Weiter");Click(wizard,"Zur Bibliothek");Assert.True(saved.Load().OnboardingCompleted);Assert.Equal("C:\\Own emulator\\duckstation.exe",saved.Load().EmulatorPaths["duckstation"]);Assert.Empty(saved.Load().Packages);window.Close();
+    }
+    [AvaloniaFact] public void FirstStartShowsWizardAndLaterChoiceIsRemembered()
+    {
+        using var dir=new TestDirectory();var saved=new SettingsStore(Path.Combine(dir.Path,"settings.json"));saved.Save(new(){CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});var window=new MainWindow(dir.Path);window.Show();Dispatcher.UIThread.RunJobs();var wizard=Assert.Single(window.OwnedWindows);Click(wizard,"Später einrichten");Assert.True(saved.Load().OnboardingCompleted);window.Close();
+        var again=new MainWindow(dir.Path);again.Show();Dispatcher.UIThread.RunJobs();Assert.Empty(again.OwnedWindows);again.Close();
+    }
+    [AvaloniaFact] public void ControllerActivatesButtonsCheckboxesTabsAndKeyboard()
+    {
+        var panel=new StackPanel();var button=new Button{Content="Test"};var check=new CheckBox{Content="Option"};var combo=new ComboBox{ItemsSource=new[]{"First","Second"},SelectedIndex=0};var text=new TextBox{Text="Original"};panel.Children.Add(button);panel.Children.Add(check);panel.Children.Add(combo);panel.Children.Add(text);var window=new Window{Content=panel,Width=500,Height=400};window.Show();bool clicked=false;button.Click+=(_,_)=>clicked=true;button.Focus();ControllerUi.Handle(window,0x1000);Assert.True(clicked);check.Focus();ControllerUi.Handle(window,0x1000);Assert.True(check.IsChecked);combo.Focus();ControllerUi.Handle(window,8);Assert.Equal(1,combo.SelectedIndex);
+        text.Focus();ControllerUi.Handle(window,0x1000);Dispatcher.UIThread.RunJobs();var keyboard=Assert.Single(window.OwnedWindows);Click(keyboard,"A");ControllerUi.Handle(keyboard,0x2000);Assert.Equal("Original",text.Text);
+        text.Focus();ControllerUi.Handle(window,0x1000);Dispatcher.UIThread.RunJobs();keyboard=Assert.Single(window.OwnedWindows);Click(keyboard,"A");Click(keyboard,"Übernehmen");Assert.Equal("Originala",text.Text);window.Close();
+    }
+    [AvaloniaFact] public void ControllerPickerFiltersFilesAndCanBeCancelled()
+    {
+        using var dir=new TestDirectory();dir.File("Cover.png");dir.File("Other.txt");Directory.CreateDirectory(Path.Combine(dir.Path,"ROMs"));var window=new Window{Width=500,Height=400};window.Show();var pending=new ControllerPicker(window,dir.Path).OpenFilePickerAsync(new(){Title="Cover",FileTypeFilter=[new("Images"){Patterns=["*.png"]}]});Dispatcher.UIThread.RunJobs();var picker=Assert.Single(window.OwnedWindows);var list=picker.GetVisualDescendants().OfType<ListBox>().Single();Assert.Equal(2,list.ItemCount);Assert.DoesNotContain(list.Items,item=>item?.ToString()?.Contains("Other.txt")==true);Capture(picker,"Xbox-file-picker.png");ControllerUi.Handle(picker,0x2000);Dispatcher.UIThread.RunJobs();Assert.True(pending.IsCompletedSuccessfully);Assert.Empty(pending.Result);window.Close();
+    }
+    private static void Click(Window window,string label){window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string==label).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();}
+    private static void Capture(Window window,string name){window.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(Path.Combine(screenshots,name));}}
+}

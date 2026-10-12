@@ -2,6 +2,7 @@ using System.Text.Json;
 namespace EmuVora.Core;
 public sealed class AppSettings
 {
+    public bool OnboardingCompleted {get;set;}
     public string Theme {get;set;}="Midnight";
     public string? EmulationStationTheme {get;set;}
     public string? EsDeExecutable {get;set;}
