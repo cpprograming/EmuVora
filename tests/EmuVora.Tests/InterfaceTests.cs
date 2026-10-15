@@ -18,6 +18,16 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact] public void BackupTabProvidesSeparateCreateRestoreAndActivationActions()
+    {
+        using var dir=new TestDirectory();new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});
+        var window=new MainWindow(dir.Path);window.Show();window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Einstellungen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();
+        var dialog=Assert.Single(window.OwnedWindows);var tabs=dialog.GetVisualDescendants().OfType<TabControl>().Single();tabs.SelectedIndex=5;Dispatcher.UIThread.RunJobs();
+        foreach(var label in new[]{"Datensicherung erstellen …","Datensicherung prüfen und wiederherstellen …","Mit wiederhergestellter Bibliothek neu starten"})Assert.Contains(dialog.GetVisualDescendants().OfType<Button>(),b=>b.Content as string==label);
+        dialog.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+        using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Backup-options.png"));}
+        dialog.Close();window.Close();
+    }
     [AvaloniaFact][Trait("Category","Network")] public async Task RealDownloadedCoversRenderInTheUnifiedLibrary()
     {
         using var dir=new TestDirectory();using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,System.IO.Path.Combine(dir.Path,"cache"),apiToken:Environment.GetEnvironmentVariable("EMUVORA_COVER_TOKEN"));var settings=new AppSettings{OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false};
@@ -31,7 +41,7 @@ public class InterfaceTests
     {
         using var dir=new TestDirectory();var store=new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json"));store.Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});
         var window=new MainWindow(dir.Path);window.Show();window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Einstellungen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();
-        var dialog=Assert.Single(window.OwnedWindows);var tabs=dialog.GetVisualDescendants().OfType<TabControl>().Single();Assert.Equal(5,tabs.ItemCount);
+        var dialog=Assert.Single(window.OwnedWindows);var tabs=dialog.GetVisualDescendants().OfType<TabControl>().Single();Assert.Equal(6,tabs.ItemCount);
         var covers=dialog.GetVisualDescendants().OfType<CheckBox>().First(c=>c.Content as string=="Fehlende Cover beim Start und nach einem Import automatisch laden");covers.IsChecked=true;Assert.True(store.Load().AutoDownloadCovers);
         tabs.SelectedIndex=1;Dispatcher.UIThread.RunJobs();var mode=dialog.GetVisualDescendants().OfType<ComboBox>().First(c=>c.Items.Contains("Pixelgenau · ganze Skalierungsstufen"));mode.SelectedIndex=1;Assert.Equal("PixelPerfect",store.Load().DisplayMode);
         Dispatcher.UIThread.RunJobs();using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Display-options.png"));}dialog.Close();window.Close();

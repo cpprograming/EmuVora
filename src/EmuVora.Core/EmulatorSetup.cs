@@ -6,6 +6,7 @@ public static class EmulatorSetup
     private static string Quoted(string value)=>"\""+value.Replace('\\','/').Replace("\"","")+"\"";
     public static void Configure(string id,string executable,string dataDirectory,bool xbox=true,bool fullscreen=true,bool reset=false,int firstController=0)
     {
+        SaveData.RestorePending(id,executable,dataDirectory);
         var root=Path.GetDirectoryName(executable)!;var firmware=FirmwareDirectory(dataDirectory);Directory.CreateDirectory(firmware);
         var marker=Path.Combine(root,".emuvora-configured");var replace=reset;
         // Only call this for managed packages. Portable markers keep settings inside the package.
