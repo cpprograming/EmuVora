@@ -13,9 +13,11 @@ public sealed class PackageManager : IDisposable
 {
     public const string CatalogUrl="https://raw.githubusercontent.com/cpprograming/EmuVora/main/catalog/packages.json";
     private readonly HttpClient http;
+    private readonly string? githubToken;
     public static readonly Dictionary<string,string> CoreIds=SystemCatalog.RetroSystems.ToDictionary(s=>s.Name,s=>s.Core);
-    public PackageManager(HttpMessageHandler? handler=null)
+    public PackageManager(HttpMessageHandler? handler=null,string? githubToken=null)
     {
+        this.githubToken=githubToken;
         http=handler==null?new(new HttpClientHandler {AllowAutoRedirect=false}):new(handler);
         http.Timeout=TimeSpan.FromMinutes(15);http.DefaultRequestHeaders.UserAgent.ParseAdd("EmuVora/0.2");
     }
@@ -39,7 +41,11 @@ public sealed class PackageManager : IDisposable
             var index=Array.FindIndex(updated,p=>p.Id==id);if(index<0)continue;
             try
             {
-                using var metadata=await http.GetAsync($"https://api.github.com/repos/{repository}/releases/latest",token);metadata.EnsureSuccessStatusCode();
+                using var request=new HttpRequestMessage(HttpMethod.Get,$"https://api.github.com/repos/{repository}/releases/latest");
+                request.Headers.Accept.ParseAdd("application/vnd.github+json");
+                // CI credentials belong only on this fixed API request, never on downloads/redirects.
+                if(!string.IsNullOrWhiteSpace(githubToken))request.Headers.Authorization=new("Bearer",githubToken);
+                using var metadata=await http.SendAsync(request,token);metadata.EnsureSuccessStatusCode();
                 using var json=JsonDocument.Parse(await metadata.Content.ReadAsStringAsync(token));var release=json.RootElement;
                 var asset=release.GetProperty("assets").EnumerateArray().FirstOrDefault(a=>Regex.IsMatch(a.GetProperty("name").GetString()??"",pattern));
                 if(asset.ValueKind==JsonValueKind.Undefined)continue;

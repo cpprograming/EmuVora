@@ -1,6 +1,6 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 15. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 16. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
 
@@ -14,12 +14,13 @@ Stand: 15. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] Lokale Version 0.9.0: Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner.
 - [x] Für 0.9.0: 95 lokale Tests bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 
-Die lokale Setup-Datei 0.9.0 ist erstellt. Ihre Änderungen sind beim Anlegen dieser Checkliste noch nicht in main hochgeladen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der Sicherungsstand einschließlich automatischer Spielstandsübernahme ist über PR #9 auf main. Ein Prüfsummenfehler bei einem offiziellen Emulator-Download hat die Veröffentlichung zunächst gestoppt; die Downloadprüfung wird beibehalten und die Metadatenabfrage im CI korrigiert. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 ## 1. Zuerst: Sicherungen vollständig alltagstauglich machen
 
-- [ ] Den lokalen 0.9.0-Quellcode und BACKUPS.md über einen geprüften Pull Request auf GitHub übernehmen; neue Setup-Datei nach dem Merge prüfen.
-- [ ] Emulator-eigene Spielstände nach einer Neuinstallation automatisch dem neuen Emulatorordner zuordnen; vorab Zusammenfassung anzeigen und vorhandene Dateien schützen.
+- [x] Sicherungs-Quellcode und BACKUPS.md über geprüften Pull Request #9 auf GitHub übernommen.
+- [ ] Neue Release-Setup-Datei nach dem Merge herunterladen und prüfen.
+- [x] Erkannte Emulator-Spielstände nach einer Neuinstallation automatisch zuordnen; Wiederherstellung vorher erläutern und vorhandene Dateien schützen (DuckStation, PCSX2, Dolphin, PPSSPP).
 - [ ] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen.
 - [ ] Wiederherstellung auf einem anderen Laufwerk testen: Bibliothek, Cover, Favoriten und echte Spielstände vergleichen.
 - [ ] Wechsel zur wiederhergestellten Bibliothek und Rückkehr zum bisherigen Datenordner direkt in der Oberfläche anbieten.
@@ -75,4 +76,5 @@ Abnahme: Keine verzerrte Darstellung durch das automatische Profil; nachvollzieh
 - [ ] Nach dem Merge die automatisch erzeugte EXE, eingebettete Version und Updatefähigkeit prüfen.
 - [ ] ROMs, BIOS und persönliche Sicherungen nicht ins Repository hochladen.
 
-Empfohlener nächster Arbeitsschritt: Den lokalen Sicherungsstand auf GitHub übernehmen und anschließend die automatische Übernahme emulator-eigener Spielstände umsetzen.
+Empfohlener nächster Arbeitsschritt: Release-Prüfung abschließen, danach benutzerdefinierte und externe Spielstandsordner auswählbar sichern.
+
