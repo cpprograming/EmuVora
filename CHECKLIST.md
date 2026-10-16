@@ -11,15 +11,15 @@ Stand: 16. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] Monitorerkennung und Profile für Seitenverhältnis und scharfe Skalierung implementiert.
 - [x] EmulationStation-Theme-Import und optionaler ES-DE-/AlekFull-Start.
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
-- [x] Lokale Version 0.9.0: Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner.
-- [x] Für 0.9.0: 95 lokale Tests bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
+- [x] 101 Funktionstests und 5 Netzwerktests auch im Release-Build 0.9.51 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 
-Der Sicherungsstand einschließlich automatischer Spielstandsübernahme ist über PR #9 auf main. Ein Prüfsummenfehler bei einem offiziellen Emulator-Download hat die Veröffentlichung zunächst gestoppt; die Downloadprüfung wird beibehalten und die Metadatenabfrage im CI korrigiert. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.9.51](https://github.com/cpprograming/EmuVora/releases/tag/v0.9.51) veröffentlicht. [PR #9](https://github.com/cpprograming/EmuVora/pull/9) enthält Sicherung und Spielstandsübernahme; [PR #10](https://github.com/cpprograming/EmuVora/pull/10) verbessert die CI-Metadatenabfrage. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 ## 1. Zuerst: Sicherungen vollständig alltagstauglich machen
 
 - [x] Sicherungs-Quellcode und BACKUPS.md über geprüften Pull Request #9 auf GitHub übernommen.
-- [ ] Neue Release-Setup-Datei nach dem Merge herunterladen und prüfen.
+- [x] Release 0.9.51 nach dem Merge veröffentlicht, Setup heruntergeladen und mit dem EmuVora-Updater einschließlich SHA-256 geprüft.
 - [x] Erkannte Emulator-Spielstände nach einer Neuinstallation automatisch zuordnen; Wiederherstellung vorher erläutern und vorhandene Dateien schützen (DuckStation, PCSX2, Dolphin, PPSSPP).
 - [ ] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen.
 - [ ] Wiederherstellung auf einem anderen Laufwerk testen: Bibliothek, Cover, Favoriten und echte Spielstände vergleichen.
@@ -76,5 +76,5 @@ Abnahme: Keine verzerrte Darstellung durch das automatische Profil; nachvollzieh
 - [ ] Nach dem Merge die automatisch erzeugte EXE, eingebettete Version und Updatefähigkeit prüfen.
 - [ ] ROMs, BIOS und persönliche Sicherungen nicht ins Repository hochladen.
 
-Empfohlener nächster Arbeitsschritt: Release-Prüfung abschließen, danach benutzerdefinierte und externe Spielstandsordner auswählbar sichern.
+Empfohlener nächster Arbeitsschritt: Benutzerdefinierte und externe Spielstandsordner auswählbar sichern.
 
