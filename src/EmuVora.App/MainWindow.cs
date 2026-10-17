@@ -17,6 +17,7 @@ namespace EmuVora.App;
 public sealed partial class MainWindow : Window
 {
     private readonly string dataDir;
+    private readonly Button backupReminder=new(){Content="Datensicherung fällig",HorizontalAlignment=HorizontalAlignment.Stretch,IsVisible=false};
     private readonly LibraryStore store;
     private readonly SettingsStore settingsStore;
     private AppSettings settings;
@@ -86,6 +87,7 @@ public sealed partial class MainWindow : Window
         var sidebar=new StackPanel {Spacing=10,Margin=new(18)};
         sidebar.Children.Add(new TextBlock {Text="◈ EmuVora",FontSize=27,FontWeight=FontWeight.Bold,Margin=new(0,4,0,20)});
         sidebar.Children.Add(new TextBlock {Text="DEINE BIBLIOTHEK",FontSize=11,Opacity=0.65});
+        sidebar.Children.Add(backupReminder);backupReminder.Click+=async(_,_)=>await ShowSettingsAsync(initialTab:5);UpdateBackupReminder();
         foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt"})
         {
             var item=ActionButton(name,()=>{view=name;systems.SelectedItem="Alle Konsolen";Refresh();});item.HorizontalContentAlignment=HorizontalAlignment.Left;viewButtons[name]=item;sidebar.Children.Add(item);
@@ -471,7 +473,7 @@ public sealed partial class MainWindow : Window
             }
         }
     }
-    private async Task ShowSettingsAsync(string? initialEmulator=null)
+    private async Task ShowSettingsAsync(string? initialEmulator=null,int? initialTab=null)
     {
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Emulatoren & Einstellungen",FontSize=25,FontWeight=FontWeight.Bold});
         if(initialEmulator!=null)panel.Children.Add(new TextBlock {Text=status.Text,TextWrapping=TextWrapping.Wrap});
@@ -548,7 +550,7 @@ public sealed partial class MainWindow : Window
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="Gespeicherte ROM-Ordner",FontWeight=FontWeight.Bold});
         var folders=new ListBox {ItemsSource=settings.RomFolders.ToArray(),MaxHeight=150};panel.Children.Add(folders);
         panel.Children.Add(ActionButton("Ordner aus dem Neu-Scan entfernen",()=>{if(folders.SelectedItem is string folder){settings.RomFolders.Remove(folder);settingsStore.Save(settings);folders.ItemsSource=settings.RomFolders.ToArray();status.Text="Ordner aus dem Neu-Scan entfernt. Spiele und Dateien bleiben erhalten.";}}));
-        var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}},new TabItem{Header="App-Updates",Content=new ScrollViewer{Content=AppUpdateOptions()}},new TabItem{Header="Sicherung",Content=new ScrollViewer{Content=BackupOptions()}}},SelectedIndex=initialEmulator==null?0:3};
+        var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}},new TabItem{Header="App-Updates",Content=new ScrollViewer{Content=AppUpdateOptions()}},new TabItem{Header="Sicherung",Content=new ScrollViewer{Content=BackupOptions()}}},SelectedIndex=initialTab??(initialEmulator==null?0:3)};
         var dialog=Dialog("EmuVora · Einstellungen",tabs);dialog.Width=760;dialog.Height=760;dialog.Content=tabs;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
     }
     private async Task CheckAppUpdatesAsync()
@@ -606,7 +608,7 @@ public sealed partial class MainWindow : Window
     }
     private StackPanel LibraryOptions()
     {
-        var panel=new StackPanel{Spacing=14,Margin=new(24)};panel.Children.Add(new TextBlock{Text="Deine Bibliothek",FontSize=25,FontWeight=FontWeight.Bold});panel.Children.Add(AsyncButton("Einrichtungsassistent öffnen",()=>ShowOnboardingAsync()));
+        var panel=new StackPanel{Spacing=14,Margin=new(24)};panel.Children.Add(new TextBlock{Text="Deine Bibliothek",FontSize=25,FontWeight=FontWeight.Bold});panel.Children.Add(AsyncButton("Einrichtungsassistent öffnen",()=>ShowOnboardingAsync()));panel.Children.Add(DataDirectoryOptions());
         var automatic=new CheckBox{Content="Fehlende Cover beim Start und nach einem Import automatisch laden",IsChecked=settings.AutoDownloadCovers};automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoDownloadCovers=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
         panel.Children.Add(new TextBlock{Text="Quelle: libretro-thumbnails auf GitHub, ohne Konto. Vorhandene Cover bleiben erhalten. Titelvarianten werden erkannt; ähnliche Spielnamen und Fortsetzungen werden nicht geraten. Nicht jeder Titel ist verfügbar.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(new TextBlock{Text="Bevorzugte Cover-Region"});var region=new ComboBox{ItemsSource=new[]{"Europe","Germany","USA","Japan","World"},SelectedItem=settings.CoverRegion};region.SelectionChanged+=(_,_)=>Guard(()=>{settings.CoverRegion=region.SelectedItem as string??"Europe";settingsStore.Save(settings);});panel.Children.Add(region);

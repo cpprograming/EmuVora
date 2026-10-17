@@ -23,8 +23,9 @@ Der aktuelle Stand ist als [Release 0.10.54](https://github.com/cpprograming/Emu
 - [x] Erkannte Emulator-Spielstände nach einer Neuinstallation automatisch zuordnen; Wiederherstellung vorher erläutern und vorhandene Dateien schützen (DuckStation, PCSX2, Dolphin, PPSSPP).
 - [x] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen. Wiederherstellung ausschließlich getrennt im neuen Datenordner (ab 0.10.54).
 - [ ] Wiederherstellung auf einem anderen Laufwerk testen: Bibliothek, Cover, Favoriten und echte Spielstände vergleichen.
-- [ ] Wechsel zur wiederhergestellten Bibliothek und Rückkehr zum bisherigen Datenordner direkt in der Oberfläche anbieten.
-- [ ] Optionale Erinnerung an Sicherungen und Aufbewahrung der letzten Sicherungen ergänzen; nichts ohne ausdrückliche Einstellung löschen.
+- [x] Vorhandene oder wiederhergestellte Bibliotheken mit Prüfung öffnen und zur vorherigen Bibliothek zurückkehren (Implementierung 0.11).
+- [x] Optionale Sicherungserinnerung beim Programmstart ergänzen; standardmäßig ausgeschaltet (Implementierung 0.11).
+- [ ] Optionale Aufbewahrung der letzten Sicherungen ergänzen; nichts ohne ausdrückliche Einstellung löschen.
 
 Abnahme: Ein gesichertes Spiel lässt sich nach Wiederherstellung und erneuter Emulator-Einrichtung mit seinem vorhandenen Spielstand fortsetzen.
 
@@ -76,5 +77,5 @@ Abnahme: Keine verzerrte Darstellung durch das automatische Profil; nachvollzieh
 - [ ] Nach dem Merge die automatisch erzeugte EXE, eingebettete Version und Updatefähigkeit prüfen.
 - [ ] ROMs, BIOS und persönliche Sicherungen nicht ins Repository hochladen.
 
-Empfohlener nächster Arbeitsschritt: Rückwechsel zum bisherigen Datenordner direkt in der Oberfläche anbieten.
+Empfohlener nächster Arbeitsschritt: Controller-Hardwaretests gemäß Roadmap 0.12 durchführen.
 

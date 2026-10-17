@@ -141,6 +141,7 @@ public static class Backups
             settings.EmulationStationTheme=settings.EmulationStationTheme is{} theme?Rebase(theme):null;
             settings.EsDeExecutable=settings.EsDeExecutable is{} esde?Rebase(esde):null;
             settings.Packages.Clear(); // Emulator binaries are intentionally not part of the backup.
+            settings.LastBackupAt=manifest.Created;
             await File.WriteAllTextAsync(settingsPath,JsonSerializer.Serialize(settings,SettingsStore.JsonOptions),token);
             using(var database=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=Path.Combine(stage,"library.db"),Mode=SqliteOpenMode.ReadOnly,Pooling=false}.ToString()))
             {database.Open();using var command=database.CreateCommand();command.CommandText="PRAGMA integrity_check";if(command.ExecuteScalar()?.ToString()!="ok")throw new IOException("Bibliotheksdatenbank ist beschädigt.");}

@@ -16,6 +16,9 @@ public sealed partial class MainWindow
         panel.Children.Add(new TextBlock{Text="Sicherung & Wiederherstellung",FontSize=25,FontWeight=FontWeight.Bold});
         panel.Children.Add(new TextBlock{Text="Sichert Einstellungen, Bibliothek, Cover, erkannte Emulator-Spielstände und ausgewählte zusätzliche Spielstandsordner. Wähle nur Ordner mit Spielständen: Zusätzliche Ordner werden vollständig kopiert. Fehlende Ordner stoppen die Sicherung. Spiele und ES-DE vorher beenden.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(ExternalSaveOptions());
+        panel.Children.Add(new TextBlock{Text="Sicherungserinnerung beim Programmstart"});
+        var reminder=new ComboBox{ItemsSource=new[]{"Ausgeschaltet","Alle 7 Tage","Alle 14 Tage","Alle 30 Tage"},SelectedIndex=Math.Max(0,Array.IndexOf(new[]{0,7,14,30},settings.BackupReminderDays))};
+        reminder.SelectionChanged+=(_,_)=>Guard(()=>{settings.BackupReminderDays=new[]{0,7,14,30}[Math.Max(0,reminder.SelectedIndex)];settingsStore.Save(settings);UpdateBackupReminder();});panel.Children.Add(reminder);
         panel.Children.Add(AsyncButton("Datensicherung erstellen …",async()=>
         {
             if(!CanBackUp())return;
@@ -27,6 +30,7 @@ public sealed partial class MainWindow
                 var file=Path.Combine(folder,"EmuVora-"+DateTime.Now.ToString("yyyyMMdd-HHmmss")+"-"+Guid.NewGuid().ToString("N")[..6]+".emuvora.zip");
                 message.Text="Datensicherung wird erstellt …";
                 await Task.Run(()=>Backups.CreateAsync(dataDir,file,token),token);
+                settings.LastBackupAt=DateTimeOffset.UtcNow;settingsStore.Save(settings);UpdateBackupReminder();
                 message.Text="Datensicherung erstellt und mit SHA-256-Prüfsummen versehen:\n"+file;
             });
             if(!completed)message.Text=status.Text;
@@ -59,13 +63,7 @@ public sealed partial class MainWindow
         panel.Children.Add(AsyncButton("Mit wiederhergestellter Bibliothek neu starten",async()=>
         {
             if(restored==null){message.Text="Bitte zuerst eine Datensicherung wiederherstellen.";return;}
-            if(operation!=null||!CanBackUp())return;
-            var start=new ProcessStartInfo(Environment.ProcessPath!){UseShellExecute=false};start.ArgumentList.Add("--data-dir");start.ArgumentList.Add(restored);
-            var locator=Path.Combine(AppContext.BaseDirectory,"emuvora-location.json");
-            new DataLocation(File.Exists(locator)?locator:DataLocation.BootstrapFile).Select(restored);
-            _=Process.Start(start)??throw new IOException("Neustart fehlgeschlagen.");
-            if(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime lifetime)lifetime.Shutdown();
-            await Task.CompletedTask;
+            await SwitchDataDirectoryAsync(restored,message);
         }));
         panel.Children.Add(ActionButton("Spielstandsbericht öffnen",()=>{var report=Path.Combine(dataDir,"save-restore-report.txt");if(File.Exists(report))OpenPath(report);else message.Text="Noch keine automatische Spielstandsübernahme erfolgt.";}));
         panel.Children.Add(ActionButton("Übersicht zusätzlicher Spielstände öffnen",()=>{var report=Path.Combine(restored??dataDir,"external-save-folders.json");if(File.Exists(report))OpenPath(report);else message.Text="Noch keine zusätzlichen Spielstandsordner wiederhergestellt.";}));

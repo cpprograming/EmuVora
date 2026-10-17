@@ -18,3 +18,5 @@ Nach Erfolg kann der wiederhergestellte Ordner geöffnet oder EmuVora ausdrückl
 Der bisherige JSON-Export unter Verwaltung bleibt für den reinen Austausch von Bibliothekseinträgen verfügbar; er enthält keine Cover- oder Spielstandsdateien.
 
 Neue Sicherungen verwenden Format 2. EmuVora ab 0.10 liest weiterhin Format 1 aus 0.9. Ältere EmuVora-Versionen können Format 2 nicht wiederherstellen und melden ein ungültiges Format. Zusätzliche Ordner werden in der Vorschau genannt; absolute Originalpfade dienen nur der Zuordnung, niemals als automatisches Wiederherstellungsziel.
+
+Ab 0.11 speichert das Öffnen der wiederhergestellten Bibliothek den bisherigen Datenordner als Rückweg. Wechsel und Rückkehr sind unter Einstellungen → Bibliothek → Bibliothek wechseln verfügbar. Optionale Sicherungserinnerungen beim Programmstart lassen sich auf der Sicherungsseite einstellen. Details: [Datenordner und Rückkehr](DATA_LOCATIONS.md).
