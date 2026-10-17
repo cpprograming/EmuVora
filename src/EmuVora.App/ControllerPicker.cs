@@ -6,6 +6,7 @@ namespace EmuVora.App;
 
 public sealed class ControllerPicker(Window owner,string? initialDirectory=null)
 {
+    public Task<string[]> OpenFilePathsAsync(string title,bool multiple=true)=>PickAsync(title,true,multiple);
     public async Task<IReadOnlyList<IStorageFolder>> OpenFolderPickerAsync(FolderPickerOpenOptions options)
     {
         var paths=await PickAsync(options.Title??"Ordner wählen",false,options.AllowMultiple);
@@ -35,11 +36,14 @@ public sealed class ControllerPicker(Window owner,string? initialDirectory=null)
             catch(Exception ex) when(ex is IOException or UnauthorizedAccessException or ArgumentException){message.Text=ex.Message;}
         }
         void Add(string label,Action action){var button=new Button{Content=label};button.Click+=(_,_)=>action();panel.Children.Add(button);}
-        panel.Children.Add(new TextBlock{Text=title,FontSize=24});var drives=new ComboBox{ItemsSource=DriveInfo.GetDrives().Where(d=>d.IsReady).Select(d=>d.RootDirectory.FullName).ToArray(),PlaceholderText="Festplatte auswählen"};drives.SelectionChanged+=(_,_)=>{if(drives.SelectedItem is string drive)Load(drive);};panel.Children.Add(drives);panel.Children.Add(path);Add("Pfad öffnen",()=>Load(path.Text??""));panel.Children.Add(list);
+        void OpenPath(){var value=path.Text?.Trim().Trim('"')??"";if(files&&File.Exists(value)){Load(Path.GetDirectoryName(Path.GetFullPath(value))!);list.SelectedItem=list.Items.OfType<Entry>().FirstOrDefault(e=>e.Path.Equals(Path.GetFullPath(value),StringComparison.OrdinalIgnoreCase));}else Load(value);}
+        panel.Children.Add(new TextBlock{Text=title,FontSize=24});var drives=new ComboBox{ItemsSource=DriveInfo.GetDrives().Where(d=>d.IsReady).Select(d=>d.RootDirectory.FullName).ToArray(),PlaceholderText="Festplatte auswählen"};drives.SelectionChanged+=(_,_)=>{if(drives.SelectedItem is string drive)Load(drive);};panel.Children.Add(drives);panel.Children.Add(path);Add("Pfad öffnen",OpenPath);panel.Children.Add(list);
         Add("Gewählten Ordner öffnen",()=>{if(list.SelectedItem is Entry{Directory:true} entry)Load(entry.Path);});Add("Eine Ebene zurück",()=>{var parent=Directory.GetParent(directory);if(parent!=null)Load(parent.FullName);});
         if(multiple)Add("Zur Auswahl hinzufügen",()=>{var entry=list.SelectedItem as Entry;var chosen=files?entry is{Directory:false}?entry.Path:null:entry is{Directory:true}?entry.Path:directory;if(chosen!=null){selected.Add(chosen);message.Text="Auswahl: "+selected.Count;}});
-        Add("Auswahl übernehmen",()=>{var entry=list.SelectedItem as Entry;if(selected.Count==0){var chosen=files?entry is{Directory:false}?entry.Path:null:directory;if(chosen==null){message.Text="Bitte eine Datei auswählen.";return;}selected.Add(chosen);}dialog.Close(selected.ToArray());});
-        panel.Children.Add(message);panel.Children.Add(new TextBlock{Text="D-Pad ↑/↓: Dateien · ←/→: Bedienelement · A: auswählen · B: abbrechen",TextWrapping=TextWrapping.Wrap});dialog.Content=new ScrollViewer{Content=panel};Load(directory);return await dialog.ShowDialog<string[]?>(owner.OwnedWindows.LastOrDefault(w=>w.IsActive)??owner)??[];
+        void Accept(){var entry=list.SelectedItem as Entry;var chosen=files?entry is{Directory:false}?entry.Path:null:directory;if(chosen!=null)selected.Add(chosen);if(selected.Count==0){message.Text="Bitte eine Datei auswählen oder einen Ordner öffnen.";return;}dialog.Close(selected.ToArray());}
+        list.DoubleTapped+=(_,_)=>{if(list.SelectedItem is Entry{Directory:true} entry)Load(entry.Path);else if(files)Accept();};
+        var footer=new StackPanel{Spacing=8,Margin=new Avalonia.Thickness(22,8,22,16)};var accept=new Button{Content="Auswahl übernehmen"};accept.Click+=(_,_)=>Accept();var cancel=new Button{Content="Abbrechen"};cancel.Click+=(_,_)=>dialog.Close();footer.Children.Add(accept);footer.Children.Add(cancel);footer.Children.Add(message);footer.Children.Add(new TextBlock{Text="Doppelklick: Ordner öffnen / Datei übernehmen · Mehrere Dateien: Zur Auswahl hinzufügen",TextWrapping=TextWrapping.Wrap});
+        var layout=new DockPanel();DockPanel.SetDock(footer,Dock.Bottom);layout.Children.Add(footer);layout.Children.Add(new ScrollViewer{Content=panel});dialog.Content=layout;Load(directory);return await dialog.ShowDialog<string[]?>(owner.OwnedWindows.LastOrDefault(w=>w.IsActive)??owner)??[];
     }
     private record Entry(string Path,bool Directory)
     {public override string ToString()=>(Directory?"▸ ":"  ")+System.IO.Path.GetFileName(Path.TrimEnd(System.IO.Path.DirectorySeparatorChar));}

@@ -1,0 +1,132 @@
+[
+  {
+    "Name": "goldstar.bin",
+    "Size": 1048576,
+    "Sha1": "c4a2e5336f77fb5f743de1eea2cda43675ee2de7"
+  },
+  {
+    "Name": "panafz1.bin",
+    "Size": 1048576,
+    "Sha1": "34bf189111295f74d7b7dfc1f304d98b8d36325a"
+  },
+  {
+    "Name": "panafz10.bin",
+    "Size": 1048576,
+    "Sha1": "3c912300775d1ad730dc35757e279c274c0acaad"
+  },
+  {
+    "Name": "sanyotry.bin",
+    "Size": 1048576,
+    "Sha1": "b01c53da256dde43ffec4ad3fc3adfa8d635e943"
+  },
+  {
+    "Name": "5200.rom",
+    "Size": 2048,
+    "Sha1": "6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530"
+  },
+  {
+    "Name": "lynxboot.img",
+    "Size": 512,
+    "Sha1": "e4ed47fae31693e016b081c6bda48da5b70d7ccb"
+  },
+  {
+    "Name": "tos.img",
+    "Size": 196608,
+    "Sha1": "735793fdba07fe8d5295caa03484f6ef3de931f5"
+  },
+  {
+    "Name": "colecovision.rom",
+    "Size": 8192,
+    "Sha1": "45bedc4cbdeac66c7df59e9e599195c778d86a92"
+  },
+  {
+    "Name": "kick34005.A500",
+    "Size": 262144,
+    "Sha1": "891e9a547772fe0c6c19b610baf8bc4ea7fcb785"
+  },
+  {
+    "Name": "kick40063.A600",
+    "Size": 524288,
+    "Sha1": "3b7f1493b27e212830f989f26ca76c02049f09ca"
+  },
+  {
+    "Name": "kick40068.A1200",
+    "Size": 524288,
+    "Sha1": "e21545723fe8374e91342617604f1b3d703094f1"
+  },
+  {
+    "Name": "exec.bin",
+    "Size": 8192,
+    "Sha1": "5a65b922b562cb1f57dab51b73151283f0e20c7a"
+  },
+  {
+    "Name": "grom.bin",
+    "Size": 2048,
+    "Sha1": "f9608bb4ad1cfe3640d02844c7ad8e0bcd974917"
+  },
+  {
+    "Name": "syscard3.pce",
+    "Size": 262144,
+    "Sha1": "79f5ff55dd10187c7fd7b8daab0b3ffbd1f56a2c"
+  },
+  {
+    "Name": "pcfx.rom",
+    "Size": 1048576,
+    "Sha1": "1a77fd83e337f906aecab27a1604db064cf10074"
+  },
+  {
+    "Name": "dc/dc_boot.bin",
+    "Size": 2097152,
+    "Sha1": "8951d1bb219ab2ff8583033d2119c899cc81f18c"
+  },
+  {
+    "Name": "bios_CD_E.bin",
+    "Size": 131072,
+    "Sha1": "f891e0ea651e2232af0c5c4cb46a0cae2ee8f356"
+  },
+  {
+    "Name": "bios_CD_J.bin",
+    "Size": 131072,
+    "Sha1": "4846f448160059a7da0215a5df12ca160f26dd69"
+  },
+  {
+    "Name": "bios_CD_U.bin",
+    "Size": 131072,
+    "Sha1": "f4f315adcef9b8feb0364c21ab7f0eaf5457f3ed"
+  },
+  {
+    "Name": "mpr-17933.bin",
+    "Size": 524288,
+    "Sha1": "faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3"
+  },
+  {
+    "Name": "sega_101.bin",
+    "Size": 524288,
+    "Sha1": "df94c5b4d47eb3cc404d88b33a8fda237eaf4720"
+  },
+  {
+    "Name": "scph1001.bin",
+    "Size": 524288,
+    "Sha1": "10155d8d6e6e832d6ea66db9bc098321fb5e8ebf"
+  },
+  {
+    "Name": "scph5500.bin",
+    "Size": 524288,
+    "Sha1": "b05def971d8ec59f346f2d9ac21fb742e3eb6917"
+  },
+  {
+    "Name": "scph5501.bin",
+    "Size": 524288,
+    "Sha1": "0555c6fae8906f3f09baf5988f00e55f88e9f30b"
+  },
+  {
+    "Name": "scph5502.bin",
+    "Size": 524288,
+    "Sha1": "f6bc2d1f5eb6593de7d089c425ac681d6fffd3f0"
+  },
+  {
+    "Name": "scph7001.bin",
+    "Size": 524288,
+    "Sha1": "14df4f6c1e367ce097c11deae21566b4fe5647a9"
+  }
+]

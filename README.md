@@ -22,7 +22,7 @@ Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzei
 
 Die Firmware-Prüfung erkennt Dateinamen und grundlegende Größen. Tatsächliche Gültigkeit und Region prüft der jeweilige Emulator. EmuVora liefert keine ROMs oder BIOS-Dateien.
 
-Details: [Einrichtungsassistent](GUIDED_SETUP.md) · [Speicherorte und Themes](STORAGE_AND_THEMES.md).
+Details: [Einrichtungsassistent](GUIDED_SETUP.md) · [Speicherorte und Themes](STORAGE_AND_THEMES.md) · [BIOS-Import und automatische Benennung](BIOS_IMPORT.md).
 
 ## Bibliothek, Cover und Bildqualität
 
@@ -172,3 +172,4 @@ Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fe
 Der EmuVora-Code steht unter [MIT](LICENSE). Abhängigkeiten, Emulatoren, Themes und Cover unterliegen ihren eigenen Bedingungen; siehe [Drittanbieter-Hinweise](THIRD_PARTY_NOTICES.md).
 
 Emulator-Binaries, ROMs, BIOS und Theme-Pakete sind nicht im EmuVora-Programmpaket enthalten. Optionale Komponenten werden gesondert von ihren offiziellen Quellen geladen.
+
