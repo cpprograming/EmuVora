@@ -47,7 +47,7 @@ public sealed partial class MainWindow
                     var definitions=SetupPlan.RequiredEmulators(allGames.Select(g=>g.System),settings);
                     await BusyAsync(async token=>{foreach(var definition in definitions){var executable=settings.EmulatorPaths.GetValueOrDefault(definition.Id);if(executable==null||!File.Exists(executable))await InstallManagedAsync(definition.Id,token);}if(definitions.Any(e=>e.Id=="retroarch"))await InstallManagedAsync("retroarch-cores",token);status.Text="Benötigte Emulatoren und Cores eingerichtet.";});Render();feedback.Text=status.Text;
                 }));content.Children.Add(ActionButton("Download abbrechen",()=>operation?.Cancel()));
-                content.Children.Add(AsyncButton("Eigene BIOS-Dateien importieren",async()=>{var files=await new ControllerPicker(dialog).OpenFilePickerAsync(new(){Title="Eigene BIOS-/Firmware-Dateien",AllowMultiple=true});foreach(var file in files)if(file.TryGetLocalPath() is{} path)EmulatorSetup.ImportFirmware(path,dataDir);Render();feedback.Text=files.Count+" BIOS-/Firmware-Dateien importiert.";}));
+                content.Children.Add(AsyncButton("Eigene BIOS-Dateien importieren",async()=>{var files=await new ControllerPicker(dialog).OpenFilePathsAsync("Eigene BIOS-/Firmware-Dateien");if(files.Length==0)return;await ImportFirmwareFilesAsync(files);Render();feedback.Text=status.Text;}));
                 foreach(var system in allGames.Select(g=>g.System).Distinct().Order())Text(system+": "+(SetupPlan.FirmwareHint(system,dataDir,settings)??"Keine fehlende Pflicht-Firmware erkannt."));Text("BIOS-Dateien werden nicht heruntergeladen. Falls du sie noch nicht hast, kannst du die Einrichtung später fortsetzen. Fehlende Emulatoren werden mit aktivierter automatischer Einrichtung beim ersten Spielstart nachgeladen.");
             }
             if(step==4)
@@ -61,3 +61,4 @@ public sealed partial class MainWindow
         dialog.Opened+=(_,_)=>timer.Start();dialog.Closed+=(_,_)=>timer.Stop();dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();feedback.Text="Vorgang wird abgebrochen …";}};Render();await dialog.ShowDialog(this);
     }
 }
+

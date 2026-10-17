@@ -11,6 +11,18 @@ using Xunit;
 namespace EmuVora.Tests;
 public class OnboardingTests
 {
+    [AvaloniaFact] public async Task BiosPickerReturnsSelectedPathsAndKeepsConfirmVisible()
+    {
+        using var dir=new TestDirectory();var first=dir.File("first.bin","first");var second=dir.File("second.rom","second");
+        var window=new Window{Width=500,Height=400};window.Show();
+        var pending=new ControllerPicker(window,dir.Path).OpenFilePathsAsync("BIOS importieren");Dispatcher.UIThread.RunJobs();
+        var picker=Assert.Single(window.OwnedWindows);var list=picker.GetVisualDescendants().OfType<ListBox>().Single();
+        list.SelectedIndex=0;picker.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Zur Auswahl hinzufügen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        list.SelectedIndex=1;var accept=picker.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Auswahl übernehmen");
+        Assert.DoesNotContain(accept.GetVisualAncestors(),a=>a is ScrollViewer);Capture(picker,"BIOS-file-picker.png");
+        accept.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));var paths=await pending;
+        Assert.Equal(new[]{first,second},paths.OrderBy(p=>p).ToArray());window.Close();
+    }
     [Fact] public void SetupPlanOnlyIncludesImportedConsolesAndDeduplicatesRetroArch()
     {
         var settings=new AppSettings();Assert.Equal(new[]{"retroarch","pcsx2"},SetupPlan.RequiredEmulators(["NES","SNES","PS2","Unknown"],settings).Select(e=>e.Id));Assert.Single(SetupPlan.RequiredEmulators([],settings));Assert.Empty(SetupPlan.RequiredEmulators(["Unknown"],settings));

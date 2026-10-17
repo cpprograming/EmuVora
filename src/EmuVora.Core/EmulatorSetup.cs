@@ -160,7 +160,7 @@ public static class EmulatorSetup
     public static string ImportFirmware(string source,string dataDirectory)
     {
         var name=Path.GetFileName(source);var candidates=SystemCatalog.RetroSystems.Where(s=>s.Firmware!=null).SelectMany(s=>s.Firmware!.Split('|')).Concat(["neocd/000-lo.lo","grom.bin","dc/dc_flash.bin"]);
-        var relative=candidates.FirstOrDefault(n=>Path.GetFileName(n).Equals(name,StringComparison.OrdinalIgnoreCase))??name;
+        var relative=FirmwareRecognition.Identify(source)??candidates.FirstOrDefault(n=>Path.GetFileName(n).Equals(name,StringComparison.OrdinalIgnoreCase))??name;
         var destination=Path.GetFullPath(Path.Combine(FirmwareDirectory(dataDirectory),relative));Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
         if(!Path.GetFullPath(source).Equals(Path.GetFullPath(destination),StringComparison.OrdinalIgnoreCase)){if(File.Exists(destination))File.Copy(destination,destination+".bak",true);File.Copy(source,destination,true);}return destination;
     }
@@ -173,7 +173,7 @@ public static class EmulatorSetup
         foreach(var file in Directory.EnumerateFiles(source,"*",new EnumerationOptions {RecurseSubdirectories=true,AttributesToSkip=FileAttributes.ReparsePoint}))
         {
             token.ThrowIfCancellationRequested();if((total+=new FileInfo(file).Length)>512L*1024*1024)throw new InvalidDataException("Firmware-Ordner ist größer als 512 MiB. Bitte nur die Firmware auswählen.");
-            var target=Path.Combine(targetRoot,Path.GetRelativePath(source,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);if(File.Exists(target))File.Copy(target,target+".bak",true);File.Copy(file,target,true);
+            var target=Path.Combine(targetRoot,FirmwareRecognition.Identify(file)??Path.GetRelativePath(source,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);if(File.Exists(target))File.Copy(target,target+".bak",true);File.Copy(file,target,true);
         }
     }
     private static string? FindPlayStationBios(string system,string directory)=>Directory.Exists(directory)?Directory.EnumerateFiles(directory,"*",SearchOption.TopDirectoryOnly).FirstOrDefault(f=>new FileInfo(f).Length==(system=="PS1"?512*1024:4*1024*1024)):null;

@@ -640,7 +640,7 @@ public sealed partial class MainWindow : Window
             await BusyAsync(async token=>{catalog=await packages.GetCatalogAsync(token);foreach(var id in EmulatorCatalog.Known.Select(e=>e.Id).Append("retroarch-cores"))await InstallManagedAsync(id,token);status.Text="Emulatoren, Cores und Xbox-Standardbelegung eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";});
         }));
         panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch / PS1 / PS2: View + Menu beendet das Spiel; View + RB öffnet das Menü. Dolphin: View + Menu beendet; PPSSPP: LT öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
-        panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="Eigene BIOS-/Firmware-Dateien",AllowMultiple=true});Guard(()=>{foreach(var file in files)if(file.TryGetLocalPath() is{} source)EmulatorSetup.ImportFirmware(source,dataDir);status.Text=$"{files.Count} Firmware-Dateien importiert. PS1 / PS2: BIOS im Emulator prüfen und auswählen.";});}));
+        panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await new ControllerPicker(this).OpenFilePathsAsync("Eigene BIOS-/Firmware-Dateien");if(files.Length==0)return;await ImportFirmwareFilesAsync(files);}));
         panel.Children.Add(AsyncButton("Firmware-Ordner importieren (z. B. MSX)",async()=>
         {
             var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="Ordner mit eigenen Firmware-Dateien"});if(folders.Count==0||folders[0].TryGetLocalPath() is not{} folder)return;
@@ -684,4 +684,5 @@ public sealed partial class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
+
 
