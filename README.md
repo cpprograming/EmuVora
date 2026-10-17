@@ -58,6 +58,14 @@ Verwaltete Emulatoren erhalten Xbox-Standardprofile; PPSSPP verwendet seine eing
 
 Die Bedienung einzelner Spiele hängt vom System ab: Nintendo DS kann Maus/Touch benötigen, Wii-Spiele besondere Bewegungsprofile und Heimcomputer, DOS oder Intellivision zusätzliche Tastatureingaben. Tests mit echten Controllern und mehreren Spielern stehen weiterhin auf der [Checkliste](CHECKLIST.md).
 
+## Bibliotheken wechseln und Sicherungserinnerung – neu in 0.11
+
+Unter **Einstellungen → Bibliothek → Bibliothek wechseln** kannst du eine vorhandene Bibliothek prüfen und nach Bestätigung mit einem Neustart öffnen. **Zur vorherigen Bibliothek zurück** führt wieder zum unmittelbar vorherigen Datenordner. Spiele und Spielstände werden dabei nicht verschoben; nicht erreichbare oder ungültige Ordner werden abgewiesen.
+
+Unter **Einstellungen → Sicherung** lassen sich Erinnerungen beim Programmstart auf 7, 14 oder 30 Tage stellen. Sie sind standardmäßig ausgeschaltet. Der Hinweis **Datensicherung fällig** öffnet die Sicherungsseite.
+
+Details: [Datenordner wechseln](DATA_LOCATIONS.md).
+
 ## Sicherung und Wiederherstellung
 
 Unter **Einstellungen → Sicherung** kannst du eine Datensicherung erstellen oder wiederherstellen.
@@ -157,7 +165,7 @@ Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsint
 
 ## Nächste Schritte
 
-Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Als Nächstes ist der Rückwechsel zum bisherigen Datenordner direkt in der Oberfläche vorgesehen; weitere Punkte betreffen Controller-Hardwaretests, TV-Darstellung und Bibliothekskomfort.
+Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Als Nächstes stehen Xbox-Hardwaretests und Verbesserungen der Controller-Bedienung an; danach folgen TV-Darstellung und Bibliothekskomfort.
 
 ## Lizenz
 

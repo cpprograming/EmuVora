@@ -18,6 +18,30 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact] public async Task CancellingDirectorySwitchDoesNotChangeEitherLibrary()
+    {
+        using var dir=new TestDirectory();var first=System.IO.Path.Combine(dir.Path,"first");var second=System.IO.Path.Combine(dir.Path,"second");
+        foreach(var path in new[]{first,second}){Directory.CreateDirectory(path);new SettingsStore(System.IO.Path.Combine(path,"settings.json")).Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});_=new LibraryStore(System.IO.Path.Combine(path,"library.db"));}
+        var window=new MainWindow(first);window.Show();var feedback=new TextBlock();
+        var method=typeof(MainWindow).GetMethod("SwitchDataDirectoryAsync",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        var pending=(Task)method.Invoke(window,[second,feedback])!;
+        for(var i=0;i<100&&!window.OwnedWindows.Any();i++){await Task.Delay(10);Dispatcher.UIThread.RunJobs();}
+        var dialog=Assert.Single(window.OwnedWindows);Assert.Equal("Bibliothek wechseln",dialog.Title);
+        dialog.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+        using(var frame=dialog.CaptureRenderedFrame()){Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Data-directory-switch.png"));}}
+        dialog.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Abbrechen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));await pending;
+        Assert.Null(DataDirectorySwitch.Previous(first));Assert.Null(DataDirectorySwitch.Previous(second));Assert.True(window.IsVisible);window.Close();
+    }
+    [AvaloniaFact] public void BackupReminderPersistsAndOpensTheBackupTab()
+    {
+        using var dir=new TestDirectory();var store=new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json"));store.Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});
+        var window=new MainWindow(dir.Path);window.Show();var reminder=window.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Datensicherung fällig");Assert.False(reminder.IsVisible);
+        window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Einstellungen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();
+        var dialog=Assert.Single(window.OwnedWindows);dialog.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex=5;Dispatcher.UIThread.RunJobs();
+        dialog.GetVisualDescendants().OfType<ComboBox>().Single(c=>c.Items.Contains("Alle 7 Tage")).SelectedIndex=1;Assert.Equal(7,store.Load().BackupReminderDays);Assert.True(reminder.IsVisible);dialog.Close();
+        reminder.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();dialog=Assert.Single(window.OwnedWindows);Assert.Equal(5,dialog.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex);
+        dialog.GetVisualDescendants().OfType<ComboBox>().Single(c=>c.Items.Contains("Alle 7 Tage")).SelectedIndex=0;Assert.False(reminder.IsVisible);Assert.Equal(0,store.Load().BackupReminderDays);dialog.Close();window.Close();
+    }
     [AvaloniaFact] public void RemovingExternalFolderOnlyRemovesItsBackupSelection()
     {
         using var dir=new TestDirectory();var file=dir.File("Additional saves/game.sav","progress");var saved=new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json"));
