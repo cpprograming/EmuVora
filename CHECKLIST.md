@@ -12,16 +12,16 @@ Stand: 17. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] EmulationStation-Theme-Import und optionaler ES-DE-/AlekFull-Start.
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
-- [x] 101 Funktionstests und 5 Netzwerktests auch im Release-Build 0.9.51 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] 107 Funktionstests und 5 Netzwerktests auch im Release-Build 0.10.54 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 
-Der aktuelle Stand ist als [Release 0.9.51](https://github.com/cpprograming/EmuVora/releases/tag/v0.9.51) veröffentlicht. [PR #9](https://github.com/cpprograming/EmuVora/pull/9) enthält Sicherung und Spielstandsübernahme; [PR #10](https://github.com/cpprograming/EmuVora/pull/10) verbessert die CI-Metadatenabfrage. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.10.54](https://github.com/cpprograming/EmuVora/releases/tag/v0.10.54) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 ## 1. Zuerst: Sicherungen vollständig alltagstauglich machen
 
 - [x] Sicherungs-Quellcode und BACKUPS.md über geprüften Pull Request #9 auf GitHub übernommen.
-- [x] Release 0.9.51 nach dem Merge veröffentlicht, Setup heruntergeladen und mit dem EmuVora-Updater einschließlich SHA-256 geprüft.
+- [x] Release 0.10.54 nach dem Merge veröffentlicht, Setup heruntergeladen und mit dem EmuVora-Updater einschließlich SHA-256 geprüft.
 - [x] Erkannte Emulator-Spielstände nach einer Neuinstallation automatisch zuordnen; Wiederherstellung vorher erläutern und vorhandene Dateien schützen (DuckStation, PCSX2, Dolphin, PPSSPP).
-- [x] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen. Wiederherstellung ausschließlich getrennt im neuen Datenordner (Implementierung für 0.10).
+- [x] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen. Wiederherstellung ausschließlich getrennt im neuen Datenordner (ab 0.10.54).
 - [ ] Wiederherstellung auf einem anderen Laufwerk testen: Bibliothek, Cover, Favoriten und echte Spielstände vergleichen.
 - [ ] Wechsel zur wiederhergestellten Bibliothek und Rückkehr zum bisherigen Datenordner direkt in der Oberfläche anbieten.
 - [ ] Optionale Erinnerung an Sicherungen und Aufbewahrung der letzten Sicherungen ergänzen; nichts ohne ausdrückliche Einstellung löschen.
