@@ -13,6 +13,7 @@ public sealed class AppSettings
     public Dictionary<string,string> PreferredEmulators {get;set;}=[];
     public Dictionary<string,InstalledPackage> Packages {get;set;}=[];
     public List<string> RomFolders {get;set;}=[];
+    public List<ExternalSaveFolder> ExternalSaveFolders {get;set;}=[];
     public bool Fullscreen {get;set;}=true;
     public bool CheckAppUpdatesOnStartup {get;set;}=true;
     public bool CheckUpdatesOnStartup {get;set;}=true;
@@ -40,7 +41,7 @@ public sealed class SettingsStore(string file)
         {
             var settings=JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(file),JsonOptions)??new();
             settings.EmulatorPaths??=[];settings.CorePaths??=[];settings.Covers??=[];settings.PreferredEmulators??=[];settings.Packages??=[];settings.RomFolders??=[];
-            settings.GameAspectRatios??=[];
+            settings.GameAspectRatios??=[];settings.ExternalSaveFolders??=[];
             if(settings.CorePaths.TryGetValue("retroarch",out var legacy))foreach(var system in EmulatorCatalog.Get("retroarch").Systems)settings.CorePaths.TryAdd(system,legacy);
             return settings;
         }

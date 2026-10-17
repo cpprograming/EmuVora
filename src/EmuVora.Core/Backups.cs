@@ -6,7 +6,7 @@ using Microsoft.Data.Sqlite;
 namespace EmuVora.Core;
 
 public record BackupEntry(string Path,long Size,string Sha256);
-public record BackupManifest(int Format,string SourceDirectory,DateTimeOffset Created,IReadOnlyList<BackupEntry> Files);
+public record BackupManifest(int Format,string SourceDirectory,DateTimeOffset Created,IReadOnlyList<BackupEntry> Files,IReadOnlyList<ExternalSaveFolder>? ExternalFolders=null);
 
 public static class Backups
 {
@@ -17,13 +17,16 @@ public static class Backups
     {
         source=Path.GetFullPath(source);destination=Path.GetFullPath(destination);
         if(Inside(destination,source))throw new IOException("Sicherung bitte außerhalb des Datenordners speichern.");
-        NoLinks(source);var stage=Path.Combine(Path.GetTempPath(),"emuvora-backup-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(stage);
+        NoLinks(source);NoLinks(Path.GetDirectoryName(destination)!);
+        var stage=Path.Combine(Path.GetDirectoryName(destination)!,".emuvora-backup-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(stage);
         var temporary=destination+"."+Guid.NewGuid().ToString("N")+".part";
         try
         {
             var files=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
             var settingsFile=Path.Combine(source,"settings.json");NoLinks(settingsFile);
             var settings=new SettingsStore(settingsFile).Load();
+            var external=ExternalSaves.ValidateSelection(source,settings.ExternalSaveFolders);
+            foreach(var folder in external)if(Inside(destination,folder.Path))throw new IOException("Sicherung bitte außerhalb aller ausgewählten Spielstandsordner speichern.");
             files.Add("settings.json",settingsFile);
             var database=Path.Combine(source,"library.db");NoLinks(database);
             using(var input=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=database,Mode=SqliteOpenMode.ReadOnly}.ToString()))
@@ -34,14 +37,20 @@ public static class Backups
             foreach(var (id,folders) in SaveData.Folders)
                 if(settings.EmulatorPaths.TryGetValue(id,out var executable)&&Inside(executable,source))
                     foreach(var folder in folders)AddFolder(Path.Combine(Path.GetDirectoryName(executable)!,folder));
-            void AddFolder(string folder)
+            foreach(var folder in external)AddFolder(folder.Path,"external-saves/"+folder.Id);
+            void AddFolder(string folder,string? prefix=null)
             {
-                if(!Directory.Exists(folder))return;
+                if(!Directory.Exists(folder)){if(prefix!=null)throw new DirectoryNotFoundException("Spielstandsordner nicht erreichbar: "+folder);return;}
                 var pending=new Stack<string>();pending.Push(folder);
                 while(pending.TryPop(out var current))
                 {
-                    NoLinks(current);
-                    foreach(var file in Directory.EnumerateFiles(current)){NoLinks(file);files.TryAdd(Path.GetRelativePath(source,file).Replace('\\','/'),file);if(files.Count>100000)throw new IOException("Zu viele Dateien für eine Sicherung.");}
+                    token.ThrowIfCancellationRequested();NoLinks(current);
+                    foreach(var file in Directory.EnumerateFiles(current))
+                    {
+                        token.ThrowIfCancellationRequested();NoLinks(file);
+                        var relative=prefix==null?Path.GetRelativePath(source,file):prefix+"/"+Path.GetRelativePath(folder,file).Replace('\\','/');
+                        files.TryAdd(relative.Replace('\\','/'),file);if(files.Count>100000)throw new IOException("Zu viele Dateien für eine Sicherung.");
+                    }
                     foreach(var child in Directory.EnumerateDirectories(current))pending.Push(child);
                 }
             }
@@ -59,7 +68,7 @@ public static class Backups
                     entries.Add(new(relative,input.Length,Convert.ToHexString(hash.GetHashAndReset())));
                 }
                 await using var manifest=archive.CreateEntry("manifest.json").Open();
-                await JsonSerializer.SerializeAsync(manifest,new BackupManifest(1,source,DateTimeOffset.UtcNow,entries),SettingsStore.JsonOptions,token);
+                await JsonSerializer.SerializeAsync(manifest,new BackupManifest(2,source,DateTimeOffset.UtcNow,entries,external),SettingsStore.JsonOptions,token);
             }
             token.ThrowIfCancellationRequested();File.Move(temporary,destination,false);
         }
@@ -75,11 +84,16 @@ public static class Backups
         var entry=archive.GetEntry("manifest.json")??throw new IOException("Kein EmuVora-Sicherungsarchiv.");
         if(entry.Length>16*1024*1024)throw new IOException("Manifest ist zu groß.");
         using var stream=entry.Open();var manifest=JsonSerializer.Deserialize<BackupManifest>(stream,SettingsStore.JsonOptions)??throw new IOException("Manifest fehlt.");
-        if(manifest.Format!=1||!Path.IsPathFullyQualified(manifest.SourceDirectory)||manifest.Files==null||manifest.Files.Count>100000)throw new IOException("Sicherungsformat ungültig.");
+        if(manifest.Format is not (1 or 2)||!Path.IsPathFullyQualified(manifest.SourceDirectory)||manifest.Files==null||manifest.Files.Count>100000)throw new IOException("Sicherungsformat ungültig.");
+        var external=manifest.ExternalFolders??[];var ids=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if(external.Count>32||manifest.Format==1&&external.Count>0)throw new IOException("Ungültige externe Ordnerliste.");
+        foreach(var folder in external)if(folder==null||!ExternalSaves.ValidId(folder.Id)||!ids.Add(folder.Id)||!Path.IsPathFullyQualified(folder.Path))throw new IOException("Ungültiger externer Ordner im Archiv.");
         var names=new HashSet<string>(StringComparer.OrdinalIgnoreCase);long size=0;
         foreach(var file in manifest.Files)
         {
             if(file.Path==null||file.Sha256==null||file.Sha256.Length!=64||file.Size<0||!SafePath(file.Path)||!names.Add(file.Path))throw new IOException("Ungültiger Dateieintrag.");
+            var parts=file.Path.Split('/');
+            if(parts[0].Equals("external-saves",StringComparison.OrdinalIgnoreCase)&&(parts.Length<3||!ids.Contains(parts[1])))throw new IOException("Nicht zugeordnete externe Spielstände im Archiv.");
             size=checked(size+file.Size);if(size>MaximumBytes)throw new IOException("Sicherung überschreitet 20 GiB.");
             if(archive.GetEntry("data/"+file.Path)?.Length!=file.Size)throw new IOException("Dateiliste stimmt nicht mit dem Archiv überein.");
         }
@@ -112,6 +126,14 @@ public static class Backups
             var settingsPath=Path.Combine(stage,"settings.json");
             var settings=JsonSerializer.Deserialize<AppSettings>(await File.ReadAllTextAsync(settingsPath,token),SettingsStore.JsonOptions)??throw new IOException("Ungültige Einstellungen.");
             SaveData.PrepareRestore(settings,manifest.SourceDirectory,stage);
+            settings.ExternalSaveFolders=[];
+            foreach(var folder in manifest.ExternalFolders??[])
+            {
+                Directory.CreateDirectory(Path.Combine(stage,"external-saves",folder.Id));
+                settings.ExternalSaveFolders.Add(new(folder.Id,Path.Combine(destination,"external-saves",folder.Id)));
+            }
+            if(settings.ExternalSaveFolders.Count>0)
+                await File.WriteAllTextAsync(Path.Combine(stage,"external-save-folders.json"),JsonSerializer.Serialize((manifest.ExternalFolders??[]).Select(folder=>new {OriginalPath=folder.Path,RestoredPath=Path.Combine(destination,"external-saves",folder.Id)}),SettingsStore.JsonOptions),token);
             string Rebase(string path)=>Inside(path,manifest.SourceDirectory)?Path.Combine(destination,Path.GetRelativePath(manifest.SourceDirectory,path)):path;
             foreach(var map in new[]{settings.Covers,settings.EmulatorPaths,settings.CorePaths})foreach(var key in map.Keys.ToArray())map[key]=Rebase(map[key]);
             settings.EmulationStationTheme=settings.EmulationStationTheme is{} theme?Rebase(theme):null;

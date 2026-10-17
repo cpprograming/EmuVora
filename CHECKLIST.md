@@ -1,6 +1,6 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 16. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 17. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
 
@@ -21,7 +21,7 @@ Der aktuelle Stand ist als [Release 0.9.51](https://github.com/cpprograming/EmuV
 - [x] Sicherungs-Quellcode und BACKUPS.md über geprüften Pull Request #9 auf GitHub übernommen.
 - [x] Release 0.9.51 nach dem Merge veröffentlicht, Setup heruntergeladen und mit dem EmuVora-Updater einschließlich SHA-256 geprüft.
 - [x] Erkannte Emulator-Spielstände nach einer Neuinstallation automatisch zuordnen; Wiederherstellung vorher erläutern und vorhandene Dateien schützen (DuckStation, PCSX2, Dolphin, PPSSPP).
-- [ ] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen.
+- [x] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen. Wiederherstellung ausschließlich getrennt im neuen Datenordner (Implementierung für 0.10).
 - [ ] Wiederherstellung auf einem anderen Laufwerk testen: Bibliothek, Cover, Favoriten und echte Spielstände vergleichen.
 - [ ] Wechsel zur wiederhergestellten Bibliothek und Rückkehr zum bisherigen Datenordner direkt in der Oberfläche anbieten.
 - [ ] Optionale Erinnerung an Sicherungen und Aufbewahrung der letzten Sicherungen ergänzen; nichts ohne ausdrückliche Einstellung löschen.
@@ -76,5 +76,5 @@ Abnahme: Keine verzerrte Darstellung durch das automatische Profil; nachvollzieh
 - [ ] Nach dem Merge die automatisch erzeugte EXE, eingebettete Version und Updatefähigkeit prüfen.
 - [ ] ROMs, BIOS und persönliche Sicherungen nicht ins Repository hochladen.
 
-Empfohlener nächster Arbeitsschritt: Benutzerdefinierte und externe Spielstandsordner auswählbar sichern.
+Empfohlener nächster Arbeitsschritt: Rückwechsel zum bisherigen Datenordner direkt in der Oberfläche anbieten.
 
