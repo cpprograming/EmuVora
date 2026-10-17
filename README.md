@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.11.56](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.56)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.11.59](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.59)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -11,6 +11,10 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 - Alle Versionen und Änderungen findest du unter **[Releases](https://github.com/cpprograming/EmuVora/releases)**.
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
+
+## BIOS-Import verbessert in 0.11.59
+
+Die Dateiauswahl unterstützt Doppelklick und einen stets sichtbaren Übernehmen-Knopf. Bekannte BIOS-Dateien werden offline anhand von Prüfsummen erkannt und beim Kopieren automatisch passend benannt. Originale bleiben erhalten; eine Ergebnisübersicht zeigt Zielnamen und Fehler. [Anleitung und Grenzen](BIOS_IMPORT.md).
 
 ## Erste Einrichtung
 
@@ -159,7 +163,7 @@ $env:EMUVORA_PACKAGE_CATALOG = (Resolve-Path catalog/packages.json).Path
 dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Category=Network"
 ```
 
-**Für Release 0.11.56 bestanden:** 115 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
+**Für Release 0.11.59 bestanden:** 119 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
 
 Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsintegrität, externe Ordner, Wiederherstellung älterer Archive und Dateipfade ab. Avalonia-Tests erzeugen UI-Aufnahmen; die GitHub-Artefakte enthalten **EmuVora-UI-previews**. Echte Hardwaretests stehen separat auf der Checkliste.
 

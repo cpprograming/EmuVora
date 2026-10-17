@@ -2,7 +2,7 @@
 
 Stand: 17. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.11.56](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.56).
+Aktueller geprüfter Release: [0.11.59](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.59).
 
 ## 0.11 – Daten und Wiederherstellung (abgeschlossen)
 
@@ -10,7 +10,9 @@ Aktueller geprüfter Release: [0.11.56](https://github.com/cpprograming/EmuVora/
 - [x] Zur unmittelbar vorherigen Bibliothek zurückkehren; nicht erreichbare Laufwerke erhalten keine Ersatzbibliothek.
 - [x] Datenpfad und Rückweg bei fehlgeschlagenem Prozessstart zurücksetzen.
 - [x] Optional an Sicherungen erinnern: 7, 14 oder 30 Tage, standardmäßig ausgeschaltet.
-- [x] Release 0.11.56 veröffentlicht, heruntergeladen und mit dem Updater einschließlich SHA-256 geprüft; 115 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
+- [x] Release 0.11.59 veröffentlicht, heruntergeladen und mit dem Updater einschließlich SHA-256 geprüft; 119 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
+
+Zusätzlich in 0.11.59: BIOS-Dateiauswahl korrigiert und automatische Benennung anhand bekannter Prüfsummen ergänzt; [Anleitung](BIOS_IMPORT.md).
 
 ## 0.12 – Xbox und Plug-and-play
 
