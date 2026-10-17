@@ -18,6 +18,19 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact] public void RemovingExternalFolderOnlyRemovesItsBackupSelection()
+    {
+        using var dir=new TestDirectory();var file=dir.File("Additional saves/game.sav","progress");var saved=new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json"));
+        saved.Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false,ExternalSaveFolders=[new("1234567890abcdef1234567890abcdef",System.IO.Path.GetDirectoryName(file)!)]});
+        var window=new MainWindow(dir.Path);window.Show();window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Einstellungen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();
+        var dialog=Assert.Single(window.OwnedWindows);dialog.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex=5;Dispatcher.UIThread.RunJobs();
+        var section=dialog.GetVisualDescendants().OfType<Expander>().Single(e=>e.Header?.ToString()?.StartsWith("Zusätzliche Spielstandsordner")==true);section.IsExpanded=true;Dispatcher.UIThread.RunJobs();
+        var list=dialog.GetVisualDescendants().OfType<ListBox>().Single();list.SelectedIndex=0;
+        dialog.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+        using(var frame=dialog.CaptureRenderedFrame()){Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Backup-external-folders.png"));}}
+        dialog.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Aus Sicherungsauswahl entfernen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.Empty(saved.Load().ExternalSaveFolders);Assert.Equal("progress",File.ReadAllText(file));dialog.Close();window.Close();
+    }
     [AvaloniaFact] public void BackupTabProvidesSeparateCreateRestoreAndActivationActions()
     {
         using var dir=new TestDirectory();new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});

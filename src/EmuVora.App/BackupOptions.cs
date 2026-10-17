@@ -14,7 +14,8 @@ public sealed partial class MainWindow
         var panel=new StackPanel{Spacing=14,Margin=new(24)};
         var message=new TextBlock{TextWrapping=TextWrapping.Wrap};string? restored=null;
         panel.Children.Add(new TextBlock{Text="Sicherung & Wiederherstellung",FontSize=25,FontWeight=FontWeight.Bold});
-        panel.Children.Add(new TextBlock{Text="Sichert Einstellungen, Bibliothek, Cover im Datenordner sowie saves und states. Erkannte Speicherordner verwalteter DuckStation-, PCSX2-, Dolphin- und PPSSPP-Installationen werden ebenfalls kopiert. ROMs, BIOS, Emulatorprogramme und Themes sind nicht enthalten. Externe Speicherordner bitte separat sichern. Spiele und ES-DE vorher beenden.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(new TextBlock{Text="Sichert Einstellungen, Bibliothek, Cover, erkannte Emulator-Spielstände und ausgewählte zusätzliche Spielstandsordner. Wähle nur Ordner mit Spielständen: Zusätzliche Ordner werden vollständig kopiert. Fehlende Ordner stoppen die Sicherung. Spiele und ES-DE vorher beenden.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(ExternalSaveOptions());
         panel.Children.Add(AsyncButton("Datensicherung erstellen …",async()=>
         {
             if(!CanBackUp())return;
@@ -37,6 +38,7 @@ public sealed partial class MainWindow
             if(files.Count==0||files[0].TryGetLocalPath() is not{} file)return;
             var manifest=await Task.Run(()=>Backups.Inspect(file));
             var preview=new StackPanel{Spacing=14,Margin=new(24)};
+            if(manifest.ExternalFolders?.Count>0)preview.Children.Add(new TextBlock{Text="Zusätzliche Spielstandsordner:\n"+string.Join("\n",manifest.ExternalFolders.Select(folder=>folder.Path))+"\n\nDiese Dateien werden ausschließlich im neuen Datenordner unter external-saves wiederhergestellt. Die ursprünglichen Ordner bleiben unverändert. Im Emulator musst du den neuen Speicherort bei Bedarf selbst auswählen.",TextWrapping=TextWrapping.Wrap});
             preview.Children.Add(new TextBlock{Text=$"Sicherung vom {manifest.Created.ToLocalTime():g}\n{manifest.Files.Count} Dateien · {manifest.Files.Sum(f=>f.Size)/1024d/1024:0.0} MiB\n\nAlle Dateien werden beim Entpacken geprüft. Als Ziel wird ein neuer Unterordner angelegt; deine aktuelle Bibliothek bleibt erhalten. Erst nach erfolgreicher Prüfung kannst du die wiederhergestellte Bibliothek öffnen. Erkannte Emulator-Spielstände werden bei der nächsten automatischen Emulator-Einrichtung übernommen. Vorhandene Zieldateien und die gesicherte Quelle bleiben erhalten.",TextWrapping=TextWrapping.Wrap});
             var dialog=Dialog("Datensicherung wiederherstellen",preview);
             preview.Children.Add(ActionButton("Zielordner auswählen",()=>dialog.Close(true)));
@@ -48,7 +50,7 @@ public sealed partial class MainWindow
             {
                 message.Text="Datensicherung wird geprüft und wiederhergestellt …";
                 var result=await Task.Run(()=>Backups.RestoreAsync(file,parent,token),token);restored=result;
-                message.Text="Geprüft und wiederhergestellt:\n"+result+"\nEmulatoren und BIOS müssen gegebenenfalls erneut eingerichtet werden. Erkannte Emulator-Spielstände werden bei der nächsten automatischen Einrichtung übernommen. Bestehende Zieldateien bleiben erhalten; Details stehen im Spielstandsbericht. ROM-Pfade bleiben erhalten.";
+                message.Text="Geprüft und wiederhergestellt:\n"+result+"\nEmulatoren und BIOS müssen gegebenenfalls erneut eingerichtet werden. Erkannte Emulator-Spielstände werden bei der nächsten automatischen Einrichtung übernommen. Zusätzliche Ordner liegen getrennt unter external-saves; ihre Zuordnung steht in der Übersicht. Im Emulator bei Bedarf den neuen Speicherort auswählen. ROM-Pfade bleiben erhalten.";
             });
             if(!completed)message.Text=status.Text;
         }));
@@ -66,7 +68,36 @@ public sealed partial class MainWindow
             await Task.CompletedTask;
         }));
         panel.Children.Add(ActionButton("Spielstandsbericht öffnen",()=>{var report=Path.Combine(dataDir,"save-restore-report.txt");if(File.Exists(report))OpenPath(report);else message.Text="Noch keine automatische Spielstandsübernahme erfolgt.";}));
+        panel.Children.Add(ActionButton("Übersicht zusätzlicher Spielstände öffnen",()=>{var report=Path.Combine(restored??dataDir,"external-save-folders.json");if(File.Exists(report))OpenPath(report);else message.Text="Noch keine zusätzlichen Spielstandsordner wiederhergestellt.";}));
         panel.Children.Add(message);return panel;
+    }
+    private Expander ExternalSaveOptions()
+    {
+        var message=new TextBlock{TextWrapping=TextWrapping.Wrap};
+        var panel=new StackPanel{Spacing=10};var list=new ListBox{Height=120};
+        list.ItemTemplate=new Avalonia.Controls.Templates.FuncDataTemplate<ExternalSaveFolder>((folder,_)=>new TextBlock{Text=folder?.ToString(),TextWrapping=TextWrapping.Wrap,MaxWidth=580});
+        var section=new Expander{Header="Zusätzliche Spielstandsordner",Content=panel};
+        void RefreshFolders(){list.ItemsSource=settings.ExternalSaveFolders.ToArray();section.Header=$"Zusätzliche Spielstandsordner ({settings.ExternalSaveFolders.Count})";}
+        panel.Children.Add(new TextBlock{Text="Zusätzliche oder externe Speicherorte auswählen. Entfernen ändert nur die Sicherungsauswahl. Dateien werden nicht gelöscht. Ziel der Sicherungsdatei außerhalb aller ausgewählten Ordner wählen.",TextWrapping=TextWrapping.Wrap});panel.Children.Add(list);
+        panel.Children.Add(message);
+        panel.Children.Add(AsyncButton("Spielstandsordner hinzufügen …",async()=>
+        {
+            if(operation!=null){message.Text="Bitte den laufenden Vorgang abschließen oder abbrechen.";return;}
+            var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="Zusätzliche Spielstandsordner auswählen",AllowMultiple=true});
+            if(operation!=null){message.Text="Bitte den laufenden Vorgang abschließen oder abbrechen.";return;}
+            var selected=settings.ExternalSaveFolders.ToList();
+            foreach(var folder in folders)if(folder.TryGetLocalPath() is{} path)selected.Add(new(Guid.NewGuid().ToString("N"),path));
+            if(folders.Count==0)return;
+            try{settings.ExternalSaveFolders=ExternalSaves.ValidateSelection(dataDir,selected).ToList();settingsStore.Save(settings);RefreshFolders();message.Text="Zusätzliche Spielstandsordner gespeichert.";}
+            catch(Exception ex){message.Text=ex.Message;}
+        }));
+        panel.Children.Add(ActionButton("Aus Sicherungsauswahl entfernen",()=>
+        {
+            if(operation!=null){message.Text="Bitte den laufenden Vorgang abschließen oder abbrechen.";return;}
+            if(list.SelectedItem is not ExternalSaveFolder folder){message.Text="Zuerst einen zusätzlichen Spielstandsordner auswählen.";return;}
+            settings.ExternalSaveFolders.Remove(folder);settingsStore.Save(settings);RefreshFolders();message.Text="Ordner aus der Auswahl entfernt. Seine Dateien bleiben erhalten.";
+        }));
+        RefreshFolders();return section;
     }
     private bool CanBackUp()
     {
