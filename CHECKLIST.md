@@ -12,19 +12,19 @@ Stand: 17. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] EmulationStation-Theme-Import und optionaler ES-DE-/AlekFull-Start.
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
-- [x] 107 Funktionstests und 5 Netzwerktests auch im Release-Build 0.10.54 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] 115 Funktionstests und 5 Netzwerktests auch im Release-Build 0.11.56 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 
-Der aktuelle Stand ist als [Release 0.10.54](https://github.com/cpprograming/EmuVora/releases/tag/v0.10.54) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.11.56](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.56) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 ## 1. Zuerst: Sicherungen vollständig alltagstauglich machen
 
 - [x] Sicherungs-Quellcode und BACKUPS.md über geprüften Pull Request #9 auf GitHub übernommen.
-- [x] Release 0.10.54 nach dem Merge veröffentlicht, Setup heruntergeladen und mit dem EmuVora-Updater einschließlich SHA-256 geprüft.
+- [x] Release 0.11.56 nach dem Merge veröffentlicht, Setup heruntergeladen und mit dem EmuVora-Updater einschließlich SHA-256 geprüft.
 - [x] Erkannte Emulator-Spielstände nach einer Neuinstallation automatisch zuordnen; Wiederherstellung vorher erläutern und vorhandene Dateien schützen (DuckStation, PCSX2, Dolphin, PPSSPP).
 - [x] Benutzerdefinierte und externe Spielstandsordner auswählbar sichern; fehlende Orte deutlich anzeigen. Wiederherstellung ausschließlich getrennt im neuen Datenordner (ab 0.10.54).
 - [ ] Wiederherstellung auf einem anderen Laufwerk testen: Bibliothek, Cover, Favoriten und echte Spielstände vergleichen.
-- [x] Vorhandene oder wiederhergestellte Bibliotheken mit Prüfung öffnen und zur vorherigen Bibliothek zurückkehren (Implementierung 0.11).
-- [x] Optionale Sicherungserinnerung beim Programmstart ergänzen; standardmäßig ausgeschaltet (Implementierung 0.11).
+- [x] Vorhandene oder wiederhergestellte Bibliotheken mit Prüfung öffnen und zur vorherigen Bibliothek zurückkehren (ab 0.11.56).
+- [x] Optionale Sicherungserinnerung beim Programmstart ergänzen; standardmäßig ausgeschaltet (ab 0.11.56).
 - [ ] Optionale Aufbewahrung der letzten Sicherungen ergänzen; nichts ohne ausdrückliche Einstellung löschen.
 
 Abnahme: Ein gesichertes Spiel lässt sich nach Wiederherstellung und erneuter Emulator-Einrichtung mit seinem vorhandenen Spielstand fortsetzen.
