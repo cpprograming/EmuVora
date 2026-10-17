@@ -112,6 +112,8 @@ public static class Backups
             using(var archive=ZipFile.OpenRead(archivePath))
             {
                 manifest=ReadManifest(archive);
+                foreach(var folder in manifest.ExternalFolders??[])
+                    if(ExternalSaves.Equal(parent,folder.Path)||Inside(parent,folder.Path))throw new IOException("Wiederherstellungsziel bitte außerhalb der ursprünglichen zusätzlichen Spielstandsordner wählen.");
                 foreach(var file in manifest.Files)
                 {
                     token.ThrowIfCancellationRequested();var target=Path.Combine(stage,file.Path.Replace('/',Path.DirectorySeparatorChar));

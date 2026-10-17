@@ -14,6 +14,8 @@ public class ExternalSaveTests
         var settings=new SettingsStore(Path.Combine(data,"settings.json"));settings.Save(new(){ExternalSaveFolders=[new(Id,Path.GetDirectoryName(original)!)]});
         var archive=Path.Combine(dir.Path,"backup.zip");await Backups.CreateAsync(data,archive);
         Assert.Equal(2,Backups.Inspect(archive).Format);Assert.Equal(Path.GetDirectoryName(original),Assert.Single(Backups.Inspect(archive).ExternalFolders!).Path);
+        await Assert.ThrowsAsync<IOException>(()=>Backups.RestoreAsync(archive,Path.GetDirectoryName(original)!));
+        Assert.Empty(Directory.GetDirectories(Path.GetDirectoryName(original)!));
         File.WriteAllText(original,"new progress");var restored=await Backups.RestoreAsync(archive,dir.Path);
         var folder=Assert.Single(new SettingsStore(Path.Combine(restored,"settings.json")).Load().ExternalSaveFolders);
         Assert.StartsWith(restored,folder.Path);Assert.Equal(Id,folder.Id);

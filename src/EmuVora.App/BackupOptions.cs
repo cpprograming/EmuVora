@@ -84,6 +84,7 @@ public sealed partial class MainWindow
         {
             if(operation!=null){message.Text="Bitte den laufenden Vorgang abschließen oder abbrechen.";return;}
             var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="Zusätzliche Spielstandsordner auswählen",AllowMultiple=true});
+            if(operation!=null){message.Text="Bitte den laufenden Vorgang abschließen oder abbrechen.";return;}
             var selected=settings.ExternalSaveFolders.ToList();
             foreach(var folder in folders)if(folder.TryGetLocalPath() is{} path)selected.Add(new(Guid.NewGuid().ToString("N"),path));
             if(folders.Count==0)return;
