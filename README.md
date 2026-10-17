@@ -1,83 +1,166 @@
-## Neu in v0.6
-
-Automatischer Sammeldownload fehlender Cover, regionale Titelvarianten, Monitor-Erkennung und Grafikprofile für verwaltete Emulatoren. Die Bibliothek bietet Konsolen-Navigation, einstellbare Covergröße und Details; die Einstellungen sind in vier Tabs gegliedert. Windows-Builds liefern zusätzlich eine Setup-EXE mit eigenem Symbol und Desktop-/Startmenü-Verknüpfungen. Details: [Bibliothek und Bildqualität](LIBRARY_AND_DISPLAY.md).
-
 # EmuVora
 
-Windows-Spielbibliothek für RetroArch, DuckStation, PCSX2, Dolphin und PPSSPP. EmuVora verwaltet deine eigenen ROMs und startet die offiziellen externen Emulatoren.
+EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-## Windows-Version starten
+**Aktueller geprüfter Stand: [0.10.54](https://github.com/cpprograming/EmuVora/releases/tag/v0.10.54)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
-Neu in v0.5: **AlekFull NX mit der originalen ES-DE-Oberfläche**. Einrichtung, Controller und Bibliotheksabgleich: [AlekFull NX / ES-DE](ALEKFULL_ESDE.md).
+## Download und Installation
 
-Neu in v0.4: **Installationslaufwerk / Datenordner auswählen** und klassische **EmulationStation-Theme-Gestaltung importieren**. Einrichtung und genaue Kompatibilitätsgrenzen: [Speicherorte und Themes](STORAGE_AND_THEMES.md).
+- **[Windows-Setup herunterladen](https://github.com/cpprograming/EmuVora/releases/latest/download/EmuVora-Setup.exe)** – Installationslaufwerk und Ordner wählen; eigene Desktop- und Startmenü-Verknüpfungen sind optional.
+- **[Portable Windows-Version herunterladen](https://github.com/cpprograming/EmuVora/releases/latest/download/EmuVora-win-x64.zip)** – ZIP vollständig entpacken und `EmuVora.App.exe` starten.
+- Alle Versionen und Änderungen findest du unter **[Releases](https://github.com/cpprograming/EmuVora/releases)**.
 
-Unter [GitHub Actions](https://github.com/cpprograming/EmuVora/actions) den neuesten erfolgreichen **Build and test** öffnen und **EmuVora-win-x64** herunterladen. ZIP vollständig entpacken und `EmuVora.App.exe` starten. .NET muss für dieses portable Paket nicht installiert werden. Optional richtet `Install-EmuVora.ps1` das Programm und eine Startmenü-Verknüpfung im Benutzerkonto ein.
+Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
 
-1. **ROM-Ordner importieren**. Unterordner werden mitgescannt; nicht lesbare Ordner werden gemeldet.
-2. Unklare Discs unter **Konsole zuordnen** bearbeiten. Wii/GameCube-ISO-Header und Konsolenordner helfen bei der Erkennung; andere Disc-Formate werden nicht als sicher erkannt ausgegeben.
-3. **Spielen**: fehlende Emulatoren und RetroArch-Cores werden automatisch heruntergeladen und eingerichtet. Alternativ unter **Emulatoren einrichten → Alle Emulatoren + Cores automatisch einrichten** alles vorab installieren. Die Automatik lässt sich deaktivieren; vorhandene EXE-Pfade bleiben nutzbar.
-4. Xbox-Controller anschließen. Benötigte eigene BIOS-Dateien über die Einstellungen importieren. Dateinamen, Zusatzdateien und Systemhinweise stehen dort. PS2-BIOS mit 4 MiB wird als Standard gewählt, PS1 durchsucht den Firmware-Ordner. Die Emulatoren prüfen die tatsächliche BIOS-Gültigkeit und Region. Bei fehlenden VCRUNTIME/MSVCP-DLLs die verlinkte Microsoft Visual C++ Runtime installieren.
-5. Spiel auswählen und **Spielen**, doppelklicken oder Eingabetaste drücken.
+## Erste Einrichtung
 
-## Bibliothek und Bedienung
+1. **Speicherort festlegen.** Das Setup legt Programm und Daten standardmäßig in den Unterordnern `App` und `Data` des gewählten Installationsordners ab. Bei einem portablen Erststart ohne gespeicherten Datenpfad wählst du den Datenordner selbst.
+2. **Einrichtungsassistent durchlaufen.** Er führt durch Speicherort, ROM-Import, Controller, Emulatoren/BIOS und Abschluss. Er lässt sich später über die Seitenleiste erneut öffnen.
+3. **Eigene ROM-Ordner importieren.** Unterordner werden durchsucht. Unklare Disc-Dateien kannst du anschließend einer Konsole zuordnen.
+4. **Xbox-Controller anschließen und eigene BIOS-Dateien importieren**, soweit das System sie benötigt.
+5. **Spiel auswählen und starten.** Bei aktivierter automatischer Einrichtung werden fehlende Emulatoren und RetroArch-Cores heruntergeladen. Vorhandene eigene Emulatorpfade bleiben nutzbar.
 
-- Cover-Kacheln, kombinierte Suche/Konsolenfilter, Sortierung, Favoriten und zuletzt gespielte Titel.
-- Eigene Cover kopieren oder nach einem exakten No-Intro-/Redump-Titel bei libretro-thumbnails suchen. Nur beim Klick auf die Online-Suche werden Titel und Konsole an GitHub gesendet; fehlende Treffer lassen das Platzhalter-Cover bestehen.
-- Titel und Konsole korrigieren; erneutes Scannen bewahrt Korrekturen, Favoriten und Startverlauf.
-- Mehrdisc-M3U-Dateien bündeln referenzierte Discs. ZIP-Dateien mit genau einer unterstützten Cartridge-ROM können über RetroArch gestartet werden.
-- Fehlende Dateien anzeigen; Entfernen betrifft nur den Bibliothekseintrag, nicht die ROM-Datei.
-- JSON-Sicherung/Wiederherstellung für Titel, Dateipfade, Konsole, Favoriten und Startverlauf. Cover, Einstellungen und Emulator-Speicherstände sind nicht in dieser JSON enthalten.
-- Tastatur: Eingabetaste startet; Strg+F aktiviert die Suche. Xbox/XInput: Steuerkreuz oder linker Stick navigiert mit Wiederholung; A startet, Y schaltet Favoriten um, LB/RB wechselt den Systemfilter, B setzt die Ansicht zurück. Verbundene Controller werden laufend angezeigt. RetroArch, DuckStation, PCSX2 und Dolphin erhalten automatisch Xbox-Profile mit Analogsticks, Triggern und unterstütztem Rumble. PPSSPP nutzt seine eingebauten Xbox-Defaults. RetroArch / PS1 / PS2: View + Menu beendet, View + RB öffnet das Menü. Dolphin: View + Menu beendet das Spiel, View + rechter Stick-Klick schließt den Emulator. PPSSPP: LT öffnet das Menü. Profile berücksichtigen den ersten verbundenen XInput-Slot. Eigene geänderte Belegungen bleiben erhalten; unveränderte verwaltete Werte werden bei Bedarf angepasst. **Xbox-Standardprofil erneut anwenden** setzt die Standardbelegung mit Dateisicherung zurück.
+Die Firmware-Prüfung erkennt Dateinamen und grundlegende Größen. Tatsächliche Gültigkeit und Region prüft der jeweilige Emulator. EmuVora liefert keine ROMs oder BIOS-Dateien.
+
+Details: [Einrichtungsassistent](GUIDED_SETUP.md) · [Speicherorte und Themes](STORAGE_AND_THEMES.md).
+
+## Bibliothek, Cover und Bildqualität
+
+- Cover-Kacheln, Suche, Konsolenfilter, Sortierung, Favoriten und Startverlauf.
+- Fehlende Cover automatisch beim Start und nach einem Import laden; Sammeldownload und manuelle Auswahl sind ebenfalls möglich.
+- Regionale Titelvarianten werden berücksichtigt. Vorhandene eigene Cover bleiben erhalten; nicht jeder Titel hat einen passenden Treffer.
+- Titel und Konsolenzuordnung bearbeiten. Erneutes Scannen bewahrt eigene Korrekturen, Favoriten und Verlauf.
+- Mehrdisc-M3U-Dateien bündeln referenzierte Discs. Cartridge-ZIPs mit genau einer unterstützten ROM können über RetroArch gestartet werden.
+- Monitorerkennung, Profile für das ursprüngliche Seitenverhältnis und scharfe Skalierung sowie einstellbare interne Auflösung für verwaltete Emulatoren.
+- Entfernen aus der Bibliothek löscht keine ROM-Datei.
+
+**Online-Cover:** Automatischer und manueller Abruf verwenden libretro-thumbnails auf GitHub. Dabei werden Titel/Konsolenzuordnung für die Suche verwendet. Den automatischen Abruf kannst du unter **Einstellungen → Bibliothek** abschalten.
+
+Details: [Bibliothek und Bildqualität](LIBRARY_AND_DISPLAY.md).
+
+## Xbox-Controller
+
+Die Oberfläche unterstützt Xbox-/XInput-Navigation einschließlich Einstellungen, Dialogen, Dateiauswahl und Bildschirmtastatur.
+
+| Eingabe | In der Spielebibliothek |
+| --- | --- |
+| Steuerkreuz / linker Stick | Spiel auswählen |
+| A | Spiel starten |
+| Y | Favorit umschalten |
+| LB / RB | Konsolenfilter wechseln |
+| Menu | Einstellungen öffnen |
+| View | Zwischen Spieleliste und Bedienelement-Navigation umschalten |
+| B | Zur Spieleliste zurück; laufenden Vorgang abbrechen |
+
+In Dialogen wählt das Steuerkreuz Bedienelemente, A bestätigt und B geht zurück bzw. schließt. Beim Einrichtungsassistenten führt B zum vorherigen Schritt. LB/RB wechselt Einstellungen-Tabs.
+
+Verwaltete Emulatoren erhalten Xbox-Standardprofile; PPSSPP verwendet seine eingebauten Voreinstellungen. Eigene geänderte Belegungen bleiben erhalten. **Xbox-Standardprofil erneut anwenden** setzt die verwalteten Standardwerte mit Dateisicherung zurück.
+
+Die Bedienung einzelner Spiele hängt vom System ab: Nintendo DS kann Maus/Touch benötigen, Wii-Spiele besondere Bewegungsprofile und Heimcomputer, DOS oder Intellivision zusätzliche Tastatureingaben. Tests mit echten Controllern und mehreren Spielern stehen weiterhin auf der [Checkliste](CHECKLIST.md).
+
+## Sicherung und Wiederherstellung
+
+Unter **Einstellungen → Sicherung** kannst du eine Datensicherung erstellen oder wiederherstellen.
+
+Enthalten sind Einstellungen, eine konsistente Kopie der Spielebibliothek, Cover im Datenordner sowie erkannte Spielstände. Für verwaltete DuckStation-, PCSX2-, Dolphin- und PPSSPP-Installationen werden bekannte Speicherordner berücksichtigt.
+
+### Zusätzliche Spielstandsordner – neu in 0.10
+
+1. **Zusätzliche Spielstandsordner → Spielstandsordner hinzufügen** öffnen.
+2. Die gewünschten Speicherordner auswählen; höchstens 32, ohne doppelte oder überlappende Auswahl.
+3. Das Sicherungsarchiv außerhalb des Datenordners und aller zusätzlichen Quellordner speichern.
+
+Alle Dateien in zusätzlich ausgewählten Ordnern werden kopiert. Wähle deshalb gezielt Spielstandsordner aus. Ein nicht erreichbarer Ordner stoppt die Sicherung mit einer Meldung. Entfernen aus der Auswahl löscht keine Dateien.
+
+### Wiederherstellen
+
+- Vor dem Wiederherstellen werden Datum, Dateianzahl, Größe und zusätzliche Ordner angezeigt.
+- Jede Datei wird mit SHA-256 geprüft; anschließend wird die Bibliotheksdatenbank geprüft.
+- Die Wiederherstellung erstellt einen **neuen Datenordner**. Die aktive Bibliothek und ursprünglichen externen Spielstandsdateien bleiben erhalten.
+- Zusätzliche Spielstände liegen danach unter `external-saves`. Die **Übersicht zusätzlicher Spielstände** zeigt die alten und neuen Pfade; im Emulator musst du den neuen Speicherort bei Bedarf selbst einstellen.
+- Erkannte Spielstände verwalteter Emulatoren werden bei der nächsten automatischen Emulator-Einrichtung übernommen. Vorhandene Zieldateien werden nicht ersetzt; die Quelle bleibt erhalten.
+- Erst mit **Mit wiederhergestellter Bibliothek neu starten** wechselst du ausdrücklich zur neuen Bibliothek.
+
+**Kompatibilität:** Ab 0.10 werden neue Sicherungen in Format 2 geschrieben. Ältere Format-1-Sicherungen bleiben lesbar; EmuVora 0.9 kann Format 2 nicht wiederherstellen. Grenzen: 100.000 Dateien und 20 GiB unkomprimierte Daten; Dateisystem-Verknüpfungen werden abgewiesen.
+
+Emulatorprogramme, Themes, ROM-Verzeichnisse und BIOS gehören nicht zur automatischen Datensicherung. Zusätzlich ausgewählte Ordner werden dagegen ohne Inhaltsfilter kopiert. Emulatoren, Cores, Themes und BIOS müssen nach einer Wiederherstellung gegebenenfalls erneut eingerichtet werden. ROM-Pfade bleiben unverändert.
+
+Der bisherige JSON-Export unter **Verwaltung** tauscht nur Bibliothekseinträge aus und enthält keine Cover- oder Spielstandsdateien.
+
+Vollständige Anleitung: [Sicherung und Wiederherstellung](BACKUPS.md).
+
+## Themes und ES-DE
+
+Klassische EmulationStation-Themes lassen sich innerhalb der unterstützten Darstellungsgrenzen importieren. Für **AlekFull NX mit der originalen ES-DE-Oberfläche** gibt es einen optionalen separaten ES-DE-Start mit Bibliotheksabgleich.
+
+Nicht jedes ES-DE-Theme lässt sich direkt in der EmuVora-Oberfläche darstellen. Kompatibilitätsgrenzen und Einrichtung:
+
+- [Speicherorte und Theme-Import](STORAGE_AND_THEMES.md)
+- [AlekFull NX / ES-DE](ALEKFULL_ESDE.md)
+
+Theme-Dateien und ihre Lizenzhinweise bleiben den jeweiligen Autoren zugeordnet.
 
 ## Unterstützte Systeme (47 Einträge)
 
-- Nintendo: NES, SNES, GB, GBC, GBA, N64, Nintendo DS, Virtual Boy, GameCube, Wii.
-- Sega: Mega Drive, Master System, Game Gear, Mega-CD, 32X, Saturn, Dreamcast.
-- Sony: PS1, PS2, PSP.
-- Atari: 2600, 5200, 7800, Lynx, Jaguar, ST.
-- NEC: PC Engine, PC Engine CD, SuperGrafx, PC-FX.
-- SNK: Neo Geo, Neo Geo CD, Neo Geo Pocket, Neo Geo Pocket Color.
-- Weitere: 3DO, ColecoVision, Intellivision, WonderSwan, WonderSwan Color.
-- Computer: Commodore 64, Amiga, Amstrad CPC, ZX Spectrum, MSX, DOS.
-- Arcade: FinalBurn Neo und MAME.
+- **Nintendo:** NES, SNES, GB, GBC, GBA, N64, Nintendo DS, Virtual Boy, GameCube, Wii.
+- **Sega:** Mega Drive, Master System, Game Gear, Mega-CD, 32X, Saturn, Dreamcast.
+- **Sony:** PS1, PS2, PSP.
+- **Atari:** 2600, 5200, 7800, Lynx, Jaguar, ST.
+- **NEC:** PC Engine, PC Engine CD, SuperGrafx, PC-FX.
+- **SNK:** Neo Geo, Neo Geo CD, Neo Geo Pocket, Neo Geo Pocket Color.
+- **Weitere:** 3DO, ColecoVision, Intellivision, WonderSwan, WonderSwan Color.
+- **Computer:** Commodore 64, Amiga, Amstrad CPC, ZX Spectrum, MSX, DOS.
+- **Arcade:** FinalBurn Neo und MAME.
 
-Dreamcast nutzt ohne eigene BIOS-Datei automatisch Flycast HLE. Gemeinsame Formate wie CHD/CUE/ISO, DSK, ROM oder komplette ZIP-ROM-Sets in einen Systemordner legen, z. B. `Saturn`, `MSX`, `DOS`, `MAME` oder `FBNeo`. Mehrdisc-Playlists werden zusammengefasst. Arcade-/DOS-Archive bleiben als vollständige Sets erhalten. Die Firmware-Prüfung erkennt Dateinamen und grundlegende Größen, ersetzt aber keine Validierung durch den Emulator. MSX benötigt die eigenen blueMSX-Verzeichnisse `Machines` und `Databases`; ganze Firmware-Ordner lassen sich importieren.
+Gemeinsame Formate wie CHD/CUE/ISO, DSK, ROM oder vollständige ZIP-ROM-Sets am besten in passend benannte Systemordner legen, etwa `Saturn`, `MSX`, `DOS`, `MAME` oder `FBNeo`. Arcade-ROM-Sets müssen zur Core-Version passen. Dreamcast nutzt ohne eigenes BIOS Flycast HLE. MSX benötigt die eigenen blueMSX-Verzeichnisse `Machines` und `Databases`.
 
-## Downloads und Updates
+Die Liste beschreibt die Systemzuordnung im Frontend; Spielkompatibilität und besondere Eingabegeräte hängen vom jeweiligen Emulator ab.
 
-Offizielle portable Windows-x64-Pakete werden über einen versionierten Katalog bezogen und vor dem Entpacken mit SHA-256 geprüft. GitHub-Release-Pakete werden zusätzlich gegen aktuelle offizielle Release-Metadaten aufgelöst. ZIP/7z werden in neue Installationsordner entpackt; Pfadtraversal und Links werden abgewiesen. Bei Fehlern oder Abbruch bleibt die bisherige Installation erhalten.
+## Updates und Datenablage
 
-Beim Start können verfügbare Updates gemeldet werden. **Updates automatisch installieren** ist optional und zunächst ausgeschaltet. Verwaltete Emulatoren übernehmen bekannte portable Konfigurations-/Speicherordner in die neue Installation. Extern gespeicherte Emulator-Einstellungen bleiben beim Emulator. Vorige Installationen bleiben vorhanden und können wieder aktiviert werden. Eigene Emulatorpfade werden nicht automatisch aktualisiert.
+**EmuVora aktualisieren:** Unter **Einstellungen → App-Updates** nach einer neuen stabilen Version suchen, herunterladen und installieren. Der Download wird mit SHA-256 geprüft. Das Setup wartet auf das Programmende, behält den Datenpfad und sichert die vorige App-Version.
 
-`catalog/packages.json` enthält offizielle Quellen und gepinnte SHA-256-Prüfsummen. Der GitHub-Workflow **Refresh official emulator catalog** aktualisiert diesen Katalog wöchentlich oder manuell. Ein Prüfsummenfehler blockiert die Installation; er wird nicht durch Weglassen der Prüfung umgangen. SHA-256 bestätigt die Übereinstimmung mit dem Katalog; es ist keine unabhängige Signatur des Emulator-Herstellers.
+**Emulatoren aktualisieren:** Offizielle portable Pakete werden vor dem Entpacken geprüft und in neue Installationsordner entpackt. Automatisches Installieren von Emulator-Updates ist optional und zunächst ausgeschaltet. Frühere Emulator-Versionen bleiben für die Rückkehr erhalten; eigene externe Emulatorpfade werden nicht automatisch aktualisiert.
 
-## Daten und Sicherung
+**GitHub:** Nach einem erfolgreichen Merge-Build auf `main` werden Setup-EXE und portables ZIP automatisch als Release veröffentlicht. Fehlgeschlagene Prüfungen blockieren die Veröffentlichung.
 
-EmuVora speichert Daten in `%LOCALAPPDATA%\EmuVora`: SQLite-Bibliothek, `settings.json`, Cover, verwaltete Emulatoren und Fehlerprotokoll. **Datenordner öffnen** befindet sich in den Einstellungen. Für eine vollständige Sicherung das Programm und Emulatoren schließen und den gesamten Datenordner kopieren. BIOS, Spiele und extern gespeicherte Emulator-Spielstände zusätzlich sichern. Einstellungen werden atomar geschrieben und die vorige Datei als `.bak` behalten.
+Die Daten liegen im gewählten Datenordner. **Datenordner öffnen** findest du in den Einstellungen. `%LOCALAPPDATA%\EmuVora\location.json` dient als Pfadverweis; installierte Pakete können einen eigenen Verweis neben der App verwenden. Einstellungen werden atomar geschrieben und die vorige Datei als `.bak` erhalten.
+
+Details: [App-Updates](APP_UPDATES.md) · [Speicherorte](STORAGE_AND_THEMES.md).
 
 ## Entwicklung und Prüfung
 
-Windows 10/11 x64 und .NET 10 SDK:
+Benötigt: Windows x64 und **.NET 10 SDK**.
 
 ```powershell
 dotnet restore EmuVora.sln
 dotnet build EmuVora.sln -c Release
-dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Category!=Network"
+
+dotnet publish tests/EmuVora.LaunchProbe/EmuVora.LaunchProbe.csproj -c Release -r win-x64 --self-contained false -o work/launch-probe
+$env:EMUVORA_LAUNCH_PROBE = (Resolve-Path work/launch-probe/EmuVora.LaunchProbe.exe).Path
+dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj --no-build -c Release --filter "Category!=Network"
+
 dotnet run --project src/EmuVora.App/EmuVora.App.csproj
 ```
 
-Netzwerktests laden und prüfen alle echten offiziellen Archive. Sie starten keine Spiele:
+Netzwerktests laden und prüfen die offiziellen Archive; sie starten keine Spiele:
 
 ```powershell
 $env:EMUVORA_PACKAGE_CATALOG = (Resolve-Path catalog/packages.json).Path
+# Optional im CI: EMUVORA_COVER_TOKEN für authentifizierte GitHub-API-Abfragen.
 dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Category=Network"
 ```
 
-Tests prüfen Migration der ursprünglichen Datenbank, Erhalt manuell korrigierter Metadaten, Playlist-/Disc-/ZIP-Erkennung, Bibliothekswiederherstellung, Einstellungen, Startargumente, Prüfsummen und Archivpfade. Avalonia-Tests prüfen echte Such-/Filter-/Favoriten-Interaktion und rendern die vier Themes. GitHub Actions erstellt zusätzliche **EmuVora-UI-previews**.
+**Für Release 0.10.54 bestanden:** 107 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
 
-Die Emulatoren bleiben eigene Anwendungen: Kompatibilität einzelner Spiele, tatsächliche BIOS-Gültigkeit und spezielle Grafik-/Audio-/Controller-Anpassungen hängen von ihnen ab. Standardinstallation und Xbox-Belegung übernimmt EmuVora. Nintendo DS braucht für Touchaktionen Maus/Touch; Wii nutzt ein Wiimote/Nunchuk-Grundprofil mit rechtem Stick als Zeiger und RB als Schütteln. Manche Wii-Spiele benötigen andere Bewegungsprofile. Heimcomputer, Intellivision und DOS können Tastatur/Maus benötigen. Arcade-ROM-Sets müssen zur Core-Version passen; MAME und FinalBurn Neo sind getrennte Bibliothekskategorien. Vollständig controllerbasierte Bedienung jedes Spiels wird nicht zugesichert. EmuVora enthält weder Emulator-Binaries noch ROMs oder BIOS im Programmpaket.
+Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsintegrität, externe Ordner, Wiederherstellung älterer Archive und Dateipfade ab. Avalonia-Tests erzeugen UI-Aufnahmen; die GitHub-Artefakte enthalten **EmuVora-UI-previews**. Echte Hardwaretests stehen separat auf der Checkliste.
+
+## Nächste Schritte
+
+Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Als Nächstes ist der Rückwechsel zum bisherigen Datenordner direkt in der Oberfläche vorgesehen; weitere Punkte betreffen Controller-Hardwaretests, TV-Darstellung und Bibliothekskomfort.
 
 ## Lizenz
 
-MIT für den ursprünglichen EmuVora-Code. Siehe [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) für Abhängigkeiten und externe Quellen. Emulatoren und Cover behalten die Rechte und Lizenzen ihrer jeweiligen Projekte bzw. Rechteinhaber.
+Der EmuVora-Code steht unter [MIT](LICENSE). Abhängigkeiten, Emulatoren, Themes und Cover unterliegen ihren eigenen Bedingungen; siehe [Drittanbieter-Hinweise](THIRD_PARTY_NOTICES.md).
+
+Emulator-Binaries, ROMs, BIOS und Theme-Pakete sind nicht im EmuVora-Programmpaket enthalten. Optionale Komponenten werden gesondert von ihren offiziellen Quellen geladen.
