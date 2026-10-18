@@ -16,7 +16,11 @@ Zusätzlich in 0.11.59: BIOS-Dateiauswahl korrigiert und automatische Benennung 
 
 In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importierte Dateien können ausdrücklich ins eigene Archiv aufgenommen werden.
 
-## 0.12 – Xbox und Plug-and-play
+## 0.12 – Xbox und Plug-and-play (Implementierung, Hardwareabnahme offen)
+
+- [x] Gemeinsame Eingabelogik für Bibliothek und Dialoge: Wiederverbinden, Fokuswechsel, Wiederholung und Übernahme zwischen Controllern automatisiert geprüft.
+- [x] Diagnoseansicht für vier XInput-Slots mit Tasten, Sticks, Triggern und Verbindungswechseln ergänzt.
+- [x] Praktische Prüfschritte in [CONTROLLERS.md](CONTROLLERS.md) dokumentiert.
 
 - [ ] Xbox-Controller per USB und Bluetooth auf echter Hardware testen.
 - [ ] Einrichtung, Dateiauswahl, Sicherung und Spielstart vollständig mit Controller durchspielen.
@@ -52,4 +56,5 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 - [ ] Eine stabile EXE mit nachvollziehbaren Versionshinweisen veröffentlichen.
 
 Der detaillierte Arbeitsstand steht in der [Checkliste](CHECKLIST.md). Automatisierte Tests ersetzen die noch offenen Hardwaretests nicht.
+
 

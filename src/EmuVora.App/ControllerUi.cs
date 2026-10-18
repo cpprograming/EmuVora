@@ -15,17 +15,11 @@ public static class ControllerUi
     public static void Attach(Window window)
     {
         var timer=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(100)};
-        ushort previous=ushort.MaxValue;long repeat=0;int index=-1;
+        var navigation=new GamepadNavigation();
         timer.Tick+=(_,_)=>
         {
-            var pads=Gamepad.Read();var pad=pads.FirstOrDefault(p=>Gamepad.NavigationButtons(p)!=0);if(pad==default&&pads.Length>0)pad=pads[0];
-            if(!window.IsActive||pads.Length==0){previous=ushort.MaxValue;index=-1;return;}
-            var buttons=Gamepad.NavigationButtons(pad);
-            if(index!=pad.Index){index=pad.Index;previous=buttons;return;}
-            var pressed=(ushort)(buttons&~previous);
-            if((buttons&15)!=(previous&15))repeat=Environment.TickCount64+400;
-            else if((buttons&15)!=0&&Environment.TickCount64>=repeat){pressed|=(ushort)(buttons&15);repeat=Environment.TickCount64+140;}
-            previous=buttons;if(pressed!=0)Handle(window,pressed);
+            var pressed=navigation.Poll(Gamepad.Read(),window.IsActive,Environment.TickCount64);
+            if(pressed!=0)Handle(window,pressed);
         };
         window.Opened+=(_,_)=>timer.Start();window.Closed+=(_,_)=>timer.Stop();
     }

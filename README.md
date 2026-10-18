@@ -46,6 +46,8 @@ Details: [Bibliothek und Bildqualität](LIBRARY_AND_DISPLAY.md).
 
 Die Oberfläche unterstützt Xbox-/XInput-Navigation einschließlich Einstellungen, Dialogen, Dateiauswahl und Bildschirmtastatur.
 
+Neu in 0.12: **Xbox-Controller prüfen** unter Einstellungen → Emulatoren oder im Einrichtungsassistenten zeigt Tasten, beide Sticks, Trigger und Verbindungswechsel für bis zu vier XInput-Slots. Bibliothek und Dialoge unterdrücken gehaltene Eingaben nach Verbindungs-/Fokuswechseln; die Navigation wechselt bei mehreren Controllern erst nach Freigabe des aktiven Controllers. Details und noch offene Hardwaretests: [Controller-Anleitung](CONTROLLERS.md).
+
 | Eingabe | In der Spielebibliothek |
 | --- | --- |
 | Steuerkreuz / linker Stick | Spiel auswählen |
@@ -178,5 +180,6 @@ Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fe
 Der EmuVora-Code steht unter [MIT](LICENSE). Abhängigkeiten, Emulatoren, Themes und Cover unterliegen ihren eigenen Bedingungen; siehe [Drittanbieter-Hinweise](THIRD_PARTY_NOTICES.md).
 
 Emulator-Binaries, ROMs, BIOS und Theme-Pakete sind nicht im EmuVora-Programmpaket enthalten. Optionale Komponenten werden gesondert von ihren offiziellen Quellen geladen.
+
 
 
