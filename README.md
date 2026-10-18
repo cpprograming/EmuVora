@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.11.59](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.59)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.11.61](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.61)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -71,6 +71,8 @@ Unter **Einstellungen → Sicherung** lassen sich Erinnerungen beim Programmstar
 Details: [Datenordner wechseln](DATA_LOCATIONS.md).
 
 ## Sicherung und Wiederherstellung
+
+**Neu in 0.11.61:** Importierte BIOS-/Firmware-Dateien auf Wunsch im persönlichen Sicherungsarchiv speichern; Anzahl und Größe werden vor der Wiederherstellung angezeigt.
 
 Unter **Einstellungen → Sicherung** kannst du eine Datensicherung erstellen oder wiederherstellen.
 
@@ -163,7 +165,7 @@ $env:EMUVORA_PACKAGE_CATALOG = (Resolve-Path catalog/packages.json).Path
 dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Category=Network"
 ```
 
-**Für Release 0.11.59 bestanden:** 119 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
+**Für Release 0.11.61 bestanden:** 123 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
 
 Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsintegrität, externe Ordner, Wiederherstellung älterer Archive und Dateipfade ab. Avalonia-Tests erzeugen UI-Aufnahmen; die GitHub-Artefakte enthalten **EmuVora-UI-previews**. Echte Hardwaretests stehen separat auf der Checkliste.
 
