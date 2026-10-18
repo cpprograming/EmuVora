@@ -22,7 +22,11 @@ public sealed class GamepadNavigation
             edges[pad.Index]=enabled&&known&&armed.Contains(pad.Index)?(ushort)(buttons&~old):(ushort)0;
             previous[pad.Index]=buttons;
         }
-        if(!connected.Contains(ActiveIndex)){ActiveIndex=pads.Count>0?pads[0].Index:-1;direction=0;repeatAt=now+400;}
+        if(!connected.Contains(ActiveIndex))
+        {
+            ActiveIndex=pads.Count>0?pads[0].Index:-1;direction=0;repeatAt=now+400;
+            if(ActiveIndex>=0&&previous[ActiveIndex]!=0&&edges[ActiveIndex]==0)armed.Remove(ActiveIndex);
+        }
         if(!enabled||ActiveIndex<0){direction=0;repeatAt=now+400;return 0;}
         if(previous[ActiveIndex]==0||!armed.Contains(ActiveIndex))
         {

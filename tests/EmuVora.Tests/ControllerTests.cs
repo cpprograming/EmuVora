@@ -49,6 +49,11 @@ public class ControllerTests
     {
         var navigation=new GamepadNavigation();navigation.Poll([Pad(0,0x1000),Pad(1)],true,0);Assert.Equal(0x1000,navigation.Poll([Pad(0,0x1000),Pad(1,0x1000)],true,100));Assert.Equal(1,navigation.ActiveIndex);
     }
+    [Fact] public void DisconnectingOwnerDoesNotReplayAnotherHeldDirection()
+    {
+        var navigation=new GamepadNavigation();navigation.Poll([Pad(0),Pad(1)],true,0);navigation.Poll([Pad(0,0x1000),Pad(1)],true,100);navigation.Poll([Pad(0,0x1000),Pad(1,2)],true,200);
+        Assert.Equal(0,navigation.Poll([Pad(1,2)],true,300));Assert.Equal(0,navigation.Poll([Pad(1,2)],true,1000));navigation.Poll([Pad(1)],true,1100);Assert.Equal(2,navigation.Poll([Pad(1,2)],true,1200));
+    }
     [AvaloniaFact] public void DiagnosticsRequiresAHeldExitChordOnTheSameController()
     {
         var active=true;var window=new ControllerDiagnosticsWindow(()=>[],()=>active);window.Show();
