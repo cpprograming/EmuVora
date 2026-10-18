@@ -16,6 +16,9 @@ public sealed partial class MainWindow
         panel.Children.Add(new TextBlock{Text="Sicherung & Wiederherstellung",FontSize=25,FontWeight=FontWeight.Bold});
         panel.Children.Add(new TextBlock{Text="Sichert Einstellungen, Bibliothek, Cover, erkannte Emulator-Spielstände und ausgewählte zusätzliche Spielstandsordner. Wähle nur Ordner mit Spielständen: Zusätzliche Ordner werden vollständig kopiert. Fehlende Ordner stoppen die Sicherung. Spiele und ES-DE vorher beenden.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(ExternalSaveOptions());
+        var firmware=new CheckBox{Content="Importierte BIOS-/Firmware-Dateien mitsichern",IsChecked=settings.IncludeFirmwareInBackups};
+        firmware.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.IncludeFirmwareInBackups=firmware.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(firmware);
+        panel.Children.Add(new TextBlock{Text="Optional: Sichert alle Dateien im firmware-Unterordner dieses Datenordners, einschließlich vorhandener .bak-Dateien. Externe BIOS-Ordner werden nicht automatisch kopiert. Das Archiv enthält dann deine eigenen BIOS-Dateien und ist nicht verschlüsselt. Bewahre es an einem privaten Sicherungsort auf.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(new TextBlock{Text="Sicherungserinnerung beim Programmstart"});
         var reminder=new ComboBox{ItemsSource=new[]{"Ausgeschaltet","Alle 7 Tage","Alle 14 Tage","Alle 30 Tage"},SelectedIndex=Math.Max(0,Array.IndexOf(new[]{0,7,14,30},settings.BackupReminderDays))};
         reminder.SelectionChanged+=(_,_)=>Guard(()=>{settings.BackupReminderDays=new[]{0,7,14,30}[Math.Max(0,reminder.SelectedIndex)];settingsStore.Save(settings);UpdateBackupReminder();});panel.Children.Add(reminder);
@@ -42,6 +45,8 @@ public sealed partial class MainWindow
             if(files.Count==0||files[0].TryGetLocalPath() is not{} file)return;
             var manifest=await Task.Run(()=>Backups.Inspect(file));
             var preview=new StackPanel{Spacing=14,Margin=new(24)};
+            var firmwareFiles=manifest.Files.Where(f=>f.Path.StartsWith("firmware/",StringComparison.OrdinalIgnoreCase)).ToArray();
+            preview.Children.Add(new TextBlock{Text=firmwareFiles.Length==0?"Keine BIOS-/Firmware-Dateien in diesem Archiv. Bei Bedarf nach der Wiederherstellung erneut importieren.":$"BIOS/Firmware enthalten: {firmwareFiles.Length} Dateien · {firmwareFiles.Sum(f=>f.Size)/1024d/1024:0.0} MiB. Werden mit SHA-256 geprüft und ausschließlich im neuen Datenordner unter firmware wiederhergestellt. Externe BIOS-Pfade im Emulator bei Bedarf anpassen.",TextWrapping=TextWrapping.Wrap});
             if(manifest.ExternalFolders?.Count>0)preview.Children.Add(new TextBlock{Text="Zusätzliche Spielstandsordner:\n"+string.Join("\n",manifest.ExternalFolders.Select(folder=>folder.Path))+"\n\nDiese Dateien werden ausschließlich im neuen Datenordner unter external-saves wiederhergestellt. Die ursprünglichen Ordner bleiben unverändert. Im Emulator musst du den neuen Speicherort bei Bedarf selbst auswählen.",TextWrapping=TextWrapping.Wrap});
             preview.Children.Add(new TextBlock{Text=$"Sicherung vom {manifest.Created.ToLocalTime():g}\n{manifest.Files.Count} Dateien · {manifest.Files.Sum(f=>f.Size)/1024d/1024:0.0} MiB\n\nAlle Dateien werden beim Entpacken geprüft. Als Ziel wird ein neuer Unterordner angelegt; deine aktuelle Bibliothek bleibt erhalten. Erst nach erfolgreicher Prüfung kannst du die wiederhergestellte Bibliothek öffnen. Erkannte Emulator-Spielstände werden bei der nächsten automatischen Emulator-Einrichtung übernommen. Vorhandene Zieldateien und die gesicherte Quelle bleiben erhalten.",TextWrapping=TextWrapping.Wrap});
             var dialog=Dialog("Datensicherung wiederherstellen",preview);
@@ -54,7 +59,7 @@ public sealed partial class MainWindow
             {
                 message.Text="Datensicherung wird geprüft und wiederhergestellt …";
                 var result=await Task.Run(()=>Backups.RestoreAsync(file,parent,token),token);restored=result;
-                message.Text="Geprüft und wiederhergestellt:\n"+result+"\nEmulatoren und BIOS müssen gegebenenfalls erneut eingerichtet werden. Erkannte Emulator-Spielstände werden bei der nächsten automatischen Einrichtung übernommen. Zusätzliche Ordner liegen getrennt unter external-saves; ihre Zuordnung steht in der Übersicht. Im Emulator bei Bedarf den neuen Speicherort auswählen. ROM-Pfade bleiben erhalten.";
+                message.Text="Geprüft und wiederhergestellt:\n"+result+"\nEmulatoren müssen gegebenenfalls erneut eingerichtet werden. Enthaltene BIOS-/Firmware-Dateien liegen im neuen Datenordner unter firmware; externe BIOS-Pfade bei Bedarf im Emulator anpassen. Erkannte Emulator-Spielstände werden bei der nächsten automatischen Einrichtung übernommen. Zusätzliche Ordner liegen getrennt unter external-saves; ihre Zuordnung steht in der Übersicht. Im Emulator bei Bedarf den neuen Speicherort auswählen. ROM-Pfade bleiben erhalten.";
             });
             if(!completed)message.Text=status.Text;
         }));
@@ -103,3 +108,4 @@ public sealed partial class MainWindow
         status.Text="Bitte zuerst laufende Spiele und ES-DE beenden, damit Spielstände vollständig gesichert werden.";return false;
     }
 }
+
