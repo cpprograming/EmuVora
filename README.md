@@ -95,7 +95,7 @@ Alle Dateien in zusätzlich ausgewählten Ordnern werden kopiert. Wähle deshalb
 
 **Kompatibilität:** Ab 0.10 werden neue Sicherungen in Format 2 geschrieben. Ältere Format-1-Sicherungen bleiben lesbar; EmuVora 0.9 kann Format 2 nicht wiederherstellen. Grenzen: 100.000 Dateien und 20 GiB unkomprimierte Daten; Dateisystem-Verknüpfungen werden abgewiesen.
 
-Emulatorprogramme, Themes, ROM-Verzeichnisse und BIOS gehören nicht zur automatischen Datensicherung. Zusätzlich ausgewählte Ordner werden dagegen ohne Inhaltsfilter kopiert. Emulatoren, Cores, Themes und BIOS müssen nach einer Wiederherstellung gegebenenfalls erneut eingerichtet werden. ROM-Pfade bleiben unverändert.
+Importierte BIOS-/Firmware-Dateien können unter Einstellungen → Sicherung ausdrücklich eingeschlossen werden (standardmäßig aus). Dabei wird nur der firmware-Unterordner dieses Datenordners kopiert; externe BIOS-Pfade bleiben ausgenommen. Emulatorprogramme, Themes und ROM-Verzeichnisse gehören nicht zur automatischen Datensicherung. Zusätzlich ausgewählte Ordner werden dagegen ohne Inhaltsfilter kopiert. Emulatoren, Cores, Themes und BIOS müssen nach einer Wiederherstellung gegebenenfalls erneut eingerichtet werden. ROM-Pfade bleiben unverändert.
 
 Der bisherige JSON-Export unter **Verwaltung** tauscht nur Bibliothekseinträge aus und enthält keine Cover- oder Spielstandsdateien.
 
@@ -176,4 +176,5 @@ Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fe
 Der EmuVora-Code steht unter [MIT](LICENSE). Abhängigkeiten, Emulatoren, Themes und Cover unterliegen ihren eigenen Bedingungen; siehe [Drittanbieter-Hinweise](THIRD_PARTY_NOTICES.md).
 
 Emulator-Binaries, ROMs, BIOS und Theme-Pakete sind nicht im EmuVora-Programmpaket enthalten. Optionale Komponenten werden gesondert von ihren offiziellen Quellen geladen.
+
 

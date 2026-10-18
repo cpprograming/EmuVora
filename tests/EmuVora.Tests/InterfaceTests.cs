@@ -18,6 +18,13 @@ public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
 {
+    [AvaloniaFact] public void FirmwareBackupPreferenceIsOffByDefaultAndPersists()
+    {
+        using var dir=new TestDirectory();var store=new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json"));store.Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});
+        var window=new MainWindow(dir.Path);window.Show();window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Einstellungen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();
+        var dialog=Assert.Single(window.OwnedWindows);dialog.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex=5;Dispatcher.UIThread.RunJobs();
+        var firmware=dialog.GetVisualDescendants().OfType<CheckBox>().Single(c=>c.Content as string=="Importierte BIOS-/Firmware-Dateien mitsichern");Assert.False(firmware.IsChecked);firmware.IsChecked=true;Assert.True(store.Load().IncludeFirmwareInBackups);firmware.IsChecked=false;Assert.False(store.Load().IncludeFirmwareInBackups);dialog.Close();window.Close();
+    }
     [AvaloniaFact] public async Task CancellingDirectorySwitchDoesNotChangeEitherLibrary()
     {
         using var dir=new TestDirectory();var first=System.IO.Path.Combine(dir.Path,"first");var second=System.IO.Path.Combine(dir.Path,"second");

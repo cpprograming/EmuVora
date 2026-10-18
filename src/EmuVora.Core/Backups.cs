@@ -12,7 +12,7 @@ public static class Backups
 {
     private const long MaximumBytes=20L*1024*1024*1024;
     private static readonly string[] Folders=["covers","saves","states"];
-    // These are data folders only. Emulator executables, BIOS and ROMs are excluded.
+    // Firmware in the selected data folder is included only by explicit preference.
     public static async Task CreateAsync(string source,string destination,CancellationToken token=default)
     {
         source=Path.GetFullPath(source);destination=Path.GetFullPath(destination);
@@ -34,6 +34,7 @@ public static class Backups
             {input.Open();output.Open();input.BackupDatabase(output);}
             files.Add("library.db",Path.Combine(stage,"library.db"));
             foreach(var folder in Folders)AddFolder(Path.Combine(source,folder));
+            if(settings.IncludeFirmwareInBackups)AddFolder(EmulatorSetup.FirmwareDirectory(source));
             foreach(var (id,folders) in SaveData.Folders)
                 if(settings.EmulatorPaths.TryGetValue(id,out var executable)&&Inside(executable,source))
                     foreach(var folder in folders)AddFolder(Path.Combine(Path.GetDirectoryName(executable)!,folder));

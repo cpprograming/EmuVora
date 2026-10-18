@@ -13,4 +13,5 @@ Der mitgelieferte Erkennungskatalog enthält ausgewählte Signaturen für PS1, M
 
 Quelle der reinen Erkennungsmetadaten: [libretro-database/System.dat](https://github.com/libretro/libretro-database/blob/master/dat/System.dat), abgerufen am 17. Oktober 2026. Es werden keine BIOS-Inhalte heruntergeladen oder ins Repository aufgenommen. Beim Ordnerimport werden erkannte Dateien ebenfalls umbenannt; nicht erkannte Dateien behalten ihre relative Ordnerstruktur (etwa MSX Machines/Databases).
 
-Eigene BIOS-Dateien separat sichern, vorzugsweise auf einem zweiten Datenträger. Das öffentliche EmuVora-Repository ist kein persönlicher Sicherungsort. Die automatische EmuVora-Datensicherung enthält den Firmware-Ordner nicht.
+Eigene BIOS-Dateien separat sichern, vorzugsweise auf einem zweiten Datenträger. Das öffentliche EmuVora-Repository ist kein persönlicher Sicherungsort. Unter Einstellungen → Sicherung lässt sich „Importierte BIOS-/Firmware-Dateien mitsichern“ einschalten. Damit enthält dein persönliches Archiv den firmware-Unterordner einschließlich .bak-Dateien. Externe BIOS-Verzeichnisse werden nicht automatisch einbezogen. Das Archiv ist nicht verschlüsselt. Bei der Wiederherstellung landen enthaltene Dateien ausschließlich im neuen Datenordner; ursprüngliche Dateien bleiben erhalten.
+

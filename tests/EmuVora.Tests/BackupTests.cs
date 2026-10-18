@@ -7,6 +7,26 @@ namespace EmuVora.Tests;
 
 public class BackupTests
 {
+    [Theory][InlineData(false)][InlineData(true)]
+    public async Task FirmwareBackupIsOptInAndRestoresOnlyIntoANewLibrary(bool include)
+    {
+        using var dir=new TestDirectory();var original=dir.File("data/firmware/dc/dc_boot.bin","synthetic firmware");dir.File("data/firmware/own.bin.bak","old firmware");
+        var source=Path.Combine(dir.Path,"data");var settings=new SettingsStore(Path.Combine(source,"settings.json"));settings.Save(new(){IncludeFirmwareInBackups=include});_=new LibraryStore(Path.Combine(source,"library.db"));
+        var archive=Path.Combine(dir.Path,"backup.zip");await Backups.CreateAsync(source,archive);var manifest=Backups.Inspect(archive);
+        Assert.Equal(include?2:0,manifest.Files.Count(f=>f.Path.StartsWith("firmware/")));
+        var restored=await Backups.RestoreAsync(archive,dir.Path);Assert.NotEqual(source,restored);Assert.Equal("synthetic firmware",File.ReadAllText(original));
+        if(include){Assert.Equal("synthetic firmware",File.ReadAllText(Path.Combine(restored,"firmware/dc/dc_boot.bin")));Assert.Equal("old firmware",File.ReadAllText(Path.Combine(restored,"firmware/own.bin.bak")));}
+        else Assert.False(Directory.Exists(Path.Combine(restored,"firmware")));
+        Assert.Equal(include,new SettingsStore(Path.Combine(restored,"settings.json")).Load().IncludeFirmwareInBackups);
+    }
+    [Fact] public async Task CorruptedFirmwareFailsIntegrityWithoutChangingOriginals()
+    {
+        using var dir=new TestDirectory();var original=dir.File("data/firmware/own.bin","synthetic");var source=Path.Combine(dir.Path,"data");
+        new SettingsStore(Path.Combine(source,"settings.json")).Save(new(){IncludeFirmwareInBackups=true});_=new LibraryStore(Path.Combine(source,"library.db"));var file=Path.Combine(dir.Path,"backup.zip");await Backups.CreateAsync(source,file);
+        using(var zip=ZipFile.Open(file,ZipArchiveMode.Update)){zip.GetEntry("data/firmware/own.bin")!.Delete();using var entry=zip.CreateEntry("data/firmware/own.bin").Open();entry.Write("Synthetic"u8);}
+        await Assert.ThrowsAsync<IOException>(()=>Backups.RestoreAsync(file,dir.Path));Assert.Equal("synthetic",File.ReadAllText(original));
+        Assert.DoesNotContain(Directory.GetDirectories(dir.Path),p=>Path.GetFileName(p).StartsWith("EmuVora-Wiederhergestellt")||Path.GetFileName(p).StartsWith(".emuvora-restore"));
+    }
     [Theory]
     [InlineData("duckstation","memcards")][InlineData("pcsx2","sstates")]
     [InlineData("dolphin","User/Wii/title")][InlineData("ppsspp","memstick/PSP/SAVEDATA/game")]

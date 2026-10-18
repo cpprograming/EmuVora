@@ -1,6 +1,6 @@
 # EmuVora – Roadmap
 
-Stand: 17. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 18. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
 Aktueller geprüfter Release: [0.11.59](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.59).
 
@@ -13,6 +13,8 @@ Aktueller geprüfter Release: [0.11.59](https://github.com/cpprograming/EmuVora/
 - [x] Release 0.11.59 veröffentlicht, heruntergeladen und mit dem Updater einschließlich SHA-256 geprüft; 119 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
 
 Zusätzlich in 0.11.59: BIOS-Dateiauswahl korrigiert und automatische Benennung anhand bekannter Prüfsummen ergänzt; [Anleitung](BIOS_IMPORT.md).
+
+Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importierte Dateien können ausdrücklich ins eigene Archiv aufgenommen werden.
 
 ## 0.12 – Xbox und Plug-and-play
 
@@ -50,3 +52,4 @@ Zusätzlich in 0.11.59: BIOS-Dateiauswahl korrigiert und automatische Benennung 
 - [ ] Eine stabile EXE mit nachvollziehbaren Versionshinweisen veröffentlichen.
 
 Der detaillierte Arbeitsstand steht in der [Checkliste](CHECKLIST.md). Automatisierte Tests ersetzen die noch offenen Hardwaretests nicht.
+

@@ -15,6 +15,7 @@ public sealed class AppSettings
     public List<string> RomFolders {get;set;}=[];
     public List<ExternalSaveFolder> ExternalSaveFolders {get;set;}=[];
     public int BackupReminderDays {get;set;}
+    public bool IncludeFirmwareInBackups {get;set;}
     public DateTimeOffset? LastBackupAt {get;set;}
     public bool Fullscreen {get;set;}=true;
     public bool CheckAppUpdatesOnStartup {get;set;}=true;
