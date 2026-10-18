@@ -35,6 +35,9 @@ Abnahme: Ein gesichertes Spiel lässt sich nach Wiederherstellung und erneuter E
 
 ## 2. Xbox-Controller und Plug-and-play praktisch prüfen
 
+- [x] Geteilte Eingabelogik gegen wiederholte Bestätigung nach Wiederverbinden/Fokuswechsel und unbeabsichtigte Übernahme bei gleichzeitig gehaltenen Tasten ergänzt; simulierte Tests bestanden.
+- [x] Diagnoseansicht für alle vier XInput-Slots mit Tasten, beiden Sticks, Triggern und Verbindungswechseln eingebaut. [Hardware-Testanleitung](CONTROLLERS.md) verfügbar.
+
 - [ ] Xbox-Controller per USB und Bluetooth an echter Hardware testen.
 - [ ] Alle Hauptabläufe ohne Maus durchspielen: Einrichtung, Import, Einstellungen, Sicherung, Spielstart und Rückkehr.
 - [ ] Abziehen und erneutes Verbinden sowie Controllerwechsel während der Nutzung prüfen.
@@ -82,5 +85,6 @@ Abnahme: Keine verzerrte Darstellung durch das automatische Profil; nachvollzieh
 - [ ] ROMs, BIOS und persönliche Sicherungen nicht ins Repository hochladen.
 
 Empfohlener nächster Arbeitsschritt: Controller-Hardwaretests gemäß Roadmap 0.12 durchführen.
+
 
 

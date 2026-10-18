@@ -36,7 +36,7 @@ public sealed partial class MainWindow
             }
             if(step==2)
             {
-                Text("Xbox-Controller per USB, Bluetooth oder Xbox-Adapter verbinden. EmuVora erkennt Windows-XInput-Controller automatisch. Du kannst ohne Controller fortfahren und ihn später anschließen.");content.Children.Add(pad);
+                Text("Xbox-Controller per USB, Bluetooth oder Xbox-Adapter verbinden. EmuVora erkennt Windows-XInput-Controller automatisch. Du kannst ohne Controller fortfahren und ihn später anschließen.");content.Children.Add(pad);content.Children.Add(AsyncButton("Xbox-Controller prüfen",ShowControllerDiagnosticsAsync));
                 var xbox=new CheckBox{Content="Xbox-Standardbelegung bei neuen Emulator-Profilen",IsChecked=settings.XboxDefaults};xbox.IsCheckedChanged+=(_,_)=>{settings.XboxDefaults=xbox.IsChecked==true;settingsStore.Save(settings);};content.Children.Add(xbox);Text("Bibliothek: Stick/D-Pad wählen · A spielen · Y Favorit · LB/RB Konsole · Menu Einstellungen · View Bedienelemente, B zurück zur Spieleliste. Texteingabe öffnet eine Bildschirmtastatur. View + Menu beendet unterstützte Emulatoren.");
             }
             if(step==3)
@@ -61,4 +61,5 @@ public sealed partial class MainWindow
         dialog.Opened+=(_,_)=>timer.Start();dialog.Closed+=(_,_)=>timer.Stop();dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();feedback.Text="Vorgang wird abgebrochen …";}};Render();await dialog.ShowDialog(this);
     }
 }
+
 

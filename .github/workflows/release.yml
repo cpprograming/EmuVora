@@ -16,7 +16,7 @@ jobs:
         run: '"APP_VERSION=$((''${{ github.ref_name }}'').TrimStart(''v''))" >> $env:GITHUB_ENV'
       - run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:Version=${{ env.APP_VERSION }} -o publish
       - shell: pwsh
-        run: Copy-Item README.md, CHECKLIST.md, ROADMAP.md, DATA_LOCATIONS.md, BIOS_IMPORT.md, GUIDED_SETUP.md, APP_UPDATES.md, BACKUPS.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LIBRARY_AND_DISPLAY.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd, installer/EmuVora.ico -Destination publish/
+        run: Copy-Item README.md, CHECKLIST.md, ROADMAP.md, DATA_LOCATIONS.md, BIOS_IMPORT.md, CONTROLLERS.md, GUIDED_SETUP.md, APP_UPDATES.md, BACKUPS.md, STORAGE_AND_THEMES.md, ALEKFULL_ESDE.md, LIBRARY_AND_DISPLAY.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd, installer/EmuVora.ico -Destination publish/
       - shell: pwsh
         run: Compress-Archive -Path publish/* -DestinationPath EmuVora-win-x64.zip
       - shell: pwsh
@@ -26,5 +26,6 @@ jobs:
           files: |
             EmuVora-win-x64.zip
             EmuVora-Setup.exe
+
 
 

@@ -70,11 +70,8 @@ public sealed partial class MainWindow : Window
     private readonly List<Button> operationButtons=[];
     private readonly Dictionary<string,Button> viewButtons=[];
     private readonly DispatcherTimer gamepadTimer=new(){Interval=TimeSpan.FromMilliseconds(100)};
-    private ushort previousButtons;
+    private readonly GamepadNavigation gamepadNavigation=new();
     private readonly TextBlock controllerStatus=new(){TextWrapping=TextWrapping.Wrap,FontSize=12};
-    private long repeatAt;
-    private ushort previousDirection;
-    private int controllerIndex=-1;
     private bool dialogOpen;
     private bool controllerUiMode;
     public MainWindow():this(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"EmuVora")){ }
@@ -362,13 +359,8 @@ public sealed partial class MainWindow : Window
     private async Task HandleGamepadAsync()
     {
         var pads=Gamepad.Read();controllerStatus.Text=pads.Length==0?"Xbox-Controller: nicht verbunden":"Xbox-Controller: "+pads.Length+" verbunden\nD-Pad: wählen · A: spielen · Y: Favorit\nLB/RB: System · Menu: Einstellungen\nView: Bedienelemente · B: Spieleliste";
-        var active=pads.FirstOrDefault(p=>Gamepad.NavigationButtons(p)!=0);if(active==default&&pads.Length>0)active=pads[0];
-        if(active.Index!=controllerIndex){previousButtons=0;previousDirection=0;controllerIndex=active.Index;}
-        var buttons=Gamepad.NavigationButtons(active);var pressed=buttons&~previousButtons;previousButtons=buttons;
-        var direction=(ushort)(buttons&15);var now=Environment.TickCount64;
-        if(direction!=previousDirection){previousDirection=direction;repeatAt=now+400;}
-        else if(direction!=0&&now>=repeatAt){pressed|=direction;repeatAt=now+140;}
-        if(!IsActive||dialogOpen||running.Count>0||pressed==0)return;
+        var pressed=gamepadNavigation.Poll(pads,IsActive&&!dialogOpen&&running.Count==0,Environment.TickCount64);
+        if(pressed==0)return;
         await HandleLibraryControllerAsync((ushort)pressed);
     }
     public async Task HandleLibraryControllerAsync(ushort pressed)
@@ -640,6 +632,7 @@ public sealed partial class MainWindow : Window
             await BusyAsync(async token=>{catalog=await packages.GetCatalogAsync(token);foreach(var id in EmulatorCatalog.Known.Select(e=>e.Id).Append("retroarch-cores"))await InstallManagedAsync(id,token);status.Text="Emulatoren, Cores und Xbox-Standardbelegung eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";});
         }));
         panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch / PS1 / PS2: View + Menu beendet das Spiel; View + RB öffnet das Menü. Dolphin: View + Menu beendet; PPSSPP: LT öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
+        panel.Children.Add(AsyncButton("Xbox-Controller prüfen",ShowControllerDiagnosticsAsync));
         panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await new ControllerPicker(this).OpenFilePathsAsync("Eigene BIOS-/Firmware-Dateien");if(files.Length==0)return;await ImportFirmwareFilesAsync(files);}));
         panel.Children.Add(AsyncButton("Firmware-Ordner importieren (z. B. MSX)",async()=>
         {
@@ -684,5 +677,6 @@ public sealed partial class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
+
 
 
