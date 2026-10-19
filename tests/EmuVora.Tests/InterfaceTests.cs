@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
-using Avalonia.Themes.Fluent;
+using FluentAvalonia.Styling;
 using Avalonia.VisualTree;
 using Avalonia.Threading;
 using EmuVora.App;
@@ -13,7 +13,7 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization=true)]
 namespace EmuVora.Tests;
 public sealed class TestApplication:Application
-{public override void Initialize()=>Styles.Add(new FluentTheme());}
+{public override void Initialize()=>Styles.Add(new FluentAvaloniaTheme {PreferSystemTheme=false,PreferUserAccentColor=false});}
 public class TestAppBuilder
 {public static AppBuilder BuildAvaloniaApp()=>AppBuilder.Configure<TestApplication>().UseSkia().UseHeadless(new(){UseHeadlessDrawing=false});}
 public class InterfaceTests
@@ -159,3 +159,4 @@ public class InterfaceTests
         var play=window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="▶ Spielen");Assert.True(play.IsEnabled);window.Close();
     }
 }
+

@@ -30,12 +30,13 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 
 ## 0.13 – Einheitliche Oberfläche
 
-Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). FluentAvalonia zunächst auf Controllerbedienung und Kompatibilität mit unseren Themes prüfen.
+Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). FluentAvaloniaUI 2.5.1 als Bedienelement-Basis integriert; die vier Farbschemata und Controller-Raster sind automatisch geprüft. [TV-Modus](TV_MODE.md).
 
 - [ ] Dialoge, Abstände, Schriften und Schaltflächen vereinheitlichen.
-- [ ] Optionalen TV-Modus mit großen Covern, lesbaren Texten und klarem Fokus ergänzen.
-- [ ] Leere Bibliothek, fehlende Cover, Downloads und Fehlerzustände verständlich darstellen.
-- [ ] Direkte Theme-Unterstützung und separate ES-DE-Darstellung klar unterscheiden.
+- [x] Optionalen TV-Modus mit großen Covern, lesbaren Texten und sichtbarer Auswahl ergänzen.
+- [x] Leere Bibliothek und ergebnislose Filter mit eigenen Fluent-Infobereichen unterscheiden.
+- [ ] Fehlende Cover, Downloads und Fehlerzustände weiter vereinheitlichen.
+- [x] Direkte Theme-Unterstützung und separate ES-DE-Darstellung in Einstellungen und Anleitung unterscheiden.
 
 ## 0.14 – Spielebibliothek
 
@@ -59,5 +60,6 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [ ] Eine stabile EXE mit nachvollziehbaren Versionshinweisen veröffentlichen.
 
 Der detaillierte Arbeitsstand steht in der [Checkliste](CHECKLIST.md). Automatisierte Tests ersetzen die noch offenen Hardwaretests nicht.
+
 
 

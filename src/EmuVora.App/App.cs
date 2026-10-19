@@ -1,13 +1,13 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Themes.Fluent;
+using FluentAvalonia.Styling;
 using Avalonia.Controls;
 using Avalonia.Media;
 using EmuVora.Core;
 namespace EmuVora.App;
 public class App : Application
 {
-    public override void Initialize() => Styles.Add(new FluentTheme());
+    public override void Initialize() => Styles.Add(new FluentAvaloniaTheme {PreferSystemTheme=false,PreferUserAccentColor=false});
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -37,3 +37,4 @@ public class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 }
+
