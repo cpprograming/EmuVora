@@ -1,0 +1,114 @@
+[
+  {
+    "System": "GB",
+    "Path": "metadat/no-intro/Nintendo - Game Boy.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 494585,
+    "Sha256": "2dc0e5dd0ec696b60a4fc1987b1f84814a08cebc31138551f2e7ef9f11e10f74"
+  },
+  {
+    "System": "GBC",
+    "Path": "metadat/no-intro/Nintendo - Game Boy Color.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 625655,
+    "Sha256": "63cd203e8bc36273f13129be0b039c023f8475e5c82e69776bf659534041fb5a"
+  },
+  {
+    "System": "GBA",
+    "Path": "metadat/no-intro/Nintendo - Game Boy Advance.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 963559,
+    "Sha256": "0b8bd3a414276e9c31137b0a245fcdaf917d34fd035e02499c965a290ac8fce4"
+  },
+  {
+    "System": "NES",
+    "Path": "metadat/no-intro/Nintendo - Nintendo Entertainment System.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 3104048,
+    "Sha256": "f8afe5fd148ba547287b1c5ddd1a92bb7fc3a42351205c466fe380da18aec34b"
+  },
+  {
+    "System": "SNES",
+    "Path": "metadat/no-intro/Nintendo - Super Nintendo Entertainment System.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 860999,
+    "Sha256": "76bb6fc95243d03c0842b0600c34c9a0e6e711be0027d7d4fe90330658ae20ec"
+  },
+  {
+    "System": "Mega Drive",
+    "Path": "metadat/no-intro/Sega - Mega Drive - Genesis.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 714716,
+    "Sha256": "e052f983974041df633e7dc9221e462d106c9a336b2e2c705dc432fe76d6c36e"
+  },
+  {
+    "System": "Master System",
+    "Path": "metadat/no-intro/Sega - Master System - Mark III.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 240962,
+    "Sha256": "3ea6caadfea1ba168a9dbb6528abe1f6671eb34609d4ed2e0a4f8332d8a7f78b"
+  },
+  {
+    "System": "Game Gear",
+    "Path": "metadat/no-intro/Sega - Game Gear.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 136386,
+    "Sha256": "dc978b44b24621ee91e91944162b4c1685013d1b36182688de1139f067e0ebe0"
+  },
+  {
+    "System": "32X",
+    "Path": "metadat/no-intro/Sega - 32X.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 17072,
+    "Sha256": "e8acc0c60caa516f4c361003e7b43dd60108158fde6c32ae1dc87949de5380a5"
+  },
+  {
+    "System": "Atari 2600",
+    "Path": "metadat/no-intro/Atari - 2600.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 184738,
+    "Sha256": "77a4ad1f3d9031b5b4062f095dc5fd07f386d652f1b28a7f0498bc45a2008f40"
+  },
+  {
+    "System": "Atari 5200",
+    "Path": "metadat/no-intro/Atari - 5200.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 34705,
+    "Sha256": "2b56ca2767649afb8b48144b3630c367a0476ae72a14b78efdef6281b7a25c79"
+  },
+  {
+    "System": "Atari 7800",
+    "Path": "metadat/no-intro/Atari - 7800.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 74254,
+    "Sha256": "b1e72e08dc8b2f52d5508828d185280c46c6a8a8814edcdb74400f2bb56852e7"
+  },
+  {
+    "System": "WonderSwan",
+    "Path": "metadat/no-intro/Bandai - WonderSwan.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 52081,
+    "Sha256": "9475840aee1198ce45eebe419c2357b87f26614abfec73ee2f73212bddc627de"
+  },
+  {
+    "System": "WonderSwan Color",
+    "Path": "metadat/no-intro/Bandai - WonderSwan Color.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 55276,
+    "Sha256": "7eb78689dd5c24b68d551953d8436518381d6a2ee57450c7e9058150671c6d06"
+  },
+  {
+    "System": "PC Engine",
+    "Path": "metadat/no-intro/NEC - PC Engine - TurboGrafx 16.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 108957,
+    "Sha256": "d71407c0be5e17a44e26d5728b6c19a5a994ad10789268c619168d25418f004f"
+  },
+  {
+    "System": "SuperGrafx",
+    "Path": "metadat/no-intro/NEC - PC Engine SuperGrafx.dat",
+    "Commit": "12c21cf79f1e20eff6ac68b80875816c717d0a7a",
+    "Size": 1329,
+    "Sha256": "4b186c137a67f58bc5bc6c3f98978b48c2a68453049a94b4609888c31e070b5a"
+  }
+]

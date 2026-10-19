@@ -50,3 +50,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Optional ROM recognition metadata
+
+The optional metadata feature downloads original No-Intro DATs from https://github.com/libretro/libretro-database at commit 12c21cf79f1e20eff6ac68b80875816c717d0a7a. Upstream repository license: CC-BY-SA-4.0, https://creativecommons.org/licenses/by-sa/4.0/. Source metadata and original headers remain in the local cache. Only source URLs and content hashes are included in EmuVora; no complete ROM catalogs or ROM data are bundled. See ROM_RECOGNITION.md for attribution and supported scope.

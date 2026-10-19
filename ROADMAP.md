@@ -42,6 +42,8 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 ## 0.14 – Spielebibliothek
 
+- [x] Prüfsummen-Erkennung mit bestätigter Titelvorschau für 16 Cartridge-Systeme integriert; Schutz eigener Bearbeitungen und lokaler ROM-Dateien. [Anleitung](ROM_RECOGNITION.md).
+
 - [ ] Eigene Sammlungen und zusätzliche Ansichten ergänzen.
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
 - [ ] Umgezogene ROM-Ordner neu zuordnen, ohne Favoriten und Verlauf zu verlieren.
@@ -62,6 +64,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [ ] Eine stabile EXE mit nachvollziehbaren Versionshinweisen veröffentlichen.
 
 Der detaillierte Arbeitsstand steht in der [Checkliste](CHECKLIST.md). Automatisierte Tests ersetzen die noch offenen Hardwaretests nicht.
+
 
 
 

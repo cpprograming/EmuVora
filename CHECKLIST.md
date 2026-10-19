@@ -60,6 +60,8 @@ Abnahme: Einrichtung, Bibliothek und Einstellungen wirken zusammengehörig und b
 
 ## 4. Bibliothek und Cover verbessern
 
+- [x] Festgelegte libretro-/No-Intro-Kataloge mit SHA-256 prüfen und lokale ROMs per Größe/SHA-1 erkennen. Titelübernahme nach Vorschau; eigene Bearbeitungen, Pfade, Cover und Verlauf erhalten. [Umfang: 16 Systeme](ROM_RECOGNITION.md).
+
 - [ ] Eigene Sammlungen und Filter für zuletzt hinzugefügt, zuletzt gespielt und Favoriten ergänzen.
 - [ ] Mehrdisc-Spiele, doppelte Einträge und umbenannte ROM-Ordner verständlich verwalten.
 - [ ] Cover-Treffer vor einem manuellen Austausch anzeigen und falsche Zuordnungen korrigierbar machen.
@@ -87,6 +89,7 @@ Abnahme: Keine verzerrte Darstellung durch das automatische Profil; nachvollzieh
 - [ ] ROMs, BIOS und persönliche Sicherungen nicht ins Repository hochladen.
 
 Nächste Schritte: Controller-Hardwaretests gemäß Roadmap 0.12 durchführen; unabhängig davon weitere Oberflächenzustände gemäß 0.13 und Spielerkennung gemäß 0.14 verbessern. Siehe [Repository-Plan](REPOSITORY_PLAN.md).
+
 
 
 
