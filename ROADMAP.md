@@ -1,8 +1,8 @@
 # EmuVora – Roadmap
 
-Stand: 18. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 19. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.11.61](https://github.com/cpprograming/EmuVora/releases/tag/v0.11.61).
+Aktueller geprüfter Release: [0.12.64](https://github.com/cpprograming/EmuVora/releases/tag/v0.12.64).
 
 ## 0.11 – Daten und Wiederherstellung (abgeschlossen)
 
@@ -20,6 +20,7 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 
 - [x] Gemeinsame Eingabelogik für Bibliothek und Dialoge: Wiederverbinden, Fokuswechsel, Wiederholung und Übernahme zwischen Controllern automatisiert geprüft.
 - [x] Diagnoseansicht für vier XInput-Slots mit Tasten, Sticks, Triggern und Verbindungswechseln ergänzt.
+- [x] Release 0.12.64 veröffentlicht und per Updater geprüft; 134 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
 - [x] Praktische Prüfschritte in [CONTROLLERS.md](CONTROLLERS.md) dokumentiert.
 
 - [ ] Xbox-Controller per USB und Bluetooth auf echter Hardware testen.
@@ -28,6 +29,8 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 - [ ] Fokusführung und Tastensymbole anhand der Ergebnisse verbessern.
 
 ## 0.13 – Einheitliche Oberfläche
+
+Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). FluentAvalonia zunächst auf Controllerbedienung und Kompatibilität mit unseren Themes prüfen.
 
 - [ ] Dialoge, Abstände, Schriften und Schaltflächen vereinheitlichen.
 - [ ] Optionalen TV-Modus mit großen Covern, lesbaren Texten und klarem Fokus ergänzen.
