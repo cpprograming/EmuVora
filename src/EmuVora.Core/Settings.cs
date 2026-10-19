@@ -26,6 +26,7 @@ public sealed class AppSettings
     public bool AutoDownloadCovers {get;set;}=true;
     public string CoverRegion {get;set;}="Europe";
     public int CoverSize {get;set;}=164;
+    public bool TvMode {get;set;}
     public bool ShowGameDetails {get;set;}=true;
     public bool AutomaticDisplay {get;set;}=true;
     public string DisplayMode {get;set;}="Automatic";

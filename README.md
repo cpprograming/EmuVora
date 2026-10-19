@@ -12,6 +12,10 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
 
+## Oberfläche und TV-Modus – neu in 0.13
+
+FluentAvalonia sorgt für eine gemeinsame Basis der Bedienelemente. Unter **Einstellungen → Darstellung** den optionalen **TV-Modus** einschalten: größere Cover und Bedienelemente, umbrechende Beschriftungen und sichtbare Spielauswahl. Die Controller-Navigation berücksichtigt die tatsächlichen Cover-Spalten. [Anleitung und Grenzen](TV_MODE.md).
+
 ## BIOS-Import verbessert in 0.11.59
 
 Die Dateiauswahl unterstützt Doppelklick und einen stets sichtbaren Übernehmen-Knopf. Bekannte BIOS-Dateien werden offline anhand von Prüfsummen erkannt und beim Kopieren automatisch passend benannt. Originale bleiben erhalten; eine Ergebnisübersicht zeigt Zielnamen und Fehler. [Anleitung und Grenzen](BIOS_IMPORT.md).
@@ -180,6 +184,7 @@ Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fe
 Der EmuVora-Code steht unter [MIT](LICENSE). Abhängigkeiten, Emulatoren, Themes und Cover unterliegen ihren eigenen Bedingungen; siehe [Drittanbieter-Hinweise](THIRD_PARTY_NOTICES.md).
 
 Emulator-Binaries, ROMs, BIOS und Theme-Pakete sind nicht im EmuVora-Programmpaket enthalten. Optionale Komponenten werden gesondert von ihren offiziellen Quellen geladen.
+
 
 
 

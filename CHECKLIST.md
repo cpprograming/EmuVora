@@ -48,8 +48,10 @@ Abnahme: Die üblichen Abläufe funktionieren mit einem Xbox-Controller ohne fes
 
 ## 3. Einheitliche Oberfläche und TV-Modus
 
+- [x] FluentAvaloniaUI 2.5.1 als gemeinsame Bedienelement-Basis integriert; alle vier Farbschemata rendern automatisch geprüft. [TV-Anleitung](TV_MODE.md).
+
 - [ ] Abstände, Schriften, Farben, Schaltflächen und Dialoge durchgehend vereinheitlichen.
-- [ ] Optionalen TV-Modus mit größeren Covern, gut lesbaren Texten und sichtbarem Controllerfokus ergänzen.
+- [x] Optionalen TV-Modus mit größeren Covern, gut lesbaren Bedienelementen und sichtbarer Spielauswahl ergänzen; Dialogübernahme und Controller-Raster automatisiert geprüft.
 - [ ] Leere Bibliothek, fehlende Cover, laufende Downloads und Fehlerzustände verständlich gestalten.
 - [ ] Theme-Kompatibilität klar kennzeichnen: direkt unterstützte Elemente gegenüber Themes, die über ES-DE laufen.
 - [ ] AlekFull-Darstellung auf echter Hardware mit 16:9, 16:10 und 4:3 prüfen; Theme-Lizenzhinweise erhalten.
@@ -85,6 +87,7 @@ Abnahme: Keine verzerrte Darstellung durch das automatische Profil; nachvollzieh
 - [ ] ROMs, BIOS und persönliche Sicherungen nicht ins Repository hochladen.
 
 Nächste Schritte: Controller-Hardwaretests gemäß Roadmap 0.12 durchführen; unabhängig davon Oberfläche und TV-Modus gemäß 0.13 verbessern. Siehe [Repository-Plan](REPOSITORY_PLAN.md).
+
 
 
 
