@@ -2,7 +2,7 @@
 
 Stand: 19. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.12.64](https://github.com/cpprograming/EmuVora/releases/tag/v0.12.64).
+Aktueller geprüfter Release: [0.13.66](https://github.com/cpprograming/EmuVora/releases/tag/v0.13.66).
 
 ## 0.11 – Daten und Wiederherstellung (abgeschlossen)
 
@@ -28,7 +28,9 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 - [ ] Abziehen, Wiederverbinden, Controllerwechsel und mehrere Spieler praktisch prüfen.
 - [ ] Fokusführung und Tastensymbole anhand der Ergebnisse verbessern.
 
-## 0.13 – Einheitliche Oberfläche
+## 0.13 – Einheitliche Oberfläche (Fluent/TV veröffentlicht, weitere Zustände offen)
+
+- [x] Release 0.13.66 veröffentlicht, heruntergeladen und per Updater einschließlich SHA-256 geprüft; 138 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
 
 Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). FluentAvaloniaUI 2.5.1 als Bedienelement-Basis integriert; die vier Farbschemata und Controller-Raster sind automatisch geprüft. [TV-Modus](TV_MODE.md).
 

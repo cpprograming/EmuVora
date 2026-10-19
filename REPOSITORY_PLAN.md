@@ -1,6 +1,6 @@
 # Öffentliche Repositories für EmuVora
 
-Geprüft am 19. Oktober 2026. Stand: FluentAvaloniaUI 2.5.1 ist als gemeinsame Bedienelement-Basis integriert. Die weiteren unten genannten Erweiterungen sind noch nicht eingebaut.
+Geprüft am 19. Oktober 2026. Stand: FluentAvaloniaUI 2.5.1 ist als gemeinsame Bedienelement-Basis in [Release 0.13.66](https://github.com/cpprograming/EmuVora/releases/tag/v0.13.66) integriert. Die weiteren unten genannten Erweiterungen sind noch nicht eingebaut.
 
 | Priorität | Repository | Nutzen für EmuVora |
 | --- | --- | --- |

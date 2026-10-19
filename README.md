@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.12.64](https://github.com/cpprograming/EmuVora/releases/tag/v0.12.64)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.13.66](https://github.com/cpprograming/EmuVora/releases/tag/v0.13.66)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -171,13 +171,13 @@ $env:EMUVORA_PACKAGE_CATALOG = (Resolve-Path catalog/packages.json).Path
 dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Category=Network"
 ```
 
-**Für Release 0.12.64 bestanden:** 134 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
+**Für Release 0.13.66 bestanden:** 138 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
 
 Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsintegrität, externe Ordner, Wiederherstellung älterer Archive und Dateipfade ab. Avalonia-Tests erzeugen UI-Aufnahmen; die GitHub-Artefakte enthalten **EmuVora-UI-previews**. Echte Hardwaretests stehen separat auf der Checkliste.
 
 ## Nächste Schritte
 
-Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Xbox-Hardwaretests bleiben offen. Der Softwareteil für Eingabewechsel und Diagnose ist ab 0.12.64 verfügbar; als nächste Implementierung folgen TV-Darstellung und Bibliothekskomfort. Geprüfte externe Projekte stehen im [Repository-Plan](REPOSITORY_PLAN.md).
+Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Xbox-Hardwaretests bleiben offen. Der Softwareteil für Eingabewechsel und Diagnose ist ab 0.12.64 verfügbar; FluentAvalonia und TV-Modus sind ab 0.13.66 verfügbar. Als nächste Schritte folgen weitere Oberflächenzustände und datenbankgestützte Spielerkennung. Geprüfte externe Projekte stehen im [Repository-Plan](REPOSITORY_PLAN.md).
 
 ## Lizenz
 
