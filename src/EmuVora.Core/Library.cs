@@ -151,6 +151,26 @@ public sealed class LibraryStore
         tx.Commit();
     }
     public void Update(Game game)=>Execute("UPDATE games SET title=$t,system=$s,favorite=$f,customized=1 WHERE path=$p COLLATE NOCASE",game);
+    public IReadOnlyList<Game> RecognitionCandidates(string system)
+    {
+        using var c=Open();using var cmd=c.CreateCommand();cmd.CommandText="SELECT title,system,path,favorite,lastPlayed,playCount FROM games WHERE customized=0 AND system=$s ORDER BY path";cmd.Parameters.AddWithValue("$s",system);
+        var result=new List<Game>();using var r=cmd.ExecuteReader();while(r.Read())result.Add(new(r.GetString(0),r.GetString(1),r.GetString(2),r.GetInt32(3)!=0,r.IsDBNull(4)?null:DateTimeOffset.Parse(r.GetString(4)),r.GetInt32(5)));return result;
+    }
+    public int ApplyRecognition(IEnumerable<TitleSuggestion> suggestions)
+    {
+        using var c=Open();using var tx=c.BeginTransaction();var changed=0;
+        foreach(var suggestion in suggestions)
+        {
+            if(string.IsNullOrWhiteSpace(suggestion.Title)||suggestion.Title.Length>512||suggestion.Title.Any(char.IsControl))throw new InvalidDataException("Ungültiger Spieltitel.");
+            if(suggestion.SourceLength.HasValue)
+            {
+                try{var file=new FileInfo(suggestion.Path);if(!file.Exists||file.Length!=suggestion.SourceLength||file.LastWriteTimeUtc!=suggestion.SourceLastWriteUtc)continue;}
+                catch(Exception ex) when(ex is IOException or UnauthorizedAccessException){continue;}
+            }
+            using var cmd=c.CreateCommand();cmd.Transaction=tx;cmd.CommandText="UPDATE games SET title=$t WHERE path=$p COLLATE NOCASE AND title=$old AND system=$s AND customized=0";
+            cmd.Parameters.AddWithValue("$p",suggestion.Path);cmd.Parameters.AddWithValue("$t",suggestion.Title);cmd.Parameters.AddWithValue("$old",suggestion.PreviousTitle);cmd.Parameters.AddWithValue("$s",suggestion.System);changed+=cmd.ExecuteNonQuery();
+        }tx.Commit();return changed;
+    }
     public void Remove(Game game)=>Execute("DELETE FROM games WHERE path=$p COLLATE NOCASE",game);
     public void MarkPlayed(Game game)
     {
