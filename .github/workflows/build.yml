@@ -20,9 +20,10 @@ jobs:
       - name: Determine version
         shell: pwsh
         run: |
-          $taskBase = ([xml](Get-Content src/EmuVora.App/EmuVora.App.csproj)).Project.PropertyGroup.Version
-          $taskVersion = $taskBase
-          if ('${{ github.event_name }}' -eq 'push' -and '${{ github.ref }}' -eq 'refs/heads/main') { $taskVersion = ([version]$taskBase).ToString(2) + '.${{ github.run_number }}' }
+          $taskProject = [xml](Get-Content -Raw src/EmuVora.App/EmuVora.App.csproj)
+          $taskBase = [version]$taskProject.SelectSingleNode('/Project/PropertyGroup/Version').InnerText
+          $taskVersion = $taskBase.ToString(3)
+          if ('${{ github.event_name }}' -eq 'push' -and '${{ github.ref }}' -eq 'refs/heads/main') { $taskVersion = $taskBase.ToString(2) + '.${{ github.run_number }}' }
           "APP_VERSION=$taskVersion" >> $env:GITHUB_ENV
       - name: Restore
         run: dotnet restore EmuVora.sln
