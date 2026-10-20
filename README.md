@@ -12,6 +12,10 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
 
+## Mehr Controller in EmuVora
+
+SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads automatisch für Bibliothek und Dialoge. Unter **Einstellungen → Emulatoren → Controller prüfen** Namen, Verbindung und Eingaben ansehen. XInput bleibt als Rückfall erhalten. Xbox-Spielprofile bleiben erhalten; andere Spielprofile werden weiterhin im Emulator eingerichtet. [Umfang, Herkunft und Tests](CONTROLLERS.md).
+
 ## Neues Logo und Bibliotheksdesign
 
 EmuVora verwendet ein eigenes mintfarbenes App-Zeichen, ruhigere Navigation, überarbeitete Cover-Karten und eine klar gegliederte Detailansicht. Helles und dunkles Design sowie TV-Modus bleiben verfügbar. Der Einrichtungsassistent, erneutes Scannen und ES-DE liegen jetzt unter **Verwaltung**. [Vorschau, Gestaltung und Prüfungen](https://github.com/cpprograming/EmuVora/blob/main/design/README.md).
@@ -58,7 +62,7 @@ Details: [Bibliothek und Bildqualität](LIBRARY_AND_DISPLAY.md).
 
 Die Oberfläche unterstützt Xbox-/XInput-Navigation einschließlich Einstellungen, Dialogen, Dateiauswahl und Bildschirmtastatur.
 
-Neu in 0.12: **Xbox-Controller prüfen** unter Einstellungen → Emulatoren oder im Einrichtungsassistenten zeigt Tasten, beide Sticks, Trigger und Verbindungswechsel für bis zu vier XInput-Slots. Bibliothek und Dialoge unterdrücken gehaltene Eingaben nach Verbindungs-/Fokuswechseln; die Navigation wechselt bei mehreren Controllern erst nach Freigabe des aktiven Controllers. Details und noch offene Hardwaretests: [Controller-Anleitung](CONTROLLERS.md).
+Neu in 0.12: **Controller prüfen** unter Einstellungen → Emulatoren oder im Einrichtungsassistenten zeigt Tasten, beide Sticks, Trigger und Verbindungswechsel für bis zu vier XInput-Slots. Bibliothek und Dialoge unterdrücken gehaltene Eingaben nach Verbindungs-/Fokuswechseln; die Navigation wechselt bei mehreren Controllern erst nach Freigabe des aktiven Controllers. Details und noch offene Hardwaretests: [Controller-Anleitung](CONTROLLERS.md).
 
 | Eingabe | In der Spielebibliothek |
 | --- | --- |

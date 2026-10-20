@@ -22,7 +22,7 @@ public sealed partial class MainWindow
         void Render()
         {
             content.Children.Clear();feedback.Text="";previous.IsEnabled=step>0;next.Content=step==4?"Zur Bibliothek":"Weiter";
-            title.Text=(step+1)+" / 5 · "+new[]{"Dein Speicherort","Deine Spiele","Dein Xbox-Controller","Emulatoren und BIOS","Bereit zum Spielen"}[step];
+            title.Text=(step+1)+" / 5 · "+new[]{"Dein Speicherort","Deine Spiele","Dein Controller","Emulatoren und BIOS","Bereit zum Spielen"}[step];
             if(step==0)
             {
                 Text("Datenordner: "+dataDir);Text("Hier bleiben Bibliothek, Cover, Emulatoren und verwaltete Spielstände. Deine ROMs bleiben in ihren bisherigen Ordnern. Den Programmordner hast du im Setup gewählt; portable Kopien wählen den Datenordner vor diesem Assistenten.");
@@ -36,7 +36,7 @@ public sealed partial class MainWindow
             }
             if(step==2)
             {
-                Text("Xbox-Controller per USB, Bluetooth oder Xbox-Adapter verbinden. EmuVora erkennt Windows-XInput-Controller automatisch. Du kannst ohne Controller fortfahren und ihn später anschließen.");content.Children.Add(pad);content.Children.Add(AsyncButton("Xbox-Controller prüfen",ShowControllerDiagnosticsAsync));
+                Text("Xbox- oder anderes unterstütztes Gamepad verbinden. EmuVora erkennt Geräte und Tastenbelegung über SDL automatisch. A/B/X/Y folgen den Positionen des Xbox-Layouts. Für Spiele bleiben die Xbox-Standardprofile verfügbar; andere Controller im jeweiligen Emulator einrichten. Du kannst ohne Controller fortfahren und ihn später anschließen.");content.Children.Add(pad);content.Children.Add(AsyncButton("Controller prüfen",ShowControllerDiagnosticsAsync));
                 var xbox=new CheckBox{Content="Xbox-Standardbelegung bei neuen Emulator-Profilen",IsChecked=settings.XboxDefaults};xbox.IsCheckedChanged+=(_,_)=>{settings.XboxDefaults=xbox.IsChecked==true;settingsStore.Save(settings);};content.Children.Add(xbox);Text("Bibliothek: Stick/D-Pad wählen · A spielen · Y Favorit · LB/RB Konsole · Menu Einstellungen · View Bedienelemente, B zurück zur Spieleliste. Texteingabe öffnet eine Bildschirmtastatur. View + Menu beendet unterstützte Emulatoren.");
             }
             if(step==3)
@@ -57,7 +57,7 @@ public sealed partial class MainWindow
                 foreach(var system in allGames.Select(g=>g.System).Distinct().Order()){var definition=EmulatorCatalog.Known.FirstOrDefault(e=>e.Systems.Contains(system));var installed=definition!=null&&File.Exists(settings.EmulatorPaths.GetValueOrDefault(definition.Id));Text(system+": "+(installed?"Emulator vorhanden":"Emulator beim ersten Start einrichten")+(SetupPlan.FirmwareHint(system,dataDir,settings) is{} hint?" · "+hint:""));}
             }
         }
-        var timer=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(250)};timer.Tick+=(_,_)=>{var connected=Gamepad.Read();pad.Text=connected.Length==0?"Xbox-Controller: noch nicht verbunden":"Xbox-Controller: "+connected.Length+" verbunden · Eingabe: "+string.Join(", ",connected.Select(p=>"#"+(p.Index+1)+" · "+Gamepad.NavigationButtons(p).ToString("X4")));if(operation!=null)feedback.Text=status.Text;};
+        var timer=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(250)};timer.Tick+=(_,_)=>{var connected=Gamepad.Read();pad.Text=connected.Length==0?"Controller: noch nicht verbunden":"Controller: "+connected.Length+" verbunden · "+string.Join(", ",connected.Select(Gamepad.Label));if(operation!=null)feedback.Text=status.Text;};
         dialog.Opened+=(_,_)=>timer.Start();dialog.Closed+=(_,_)=>timer.Stop();dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();feedback.Text="Vorgang wird abgebrochen …";}};Render();await dialog.ShowDialog(this);
     }
 }

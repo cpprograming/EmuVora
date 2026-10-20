@@ -374,7 +374,8 @@ public sealed partial class MainWindow : Window
     }
     private async Task HandleGamepadAsync()
     {
-        var pads=Gamepad.Read();controllerStatus.Text=pads.Length==0?"Xbox-Controller: nicht verbunden":"Xbox-Controller: "+pads.Length+" verbunden\nD-Pad: wählen · A: spielen · Y: Favorit\nLB/RB: System · Menu: Einstellungen\nView: Bedienelemente · B: Spieleliste";
+        var pads=Gamepad.Read();controllerStatus.Text=pads.Length==0?"Controller: nicht verbunden":"Controller: "+pads.Length+" verbunden · "+Gamepad.Label(pads[0])+"\nD-Pad: wählen · A: spielen · Y: Favorit\nLB/RB: System · Menu: Einstellungen\nView: Bedienelemente · B: Spieleliste";
+        ToolTip.SetTip(controllerStatus,Gamepad.BackendName+(Gamepad.BackendWarning is{} warning?" · Rückfall auf XInput: "+warning:" · Automatische Belegung für EmuVora"));
         var pressed=gamepadNavigation.Poll(pads,IsActive&&!dialogOpen&&running.Count==0,Environment.TickCount64);
         if(pressed==0)return;
         await HandleLibraryControllerAsync((ushort)pressed);
@@ -400,7 +401,7 @@ public sealed partial class MainWindow : Window
         if(settings.Packages.TryGetValue(id,out var same)&&same.Version==package.Version&&File.Exists(same.ExecutablePath))
         {
             if(id=="retroarch-cores")ConfigureCores(same.ExecutablePath);
-            else{settings.EmulatorPaths[id]=same.ExecutablePath;EmulatorSetup.Configure(id,same.ExecutablePath,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.Read().FirstOrDefault().Index);}
+            else{settings.EmulatorPaths[id]=same.ExecutablePath;EmulatorSetup.Configure(id,same.ExecutablePath,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.FirstXInputIndex);}
             return;
         }
         var executable=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
@@ -409,7 +410,7 @@ public sealed partial class MainWindow : Window
         else
         {
             if(previous!=null&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
-            EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.Read().FirstOrDefault().Index);
+            EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.FirstXInputIndex);
             settings.EmulatorPaths[id]=executable;
         }
         settings.Packages[id]=new(package.Version,executable,previous);settingsStore.Save(settings);
@@ -420,7 +421,7 @@ public sealed partial class MainWindow : Window
         if(executable==null||!File.Exists(executable))await InstallManagedAsync(id,token);
         if(id=="retroarch"&&(!settings.CorePaths.TryGetValue(system,out var core)||!File.Exists(core)))await InstallManagedAsync("retroarch-cores",token);
         executable=settings.EmulatorPaths.GetValueOrDefault(id);
-        if(executable!=null&&settings.Packages.TryGetValue(id,out var managed)&&managed.ExecutablePath==executable)EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.Read().FirstOrDefault().Index);
+        if(executable!=null&&settings.Packages.TryGetValue(id,out var managed)&&managed.ExecutablePath==executable)EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.FirstXInputIndex);
         settingsStore.Save(settings);
     }
     private async Task CheckUpdatesAsync()
@@ -526,7 +527,7 @@ public sealed partial class MainWindow : Window
                 var executable=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
                 var previous=settings.EmulatorPaths.GetValueOrDefault(id);
                 if(!string.IsNullOrEmpty(previous)&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
-                EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.Read().FirstOrDefault().Index);
+                EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.FirstXInputIndex);
                 settings.Packages[id]=new(package.Version,executable,previous);settings.EmulatorPaths[id]=executable;settingsStore.Save(settings);Load();status.Text=Current().Name+" automatisch eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";
             });
         }));
@@ -535,7 +536,7 @@ public sealed partial class MainWindow : Window
         {
             var id=Current().Id;if(runningEmulators.Contains(id)){status.Text="Emulator zuerst schließen.";return;}
             if(!settings.Packages.TryGetValue(id,out var installed)||settings.EmulatorPaths.GetValueOrDefault(id)!=installed.ExecutablePath){status.Text="Automatische Profile sind für verwaltete Downloads verfügbar.";return;}
-            if(await ConfirmAsync("Xbox-Standardprofil erneut anwenden? Die bisherigen Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{EmulatorSetup.Configure(id,installed.ExecutablePath,dataDir,true,settings.Fullscreen,true,Gamepad.Read().FirstOrDefault().Index);status.Text="Xbox-Profil angewendet.";});
+            if(await ConfirmAsync("Xbox-Standardprofil erneut anwenden? Die bisherigen Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{EmulatorSetup.Configure(id,installed.ExecutablePath,dataDir,true,settings.Fullscreen,true,Gamepad.FirstXInputIndex);status.Text="Xbox-Profil angewendet.";});
         }));
         var downloadStatus=new TextBlock {TextWrapping=TextWrapping.Wrap};
         void FollowStatus(object? sender,AvaloniaPropertyChangedEventArgs e){if(e.Property==TextBlock.TextProperty)downloadStatus.Text=status.Text;}
@@ -648,7 +649,8 @@ public sealed partial class MainWindow : Window
             await BusyAsync(async token=>{catalog=await packages.GetCatalogAsync(token);foreach(var id in EmulatorCatalog.Known.Select(e=>e.Id).Append("retroarch-cores"))await InstallManagedAsync(id,token);status.Text="Emulatoren, Cores und Xbox-Standardbelegung eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";});
         }));
         panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch / PS1 / PS2: View + Menu beendet das Spiel; View + RB öffnet das Menü. Dolphin: View + Menu beendet; PPSSPP: LT öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
-        panel.Children.Add(AsyncButton("Xbox-Controller prüfen",ShowControllerDiagnosticsAsync));
+        panel.Children.Add(new TextBlock{Text="Weitere Gamepads: SDL und die mitgelieferte Controller-Datenbank belegen die EmuVora-Oberfläche automatisch. A/B/X/Y bezeichnen die Positionen wie beim Xbox-Layout. Spielprofile für andere Controller müssen im jeweiligen Emulator eingerichtet werden; Xbox-Standardprofile bleiben erhalten.",TextWrapping=TextWrapping.Wrap,FontSize=12});
+        panel.Children.Add(AsyncButton("Controller prüfen",ShowControllerDiagnosticsAsync));
         panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await new ControllerPicker(this).OpenFilePathsAsync("Eigene BIOS-/Firmware-Dateien");if(files.Length==0)return;await ImportFirmwareFilesAsync(files);}));
         panel.Children.Add(AsyncButton("Firmware-Ordner importieren (z. B. MSX)",async()=>
         {
@@ -693,3 +695,10 @@ public sealed partial class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
+
+
+
+
+
+
+

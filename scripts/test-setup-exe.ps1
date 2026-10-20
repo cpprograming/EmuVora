@@ -10,6 +10,12 @@ function Invoke-TestSetup{
 Invoke-TestSetup
 if(!(Test-Path -LiteralPath (Join-Path $taskInstall 'App/EmuVora.App.exe'))){throw 'Application missing.'}
 if(!(Test-Path -LiteralPath (Join-Path $taskInstall 'App/EmuVora.ico'))){throw 'Own shortcut icon missing.'}
+foreach($taskControllerFile in @('SDL3.dll','gamecontrollerdb.txt','SDL3.LICENSE.txt','GameControllerDB.LICENSE.txt')){
+    if(!(Test-Path -LiteralPath (Join-Path $taskInstall ('App/'+$taskControllerFile)))){throw ('Controller component missing: '+$taskControllerFile)}
+}
+if((Get-FileHash -LiteralPath (Join-Path $taskInstall 'App/SDL3.dll') -Algorithm SHA256).Hash -ne '2B4B128D8D510CC2D442693CF848C050D700D43DC667AFE9E5FD82B0570D667E'){throw 'Installed SDL runtime checksum mismatch.'}
+if((Get-FileHash -LiteralPath (Join-Path $taskInstall 'App/gamecontrollerdb.txt') -Algorithm SHA256).Hash -ne 'C6587CC65789539E61EC375AAD5BDBC14F974508B57E2AE87730AC75C4445DBA'){throw 'Installed controller database checksum mismatch.'}
+'SDL runtime, database and license files verified.'
 $taskLocator=Get-Content -Raw -LiteralPath (Join-Path $taskInstall 'App/emuvora-location.json') | ConvertFrom-Json
 if($taskLocator.DataDirectory -ne (Join-Path $taskInstall 'Data')){throw 'Incorrect data path.'}
 'retained game save' | Set-Content -LiteralPath (Join-Path $taskLocator.DataDirectory 'save-test.txt')
