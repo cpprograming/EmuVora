@@ -1,8 +1,10 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 19. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 20. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
+
+- [x] Neues Logo, Icon für Programm/Setup/Verknüpfungen und überarbeitete Bibliotheksansicht implementiert; 152 lokale Funktionstests bestanden, Windows-CI und neue Veröffentlichung folgen im Pull Request. [Vorschau](design/README.md).
 
 - [x] Einrichtungsassistent mit frei wählbarem Datenpfad.
 - [x] Spielebibliothek, Konsolenfilter, Favoriten und automatische Cover-Suche.
@@ -12,9 +14,9 @@ Stand: 19. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] EmulationStation-Theme-Import und optionaler ES-DE-/AlekFull-Start.
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
-- [x] 138 Funktionstests und 5 Netzwerktests auch im Release-Build 0.13.66 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] 149 Funktionstests und 6 Netzwerktests auch im Release-Build 0.14.68 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 
-Der aktuelle Stand ist als [Release 0.13.66](https://github.com/cpprograming/EmuVora/releases/tag/v0.13.66) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.14.68](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.68) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 - [x] BIOS-Dateiauswahl mit sichtbarer Bestätigung, direktem Pfadimport, automatischer Benennung erkannter Inhalte und Ergebnisübersicht korrigiert ([PR #13](https://github.com/cpprograming/EmuVora/pull/13), ab 0.11.59). Originaldateien bleiben erhalten.
 

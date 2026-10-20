@@ -1,8 +1,8 @@
 # EmuVora – Roadmap
 
-Stand: 19. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 20. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.13.66](https://github.com/cpprograming/EmuVora/releases/tag/v0.13.66).
+Aktueller geprüfter Release: [0.14.68](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.68).
 
 ## 0.11 – Daten und Wiederherstellung (abgeschlossen)
 
@@ -37,10 +37,13 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [ ] Dialoge, Abstände, Schriften und Schaltflächen vereinheitlichen.
 - [x] Optionalen TV-Modus mit großen Covern, lesbaren Texten und sichtbarer Auswahl ergänzen.
 - [x] Leere Bibliothek und ergebnislose Filter mit eigenen Fluent-Infobereichen unterscheiden.
-- [ ] Fehlende Cover, Downloads und Fehlerzustände weiter vereinheitlichen.
+- [x] Neue Marke, App-/Setup-/Shortcut-Icon, Navigation, Cover-Platzhalter und Detailansicht gestaltet; [Vorschau](design/README.md).
+- [ ] Downloads und Fehlerzustände weiter vereinheitlichen.
 - [x] Direkte Theme-Unterstützung und separate ES-DE-Darstellung in Einstellungen und Anleitung unterscheiden.
 
 ## 0.14 – Spielebibliothek
+
+- [x] Release 0.14.68 mit 149 Funktions- und 6 Netzwerktests veröffentlicht; Setup-Download und Selbstupdate einschließlich SHA-256 geprüft.
 
 - [x] Prüfsummen-Erkennung mit bestätigter Titelvorschau für 16 Cartridge-Systeme integriert; Schutz eigener Bearbeitungen und lokaler ROM-Dateien. [Anleitung](ROM_RECOGNITION.md).
 

@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.13.66](https://github.com/cpprograming/EmuVora/releases/tag/v0.13.66)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.68](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.68)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -11,6 +11,10 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 - Alle Versionen und Änderungen findest du unter **[Releases](https://github.com/cpprograming/EmuVora/releases)**.
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
+
+## Neues Logo und Bibliotheksdesign
+
+EmuVora erhält ein eigenes mintfarbenes App-Zeichen, ruhigere Navigation, überarbeitete Cover-Karten und eine klar gegliederte Detailansicht. Helles und dunkles Design sowie TV-Modus bleiben verfügbar. Der Einrichtungsassistent, erneutes Scannen und ES-DE liegen jetzt unter **Verwaltung**. [Vorschau, Gestaltung und Prüfungen](design/README.md).
 
 ## Spielnamen anhand von Prüfsummen – neu in 0.14
 
@@ -27,7 +31,7 @@ Die Dateiauswahl unterstützt Doppelklick und einen stets sichtbaren Übernehmen
 ## Erste Einrichtung
 
 1. **Speicherort festlegen.** Das Setup legt Programm und Daten standardmäßig in den Unterordnern `App` und `Data` des gewählten Installationsordners ab. Bei einem portablen Erststart ohne gespeicherten Datenpfad wählst du den Datenordner selbst.
-2. **Einrichtungsassistent durchlaufen.** Er führt durch Speicherort, ROM-Import, Controller, Emulatoren/BIOS und Abschluss. Er lässt sich später über die Seitenleiste erneut öffnen.
+2. **Einrichtungsassistent durchlaufen.** Er führt durch Speicherort, ROM-Import, Controller, Emulatoren/BIOS und Abschluss. Er lässt sich später über **Verwaltung → Einrichtungsassistent** erneut öffnen.
 3. **Eigene ROM-Ordner importieren.** Unterordner werden durchsucht. Unklare Disc-Dateien kannst du anschließend einer Konsole zuordnen.
 4. **Xbox-Controller anschließen und eigene BIOS-Dateien importieren**, soweit das System sie benötigt.
 5. **Spiel auswählen und starten.** Bei aktivierter automatischer Einrichtung werden fehlende Emulatoren und RetroArch-Cores heruntergeladen. Vorhandene eigene Emulatorpfade bleiben nutzbar.
@@ -175,13 +179,13 @@ $env:EMUVORA_PACKAGE_CATALOG = (Resolve-Path catalog/packages.json).Path
 dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Category=Network"
 ```
 
-**Für Release 0.13.66 bestanden:** 138 Funktionstests und 5 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
+**Für Release 0.14.68 bestanden:** 149 Funktionstests und 6 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
 
 Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsintegrität, externe Ordner, Wiederherstellung älterer Archive und Dateipfade ab. Avalonia-Tests erzeugen UI-Aufnahmen; die GitHub-Artefakte enthalten **EmuVora-UI-previews**. Echte Hardwaretests stehen separat auf der Checkliste.
 
 ## Nächste Schritte
 
-Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Xbox-Hardwaretests bleiben offen. Der Softwareteil für Eingabewechsel und Diagnose ist ab 0.12.64 verfügbar; FluentAvalonia und TV-Modus sind ab 0.13.66 verfügbar. Als nächste Schritte folgen weitere Oberflächenzustände und datenbankgestützte Spielerkennung. Geprüfte externe Projekte stehen im [Repository-Plan](REPOSITORY_PLAN.md).
+Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Xbox-Hardwaretests bleiben offen. Der Softwareteil für Eingabewechsel und Diagnose ist ab 0.12.64 verfügbar; FluentAvalonia und TV-Modus sind ab 0.13.66 verfügbar. Prüfsummenbasierte Spielerkennung ist ab 0.14.68 verfügbar. Die neue Gestaltung ist lokal mit 152 Funktionstests geprüft; der zugehörige Windows-Build folgt im Pull Request. Als nächste Schritte folgen SDL/GameControllerDB für weitere Controller und zusätzliche Bibliotheksfunktionen. Geprüfte externe Projekte stehen im [Repository-Plan](REPOSITORY_PLAN.md).
 
 ## Lizenz
 
