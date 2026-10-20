@@ -2,7 +2,7 @@
 
 Stand: 20. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.71](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.71).
+Aktueller geprüfter Release: [0.14.76](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.76).
 
 ## 0.11 – Daten und Wiederherstellung (abgeschlossen)
 
@@ -23,7 +23,7 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 - [x] Release 0.12.64 veröffentlicht und per Updater geprüft; 134 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
 - [x] Praktische Prüfschritte in [CONTROLLERS.md](CONTROLLERS.md) dokumentiert.
 
-- [x] SDL 3 und feste GameControllerDB für zusätzliche Gamepads in Bibliothek/Dialogs ergänzt; XInput-Rückfall, keine doppelte Quelle und keine SDL-IDs in Xbox-Spielprofilen. [Anleitung](CONTROLLERS.md).
+- [x] SDL 3 und feste GameControllerDB für zusätzliche Gamepads in Bibliothek/Dialogen in 0.14.76 veröffentlicht; 166 Funktions- und 6 Netzwerktests, Installer, SDK-Dateien und veröffentlichter Selbstupdate-Download geprüft; XInput-Rückfall, keine doppelte Quelle und keine SDL-IDs in Xbox-Spielprofilen. [Anleitung](CONTROLLERS.md).
 - [ ] Automatische Spielprofile für zusätzliche Controller je Emulator ergänzen und prüfen.
 - [ ] Xbox-Controller per USB und Bluetooth auf echter Hardware testen.
 - [ ] Einrichtung, Dateiauswahl, Sicherung und Spielstart vollständig mit Controller durchspielen.

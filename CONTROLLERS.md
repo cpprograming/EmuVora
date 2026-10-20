@@ -38,7 +38,7 @@ Bis zu zwölf Verbindungswechsel bleiben in der geöffneten Ansicht sichtbar; ke
 
 ## Prüfung und offene Hardwaretests
 
-166 lokale Funktionstests bestanden. Dazu gehören die echte native SDL-Runtime mit virtuellem Gamepad (Tasten, Achsen, Trigger, Trennen und erneutes Verbinden), XInput-Rückfall, Schutz vor doppelter Eingabe, Achsengrenzen, Komponentenintegrität, Diagnose und bestehende Controller-/UI-Tests. Der Aufbau aus einem leeren Download-Cache wurde ebenfalls geprüft. Die Windows-CI prüft zusätzlich die offiziellen Emulator-Downloads und die Installer.
+Veröffentlicht in **0.14.76**: 166 Funktions- und 6 Netzwerktests auf GitHub bestanden; Setup-Installation mit SDL-/Datenbank-Prüfsummen und Lizenzdateien, Update, Prozessübergabe und Datenerhalt geprüft. Der veröffentlichte Setup-Download und die Erkennung der bereits installierten Version wurden zusätzlich mit EmuVoras Updater einschließlich SHA-256 geprüft. Dazu gehören die echte native SDL-Runtime mit virtuellem Gamepad (Tasten, Achsen, Trigger, Trennen und erneutes Verbinden), XInput-Rückfall, Schutz vor doppelter Eingabe, Achsengrenzen, Komponentenintegrität, Diagnose und bestehende Controller-/UI-Tests. Der Aufbau aus einem leeren Download-Cache wurde ebenfalls geprüft. Die Windows-CI prüft zusätzlich die offiziellen Emulator-Downloads und die Installer.
 
 Praktisch noch prüfen:
 

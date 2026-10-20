@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.71](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.71)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.76](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.76)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -12,7 +12,7 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
 
-## Mehr Controller in EmuVora
+## Mehr Controller in EmuVora – neu in 0.14.76
 
 SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads automatisch für Bibliothek und Dialoge. Unter **Einstellungen → Emulatoren → Controller prüfen** Namen, Verbindung und Eingaben ansehen. XInput bleibt als Rückfall erhalten. Xbox-Spielprofile bleiben erhalten; andere Spielprofile werden weiterhin im Emulator eingerichtet. [Umfang, Herkunft und Tests](CONTROLLERS.md).
 
@@ -183,13 +183,13 @@ $env:EMUVORA_PACKAGE_CATALOG = (Resolve-Path catalog/packages.json).Path
 dotnet test tests/EmuVora.Tests/EmuVora.Tests.csproj -c Release --filter "Category=Network"
 ```
 
-**Für Release 0.14.71 bestanden:** 152 Funktionstests und 6 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
+**Für Release 0.14.76 bestanden:** 166 Funktionstests und 6 Netzwerktests sowie die Installer-Prüfungen für Installation, Update, Prozessübergabe und Datenerhalt. Der veröffentlichte Setup-Download wurde zusätzlich mit dem EmuVora-Updater geprüft.
 
 Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsintegrität, externe Ordner, Wiederherstellung älterer Archive und Dateipfade ab. Avalonia-Tests erzeugen UI-Aufnahmen; die GitHub-Artefakte enthalten **EmuVora-UI-previews**. Echte Hardwaretests stehen separat auf der Checkliste.
 
 ## Nächste Schritte
 
-Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Xbox-Hardwaretests bleiben offen. Der Softwareteil für Eingabewechsel und Diagnose ist ab 0.12.64 verfügbar; FluentAvalonia und TV-Modus sind ab 0.13.66 verfügbar. Prüfsummenbasierte Spielerkennung ist ab 0.14.68 verfügbar. Die neue Gestaltung ist ab 0.14.71 verfügbar; Windows-Build, Installation, Update und Datenerhalt sind geprüft. Als nächste Schritte folgen SDL/GameControllerDB für weitere Controller und zusätzliche Bibliotheksfunktionen. Geprüfte externe Projekte stehen im [Repository-Plan](REPOSITORY_PLAN.md).
+Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Xbox-Hardwaretests bleiben offen. Der Softwareteil für Eingabewechsel und Diagnose ist ab 0.12.64 verfügbar; FluentAvalonia und TV-Modus sind ab 0.13.66 verfügbar. Prüfsummenbasierte Spielerkennung ist ab 0.14.68 verfügbar. Die neue Gestaltung ist ab 0.14.71 verfügbar; Windows-Build, Installation, Update und Datenerhalt sind geprüft. SDL/GameControllerDB unterstützt ab 0.14.76 weitere Controller in der Oberfläche. Als nächste Schritte folgen automatische Spielprofile für zusätzliche Modelle, Hardwaretests und zusätzliche Bibliotheksfunktionen. Geprüfte externe Projekte stehen im [Repository-Plan](REPOSITORY_PLAN.md).
 
 ## Lizenz
 

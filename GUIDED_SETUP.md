@@ -1,7 +1,7 @@
-# Guided setup and Xbox controls
+# Guided setup and controller navigation
 
 New empty libraries open a five-step setup assistant: storage summary, ROM
-folders, live Xbox connection status, required emulators and BIOS, and readiness.
+folders, live controller connection status, required emulators and BIOS, and readiness.
 Setup can be deferred or reopened from the sidebar under **Verwaltung → Einrichtungsassistent**. Existing libraries
 are not forced through setup again. Every completed import/download is saved;
 cancelling or closing setup does not undo existing files or settings.
@@ -12,7 +12,7 @@ be provided by the user. Firmware checks use the emulator's configured location
 when available. Completing the assistant does not claim that missing BIOS files
 or ROMs have been supplied.
 
-Xbox library controls: D-pad/stick selects a game, A starts it, Y toggles its
+Library controls use Xbox button positions (including SDL-mapped controllers): D-pad/stick selects a game, A starts it, Y toggles its
 favorite, LB/RB changes console, Menu opens settings, View switches to control
 navigation, B returns to the game list. When a launched emulator exits, the
 library regains focus. Existing emulator-specific exit shortcuts remain active.
@@ -29,3 +29,5 @@ Connection monitoring uses Windows XInput; four connected controllers are
 supported. Reconnecting or changing windows ignores an already-held button
 until it is released. Hardware-specific Bluetooth/adapter behavior and every
 physical controller still require real-device testing.
+
+SDL 3 and the pinned GameControllerDB are bundled for offline frontend mappings. The diagnostic entry is **Controller prüfen**. Additional gamepad profiles inside individual emulators are a separate follow-up; existing Xbox game profiles remain unchanged. See [controller guide](CONTROLLERS.md).
