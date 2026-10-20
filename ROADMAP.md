@@ -1,8 +1,15 @@
 # EmuVora – Roadmap
 
-Stand: 20. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 21. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.76](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.76).
+Aktueller geprüfter Release: [0.14.78](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.78).
+
+## 0.14.78 – Startstabilität (abgeschlossen)
+
+- [x] Bibliotheksansicht auf 48 Cover-Karten pro Seite begrenzt und Bildspeicher beim Wechsel freigegeben.
+- [x] Cover-Prüfung und Downloads in den Hintergrund verlagert; Controller-Browsing bleibt möglich.
+- [x] Regression mit 6.000 synthetischen Spielen, Seitenwechseln, Suche und Bildcache ergänzt.
+- [x] 167 Funktionstests, 6 Netzwerktests und Setup-/Update-Prüfungen bestanden.
 
 ## 0.11 – Daten und Wiederherstellung (abgeschlossen)
 
