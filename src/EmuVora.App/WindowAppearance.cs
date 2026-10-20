@@ -3,16 +3,20 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 
 namespace EmuVora.App;
 public static class WindowAppearance
 {
     public static void Apply(Window window)
     {
-        window.FontFamily=new FontFamily("Segoe UI");
+        window.FontFamily=new FontFamily("Segoe UI Variable, Segoe UI");
         var icon=Path.Combine(AppContext.BaseDirectory,"EmuVora.ico");if(File.Exists(icon))window.Icon=new WindowIcon(icon);
         window.Styles.Add(new Style(s=>s.OfType<Button>()){Setters={new Setter(Button.CornerRadiusProperty,new CornerRadius(8)),new Setter(Button.PaddingProperty,new Thickness(12,9)),new Setter(Button.FontSizeProperty,13d)}});
         window.Styles.Add(new Style(s=>s.OfType<TextBox>()){Setters={new Setter(TextBox.CornerRadiusProperty,new CornerRadius(8))}});
+        window.Styles.Add(new Style(s=>s.OfType<ComboBox>()){Setters={new Setter(ComboBox.CornerRadiusProperty,new CornerRadius(8))}});
+        window.Styles.Add(new Style(s=>s.OfType<Button>().Class("library-navigation")){Setters={new Setter(Button.BorderThicknessProperty,new Thickness(0)),new Setter(Button.MinHeightProperty,39d),new Setter(Button.BackgroundProperty,Brushes.Transparent),new Setter(Button.PaddingProperty,new Thickness(12,10))}});
+        window.Styles.Add(new Style(s=>s.OfType<Button>().Class("primary-action")){Setters={new Setter(Button.BackgroundProperty,new DynamicResourceExtension("EmuAccent")),new Setter(Button.ForegroundProperty,new DynamicResourceExtension("EmuAccentText")),new Setter(Button.FontWeightProperty,FontWeight.SemiBold)}});
         window.Styles.Add(new Style(s=>s.OfType<Button>()){Setters={new Setter(Button.ContentTemplateProperty,new FuncDataTemplate<string>((text,_)=>new TextBlock{Text=text,TextWrapping=TextWrapping.Wrap,TextAlignment=TextAlignment.Center}))}});
         window.Styles.Add(new Style(s=>s.OfType<Button>().Class(":focus")){Setters={new Setter(Button.BorderBrushProperty,Brush.Parse("#37A5FF")),new Setter(Button.BorderThicknessProperty,new Thickness(2))}});
         window.Styles.Add(new Style(s=>s.OfType<CheckBox>().Class(":focus")){Setters={new Setter(CheckBox.BorderBrushProperty,Brush.Parse("#37A5FF")),new Setter(CheckBox.BorderThicknessProperty,new Thickness(2))}});

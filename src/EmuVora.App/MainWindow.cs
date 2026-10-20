@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Layout;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -36,6 +37,8 @@ public sealed partial class MainWindow : Window
     private readonly TextBlock status=new(){TextWrapping=TextWrapping.Wrap};
     private readonly TextBlock summary=new(){FontSize=13,Opacity=0.7};
     private readonly FluentAvalonia.UI.Controls.InfoBar empty=new(){IsOpen=true,IsClosable=false,VerticalAlignment=VerticalAlignment.Center,Margin=new(20)};
+    private readonly StackPanel emptyState=new(){Spacing=16,MaxWidth=460,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center};
+    private readonly Button emptyAction=new(){HorizontalAlignment=HorizontalAlignment.Center};
     private readonly ProgressBar progress=new(){IsVisible=false,Height=5};
     private readonly Button cancel=new(){Content="Abbrechen",IsVisible=false};
     private readonly TextBlock detailTitle=new(){FontSize=24,FontWeight=FontWeight.Bold,TextWrapping=TextWrapping.Wrap};
@@ -53,7 +56,9 @@ public sealed partial class MainWindow : Window
     private Button? detailsToggle;
     private readonly StackPanel consoleNavigation=new(){Spacing=4};
     private readonly TextBlock displayStatus=new(){FontSize=12,Opacity=0.75,TextWrapping=TextWrapping.Wrap};
-    private readonly Grid layout=new(){ColumnDefinitions=new("224,*,284")};
+    private readonly Grid layout=new(){ColumnDefinitions=new("240,*,300")};
+    private readonly TextBlock libraryHeading=new(){Text="Deine Spiele",FontSize=34,FontWeight=FontWeight.Bold,LetterSpacing=-0.8,TextWrapping=TextWrapping.Wrap};
+    private readonly TextBlock libraryEyebrow=new(){Text="DEINE SAMMLUNG",FontSize=10,LetterSpacing=2,Opacity=0.65};
     private readonly Image themeBackground=new(){Stretch=Stretch.UniformToFill,Opacity=0.25,IsHitTestVisible=false};
     private readonly Image themeLogo=new(){Height=70,MaxWidth=200,Stretch=Stretch.Uniform,IsVisible=false};
     private readonly Dictionary<string,Bitmap> themeImages=new(StringComparer.OrdinalIgnoreCase);
@@ -72,7 +77,7 @@ public sealed partial class MainWindow : Window
     private readonly Dictionary<string,Button> viewButtons=[];
     private readonly DispatcherTimer gamepadTimer=new(){Interval=TimeSpan.FromMilliseconds(100)};
     private readonly GamepadNavigation gamepadNavigation=new();
-    private readonly TextBlock controllerStatus=new(){TextWrapping=TextWrapping.Wrap,FontSize=12};
+    private readonly TextBlock controllerStatus=new(){TextWrapping=TextWrapping.Wrap,FontSize=12,Opacity=0.6};
     private bool dialogOpen;
     private bool controllerUiMode;
     public MainWindow():this(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"EmuVora")){ }
@@ -82,39 +87,39 @@ public sealed partial class MainWindow : Window
         settingsStore=new(Path.Combine(dataDir,"settings.json"));settings=settingsStore.Load();store=new(Path.Combine(dataDir,"library.db"));allGames=store.GetAll();
         Title="EmuVora";Width=1320;Height=820;MinWidth=820;MinHeight=520;
         WindowAppearance.Apply(this);
-        var sidebar=new StackPanel {Spacing=10,Margin=new(18)};
-        sidebar.Children.Add(new TextBlock {Text="◈ EmuVora",FontSize=27,FontWeight=FontWeight.Bold,Margin=new(0,4,0,20)});
+        var sidebar=new StackPanel {Spacing=7,Margin=new(18,16)};
+        sidebar.Children.Add(BrandIdentity.Lockup());
         sidebar.Children.Add(new TextBlock {Text="DEINE BIBLIOTHEK",FontSize=11,Opacity=0.65});
         sidebar.Children.Add(backupReminder);backupReminder.Click+=async(_,_)=>await ShowSettingsAsync(initialTab:5);UpdateBackupReminder();
         foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt"})
         {
-            var item=ActionButton(name,()=>{view=name;systems.SelectedItem="Alle Konsolen";Refresh();});item.HorizontalContentAlignment=HorizontalAlignment.Left;viewButtons[name]=item;sidebar.Children.Add(item);
+            var item=ActionButton(name,()=>{view=name;systems.SelectedItem="Alle Konsolen";Refresh();});StyleNavigation(item);viewButtons[name]=item;sidebar.Children.Add(item);
         }
         sidebar.Children.Add(new TextBlock{Text="KONSOLEN",FontSize=11,Opacity=0.65,Margin=new(0,16,0,4)});sidebar.Children.Add(consoleNavigation);
         sidebar.Children.Add(new Separator {Margin=new(0,12)});
-        var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());sidebar.Children.Add(import);operationButtons.Add(import);
-        var rescan=AsyncButton("Ordner neu scannen",()=>RescanAsync());sidebar.Children.Add(rescan);operationButtons.Add(rescan);
+        var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());import.Classes.Add("primary-action");import.Classes.Add("accent");sidebar.Children.Add(import);operationButtons.Add(import);
+        var rescan=AsyncButton("Ordner neu scannen",()=>RescanAsync());operationButtons.Add(rescan);
         var covers=AsyncButton("Fehlende Cover laden",()=>FetchAllCoversAsync());sidebar.Children.Add(covers);operationButtons.Add(covers);
-        sidebar.Children.Add(AsyncButton("Einrichtungsassistent",()=>ShowOnboardingAsync()));
-        sidebar.Children.Add(AsyncButton("Einstellungen",()=>ShowSettingsAsync()));
-        sidebar.Children.Add(AsyncButton("AlekFull NX · ES-DE öffnen",()=>OpenEsDeAsync()));
+        var preferences=AsyncButton("Einstellungen",()=>ShowSettingsAsync());StyleNavigation(preferences);sidebar.Children.Add(preferences);
         var tools=new StackPanel{Spacing=6};foreach(var name in new[]{"Konsole zuordnen","Fehlende Dateien"}){var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;tools.Children.Add(item);}
+        tools.Children.Add(rescan);tools.Children.Add(AsyncButton("Einrichtungsassistent",()=>ShowOnboardingAsync()));tools.Children.Add(AsyncButton("AlekFull NX · ES-DE öffnen",()=>OpenEsDeAsync()));
         tools.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));tools.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));tools.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));sidebar.Children.Add(new Expander{Header="Verwaltung",Content=tools});
         sidebar.Children.Add(appUpdateStatus);sidebar.Children.Add(controllerStatus);
         sidebar.Children.Add(themeStatus);
         sidebar.Children.Add(new TextBlock {Text="Windows · v"+AppVersion.ToString(3)+"\nDeine Spiele. Deine Bibliothek.",FontSize=12,Opacity=0.6,Margin=new(0,24,0,0)});
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
-        var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=12};
-        header.Children.Add(themeLogo);var heading=new TextBlock {Text="Deine Spiele",FontSize=32,FontWeight=FontWeight.Bold};Grid.SetColumn(heading,1);header.Children.Add(heading);Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
+        var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=16};
+        header.Children.Add(themeLogo);var heading=new StackPanel{Spacing=5};heading.Children.Add(libraryEyebrow);heading.Children.Add(libraryHeading);Grid.SetColumn(heading,1);header.Children.Add(heading);summary.VerticalAlignment=VerticalAlignment.Center;summary.TextAlignment=TextAlignment.Right;Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
         var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=10};Grid.SetColumnSpan(search,3);filters.Children.Add(search);Grid.SetRow(systems,1);filters.Children.Add(systems);Grid.SetRow(sort,1);Grid.SetColumn(sort,1);filters.Children.Add(sort);detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});Grid.SetRow(detailsToggle,1);Grid.SetColumn(detailsToggle,2);filters.Children.Add(detailsToggle);AddRow(main,filters,1);
-        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(12))}});
-        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,Brush.Parse("#37A5FF"))}});
+        gamesList.Classes.Add("game-library");
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
         gamesList.ItemsPanel=new FuncTemplate<Panel?>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
         ScrollViewer.SetHorizontalScrollBarVisibility(gamesList,Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
-        var library=new Grid();library.Children.Add(gamesList);library.Children.Add(empty);AddRow(main,library,2);
+        var library=new Grid();library.Children.Add(gamesList);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
         AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);AddRow(main,footer,4);
         var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
-        var details=new StackPanel {Spacing=14,Margin=new(18)};details.Children.Add(detailCover);details.Children.Add(detailTitle);details.Children.Add(detailInfo);
+        var details=new StackPanel {Spacing=16,Margin=new(22,30)};details.Children.Add(new TextBlock{Text="IM FOKUS",FontSize=10,LetterSpacing=2,Opacity=0.6});details.Children.Add(new Border{CornerRadius=new(16),Padding=new Thickness(14),Background=new SolidColorBrush(Color.Parse("#10203030")),Child=detailCover});details.Children.Add(detailTitle);details.Children.Add(detailInfo);
         details.Children.Add(displayStatus);details.Children.Add(play);details.Children.Add(favorite);
         var more=new StackPanel{Spacing=8};foreach(var button in new[]{cover,onlineCover,edit,reveal,remove})more.Children.Add(button);details.Children.Add(new Expander{Header="Spieldetails bearbeiten",Content=more});
         detailBorder.Child=new ScrollViewer {Content=details};Grid.SetColumn(detailBorder,2);layout.Children.Add(detailBorder);Content=layout;
@@ -127,13 +132,13 @@ public sealed partial class MainWindow : Window
         KeyDown+=(_,e)=>{if(e.Key==Key.F&&e.KeyModifiers.HasFlag(KeyModifiers.Control)){search.Focus();e.Handled=true;}};
         UpdateSystems();ApplyTheme();ApplyLibraryAppearance();Refresh();
         PropertyChanged+=(_,e)=>{if(e.Property==ClientSizeProperty)ApplyLayout();};
-        status.Text=settingsStore.LoadWarning??"ROM-Ordner importieren oder Emulatoren einrichten, um zu starten.";
+        status.Text=settingsStore.LoadWarning??(allGames.Count==0?"Importiere deine Spiele, um loszulegen.":"Bereit zum Spielen · Strg+F zum Suchen");
         Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
         Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
-    private void ApplyLayout(){if(detailsToggle!=null){detailsToggle.IsEnabled=!settings.TvMode&&(ClientSize.Width==0||ClientSize.Width>=1120);ToolTip.SetTip(detailsToggle,"Die rechte Detailspalte ist im Desktop-Modus ab 1120 Pixel Fensterbreite verfügbar.");}var show=!settings.TvMode&&settings.ShowGameDetails&&(ClientSize.Width==0||ClientSize.Width>=1120);detailBorder.IsVisible=show;layout.ColumnDefinitions[0].Width=new GridLength(settings.TvMode?320:224);layout.ColumnDefinitions[2].Width=new GridLength(show?284:0);}
+    private void ApplyLayout(){if(detailsToggle!=null){detailsToggle.IsEnabled=!settings.TvMode&&(ClientSize.Width==0||ClientSize.Width>=1120);ToolTip.SetTip(detailsToggle,"Die rechte Detailspalte ist im Desktop-Modus ab 1120 Pixel Fensterbreite verfügbar.");}var show=!settings.TvMode&&settings.ShowGameDetails&&(ClientSize.Width==0||ClientSize.Width>=1120);detailBorder.IsVisible=show;layout.ColumnDefinitions[0].Width=new GridLength(settings.TvMode?320:240);layout.ColumnDefinitions[2].Width=new GridLength(show?300:0);}
     private void FitMonitor(){var screen=Screens.ScreenFromWindow(this);if(screen==null)return;Width=Math.Min(Width,Math.Max(MinWidth,screen.WorkingArea.Width/screen.Scaling-32));Height=Math.Min(Height,Math.Max(MinHeight,screen.WorkingArea.Height/screen.Scaling-48));}
     private Button ActionButton(string text,Action action)
     {var button=new Button {Content=text,HorizontalAlignment=HorizontalAlignment.Stretch};button.Click+=(_,_)=>Guard(action);return button;}
@@ -146,9 +151,15 @@ public sealed partial class MainWindow : Window
     private void ApplyTheme()
     {
         var palette=settings.Theme switch
-        {"Classic Light"=>("#F3F5F9","#172235","#E6EAF2","#315DBD"),"Retro Green"=>("#101A13","#D9FFE1","#18291D","#69E991"),"Neon Purple"=>("#1A1026","#F5E6FF","#291939","#CC8CFF"),_=>("#101722","#EAF0FA","#1A2433","#6AA8FF")};
+        {"Classic Light"=>("#F5F7F8","#182C32","#E9EEF0","#087F73"),"Retro Green"=>("#101B17","#EDF7EF","#14231C","#8AE6A8"),"Neon Purple"=>("#191623","#F5F0FF","#211C2E","#C9B1FF"),_=>("#11171D","#F0F4F6","#171F27","#71E1C4")};
         RequestedThemeVariant=settings.Theme=="Classic Light"?ThemeVariant.Light:ThemeVariant.Dark;
-        Background=Brush.Parse(palette.Item1);Foreground=Brush.Parse(palette.Item2);sideBorder.Background=detailBorder.Background=Brush.Parse(palette.Item3);status.Foreground=Brush.Parse(palette.Item4);play.Background=Brush.Parse(palette.Item4);play.Foreground=Brush.Parse("#101722");play.FontWeight=FontWeight.Bold;
+        Background=Brush.Parse(palette.Item1);Foreground=Brush.Parse(palette.Item2);sideBorder.Background=detailBorder.Background=Brush.Parse(palette.Item3);status.Opacity=0.7;play.Background=Brush.Parse(palette.Item4);play.Foreground=Brush.Parse(settings.Theme=="Classic Light"?"#FFFFFF":"#102720");play.FontWeight=FontWeight.Bold;play.MinHeight=46;
+        Resources["EmuAccent"]=Brush.Parse(palette.Item4);Resources["EmuSelection"]=Brush.Parse(settings.Theme=="Classic Light"?"#D5E9E5":"#273D3D");
+        Resources["EmuAccentText"]=play.Foreground;play.Classes.Add("accent");
+        foreach(var key in new[]{"AccentButtonBackground","AccentButtonBackgroundPointerOver","AccentButtonBackgroundPressed"})Resources[key]=Brush.Parse(palette.Item4);
+        foreach(var key in new[]{"AccentButtonForeground","AccentButtonForegroundPointerOver","AccentButtonForegroundPressed"})Resources[key]=play.Foreground;
+        Resources["EmuSurface"]=Brush.Parse(palette.Item3);Resources["EmuText"]=Foreground;
+        sideBorder.BorderThickness=new(0,0,1,0);detailBorder.BorderThickness=new(1,0,0,0);sideBorder.BorderBrush=detailBorder.BorderBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D8E0E2":"#28323A");
         gamesList.Background=Brushes.Transparent;
         gamesList.Foreground=Foreground;detailTitle.Foreground=Foreground;detailInfo.Foreground=Foreground;
         currentThemeSystem=null;ApplyExternalTheme();
@@ -186,7 +197,7 @@ public sealed partial class MainWindow : Window
     {
         var previous=systems.SelectedItem as string;var choices=new[]{"Alle Konsolen"}.Concat(allGames.Select(g=>g.System).Distinct().Order()).ToArray();
         systems.ItemsSource=choices;systems.SelectedItem=previous!=null&&choices.Contains(previous)?previous:"Alle Konsolen";
-        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console+" · "+group.Count(),()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});item.Tag=console;item.HorizontalContentAlignment=HorizontalAlignment.Left;consoleNavigation.Children.Add(item);}
+        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console+" · "+group.Count(),()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});item.Tag=console;StyleNavigation(item);consoleNavigation.Children.Add(item);}
     }
     private void Reload(string? selected=null)
     {allGames=store.GetAll();UpdateSystems();Refresh(selected);}
@@ -197,10 +208,12 @@ public sealed partial class MainWindow : Window
         filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),_=>filtered};
         var result=(sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
         gamesList.ItemsSource=result;gamesList.SelectedItem=result.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));
-        empty.IsVisible=result.Length==0;empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
-        summary.Text=$"{view}\n{result.Length} von {allGames.Count} Spielen";UpdateSelected();
+        emptyState.IsVisible=empty.IsVisible=result.Length==0;emptyAction.Content=allGames.Count==0?"Ersten ROM-Ordner importieren":"Filter zurücksetzen";empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Deine Klassiker bekommen hier ein Zuhause. Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
+        libraryHeading.Text=view=="Alle Spiele"?(console is null or "Alle Konsolen"?"Deine Spiele":console):view;
+        libraryEyebrow.Text=view=="Favoriten"?"DEINE LIEBLINGSSTÜCKE":view=="Zuletzt gespielt"?"WEITERSPIELEN":"DEINE SAMMLUNG";
+        var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
         ApplyExternalTheme();
-        var selectedBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D2E1FA":"#29405F");foreach(var(name,button)in viewButtons){button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;button.Background=name==view?selectedBrush:Brushes.Transparent;}
+        var selectedBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D5E9E5":"#273D3D");foreach(var(name,button)in viewButtons){button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;button.Background=name==view?selectedBrush:Brushes.Transparent;}
         foreach(var button in consoleNavigation.Children.OfType<Button>())button.Background=button.Tag as string==console?selectedBrush:Brushes.Transparent;
     }
     private Control Artwork(Game game,int width)
@@ -214,12 +227,12 @@ public sealed partial class MainWindow : Window
             }
             catch(Exception ex) when(ex is IOException or ArgumentException or InvalidOperationException){Log(ex);}
         }
-        return new Border {Background=Brush.Parse(settings.Theme=="Classic Light"?"#D7DFED":"#25334A"),CornerRadius=new(10),Child=new TextBlock {Text="◈\n"+game.System,FontSize=24,TextAlignment=TextAlignment.Center,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center}};
+        return MissingArtwork(game);
     }
     private Control CreateCard(Game game)
     {
-        var width=CardWidth;var card=new StackPanel {Width=width,Spacing=9,Margin=new(8,8,8,14)};
-        card.Children.Add(new Border {Height=width*1.28,Padding=new Thickness(9),CornerRadius=new(12),Background=Brush.Parse(settings.Theme=="Classic Light"?"#E5EAF3":"#1C2738"),Child=Artwork(game,width)});
+        var width=CardWidth;var card=new StackPanel {Width=width,Spacing=9,Margin=new(8,8,8,12)};
+        card.Children.Add(new Border {Height=width*1.34,Padding=new Thickness(5),CornerRadius=new(12),Background=Brush.Parse(settings.Theme=="Classic Light"?"#E4EAEC":"#1E2932"),Child=Artwork(game,width),ClipToBounds=true});
         card.Children.Add(new TextBlock {Text=(game.Favorite?"★ ":"")+game.Title,TextWrapping=TextWrapping.Wrap,MaxHeight=settings.TvMode?60:44,FontSize=settings.TvMode?18:14,FontWeight=FontWeight.SemiBold});
         card.Children.Add(new TextBlock {Text=game.System+(File.Exists(game.Path)?"":" · Datei fehlt"),FontSize=settings.TvMode?16:12,Opacity=0.7});ToolTip.SetTip(card,game.Title+"\n"+game.Path);return card;
     }
@@ -680,10 +693,3 @@ public sealed partial class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
-
-
-
-
-
-
-
