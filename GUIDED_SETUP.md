@@ -2,7 +2,7 @@
 
 New empty libraries open a five-step setup assistant: storage summary, ROM
 folders, live Xbox connection status, required emulators and BIOS, and readiness.
-Setup can be deferred or reopened from the sidebar/settings. Existing libraries
+Setup can be deferred or reopened from the sidebar under **Verwaltung → Einrichtungsassistent**. Existing libraries
 are not forced through setup again. Every completed import/download is saved;
 cancelling or closing setup does not undo existing files or settings.
 

@@ -20,7 +20,7 @@ Die folgenden Aufnahmen zeigen die tatsächliche Avalonia-Oberfläche mit eigens
 
 ![Helle Bibliotheksansicht mit Demo-Covern](library-light.png)
 
-Automatisierte Prüfung: 152 Funktionstests lokal bestanden. Neue Prüfungen betreffen Desktop/820-Pixel-Layout, eingebettete Marke, Icon, Kontrast, Filter-Rücksetzung und weiterhin erreichbare Verwaltung. Die bestehende Suite prüft alle vier Paletten, TV-Modus, Controller-Raster und Dialoge. Echte 4K-/DPI-/Controller-Hardwareabnahme bleibt Teil der Roadmap. Der GitHub-Build prüft zusätzlich offizielle Downloads und beide Installer.
+Veröffentlicht in **0.14.71**. Automatisierte Prüfung: 152 Funktionstests und 6 Netzwerktests im GitHub-Windows-Build bestanden; Setup, Update, Prozessübergabe und Datenerhalt geprüft. Der veröffentlichte EXE-Download wurde zusätzlich per EmuVora-Updater einschließlich SHA-256 überprüft. Neue Prüfungen betreffen Desktop/820-Pixel-Layout, eingebettete Marke, Icon, Kontrast, Filter-Rücksetzung und weiterhin erreichbare Verwaltung. Die bestehende Suite prüft alle vier Paletten, TV-Modus, Controller-Raster und Dialoge. Echte 4K-/DPI-/Controller-Hardwareabnahme bleibt Teil der Roadmap. Der GitHub-Build prüft zusätzlich offizielle Downloads und beide Installer.
 
 ## Logo-Erzeugung
 

@@ -2,7 +2,7 @@
 
 Stand: 20. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.68](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.68).
+Aktueller geprüfter Release: [0.14.71](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.71).
 
 ## 0.11 – Daten und Wiederherstellung (abgeschlossen)
 
@@ -37,7 +37,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [ ] Dialoge, Abstände, Schriften und Schaltflächen vereinheitlichen.
 - [x] Optionalen TV-Modus mit großen Covern, lesbaren Texten und sichtbarer Auswahl ergänzen.
 - [x] Leere Bibliothek und ergebnislose Filter mit eigenen Fluent-Infobereichen unterscheiden.
-- [x] Neue Marke, App-/Setup-/Shortcut-Icon, Navigation, Cover-Platzhalter und Detailansicht gestaltet; [Vorschau](design/README.md).
+- [x] Neue Marke, App-/Setup-/Shortcut-Icon, Navigation, Cover-Platzhalter und Detailansicht in 0.14.71 veröffentlicht; 152 Funktions- und 6 Netzwerktests, Installation und Selbstupdate einschließlich SHA-256 geprüft. [Vorschau](design/README.md).
 - [ ] Downloads und Fehlerzustände weiter vereinheitlichen.
 - [x] Direkte Theme-Unterstützung und separate ES-DE-Darstellung in Einstellungen und Anleitung unterscheiden.
 
