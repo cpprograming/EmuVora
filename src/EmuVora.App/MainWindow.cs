@@ -57,7 +57,7 @@ public sealed partial class MainWindow : Window
     private readonly StackPanel consoleNavigation=new(){Spacing=4};
     private readonly TextBlock displayStatus=new(){FontSize=12,Opacity=0.75,TextWrapping=TextWrapping.Wrap};
     private readonly Grid layout=new(){ColumnDefinitions=new("240,*,300")};
-    private readonly TextBlock libraryHeading=new(){Text="Deine Spiele",FontSize=34,FontWeight=FontWeight.Bold,LetterSpacing=-0.8};
+    private readonly TextBlock libraryHeading=new(){Text="Deine Spiele",FontSize=34,FontWeight=FontWeight.Bold,LetterSpacing=-0.8,TextWrapping=TextWrapping.Wrap};
     private readonly TextBlock libraryEyebrow=new(){Text="DEINE SAMMLUNG",FontSize=10,LetterSpacing=2,Opacity=0.65};
     private readonly Image themeBackground=new(){Stretch=Stretch.UniformToFill,Opacity=0.25,IsHitTestVisible=false};
     private readonly Image themeLogo=new(){Height=70,MaxWidth=200,Stretch=Stretch.Uniform,IsVisible=false};
@@ -116,7 +116,7 @@ public sealed partial class MainWindow : Window
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
         gamesList.ItemsPanel=new FuncTemplate<Panel?>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
         ScrollViewer.SetHorizontalScrollBarVisibility(gamesList,Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
-        var library=new Grid();library.Children.Add(gamesList);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);emptyAction.Click+=async(_,_)=>{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}};library.Children.Add(emptyState);AddRow(main,library,2);
+        var library=new Grid();library.Children.Add(gamesList);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
         AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);AddRow(main,footer,4);
         var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
         var details=new StackPanel {Spacing=16,Margin=new(22,30)};details.Children.Add(new TextBlock{Text="IM FOKUS",FontSize=10,LetterSpacing=2,Opacity=0.6});details.Children.Add(new Border{CornerRadius=new(16),Padding=new Thickness(14),Background=new SolidColorBrush(Color.Parse("#10203030")),Child=detailCover});details.Children.Add(detailTitle);details.Children.Add(detailInfo);
@@ -693,10 +693,3 @@ public sealed partial class MainWindow : Window
         _=Dialog("Hilfe",text).ShowDialog(this);
     }
 }
-
-
-
-
-
-
-
