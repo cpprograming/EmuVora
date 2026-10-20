@@ -54,3 +54,49 @@ SOFTWARE.
 ## Optional ROM recognition metadata
 
 The optional metadata feature downloads original No-Intro DATs from https://github.com/libretro/libretro-database at commit 12c21cf79f1e20eff6ac68b80875816c717d0a7a. Upstream repository license: CC-BY-SA-4.0, https://creativecommons.org/licenses/by-sa/4.0/. Source metadata and original headers remain in the local cache. Only source URLs and content hashes are included in EmuVora; no complete ROM catalogs or ROM data are bundled. See ROM_RECOGNITION.md for attribution and supported scope.
+
+
+## SDL controller runtime and SDL_GameControllerDB
+
+The Windows package includes the unmodified official SDL 3.4.18 x64 runtime from https://github.com/libsdl-org/SDL/releases/tag/release-3.4.18 and the original SDL_GameControllerDB at commit ff333823a85ae896e73f4c53670932cf0f728adb from https://github.com/mdqinc/SDL_GameControllerDB. Both use the zlib license. Original copyright and license notices are also copied into the app/package as SDL3.LICENSE.txt and GameControllerDB.LICENSE.txt. Source pins and checksums are documented in CONTROLLERS.md.
+
+### SDL 3.4.18
+
+Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
+  
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+  
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required. 
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+
+### SDL_GameControllerDB
+
+Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+  
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required. 
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.

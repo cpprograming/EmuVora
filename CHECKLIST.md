@@ -4,6 +4,8 @@ Stand: 20. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 
 ## Aktueller Stand
 
+- [x] SDL 3.4.18 mit Controller-Datenbank für die Oberfläche integriert; 166 lokale Funktionstests inklusive echter SDL-Runtime und virtuellem Gamepad bestanden. XInput-Spielprofile bleiben erhalten; zusätzliche Spielprofile und Hardwareabnahme sind offen. Windows-CI und neue EXE folgen im Pull Request.
+
 - [x] Neues Logo, Icon für Programm/Setup/Verknüpfungen und überarbeitete Bibliotheksansicht veröffentlicht in 0.14.71; 152 Funktions- und 6 Netzwerktests sowie Installation, Update und Datenerhalt bestanden. [Vorschau](design/README.md).
 
 - [x] Einrichtungsassistent mit frei wählbarem Datenpfad.

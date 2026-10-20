@@ -12,6 +12,7 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            desktop.Exit+=(_,_)=>Gamepad.Shutdown();
             if(desktop.Args?.Contains("--esde-launch")==true)
             {
                 try{desktop.MainWindow=new GameLaunchWindow(EsDeLaunchRequest.Parse(desktop.Args));}

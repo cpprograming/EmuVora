@@ -76,6 +76,6 @@ public class ControllerTests
     {
         using var dir=new TestDirectory();new SettingsStore(System.IO.Path.Combine(dir.Path,"settings.json")).Save(new(){OnboardingCompleted=true,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,AutoDownloadCovers=false});
         var window=new MainWindow(dir.Path);window.Show();window.GetVisualDescendants().OfType<Button>().First(b=>b.Content as string=="Einstellungen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();var settings=Assert.Single(window.OwnedWindows);settings.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex=3;Dispatcher.UIThread.RunJobs();
-        settings.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Xbox-Controller prüfen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();var diagnostics=Assert.Single(settings.OwnedWindows);Assert.IsType<ControllerDiagnosticsWindow>(diagnostics);diagnostics.Close();settings.Close();window.Close();
+        settings.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Controller prüfen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Dispatcher.UIThread.RunJobs();var diagnostics=Assert.Single(settings.OwnedWindows);Assert.IsType<ControllerDiagnosticsWindow>(diagnostics);diagnostics.Close();settings.Close();window.Close();
     }
 }

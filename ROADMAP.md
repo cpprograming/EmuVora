@@ -23,6 +23,8 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 - [x] Release 0.12.64 veröffentlicht und per Updater geprüft; 134 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
 - [x] Praktische Prüfschritte in [CONTROLLERS.md](CONTROLLERS.md) dokumentiert.
 
+- [x] SDL 3 und feste GameControllerDB für zusätzliche Gamepads in Bibliothek/Dialogs ergänzt; XInput-Rückfall, keine doppelte Quelle und keine SDL-IDs in Xbox-Spielprofilen. [Anleitung](CONTROLLERS.md).
+- [ ] Automatische Spielprofile für zusätzliche Controller je Emulator ergänzen und prüfen.
 - [ ] Xbox-Controller per USB und Bluetooth auf echter Hardware testen.
 - [ ] Einrichtung, Dateiauswahl, Sicherung und Spielstart vollständig mit Controller durchspielen.
 - [ ] Abziehen, Wiederverbinden, Controllerwechsel und mehrere Spieler praktisch prüfen.
