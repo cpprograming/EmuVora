@@ -9,6 +9,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using EmuVora.Core;
 using System.Diagnostics;
 using System.Text.Json;
@@ -67,6 +68,13 @@ public sealed partial class MainWindow : Window
     private readonly TextBlock themeStatus=new(){TextWrapping=TextWrapping.Wrap,FontSize=12};
     private readonly Grid main=new(){RowDefinitions=new("Auto,Auto,*,Auto,Auto"),RowSpacing=16,Margin=new(24)};
     private readonly Dictionary<string,Bitmap> coverImages=new(StringComparer.OrdinalIgnoreCase);
+    private const int LibraryPageSize=48;
+    private int libraryPage;
+    private int libraryResultCount;
+    private readonly TextBlock pageLabel=new(){VerticalAlignment=VerticalAlignment.Center};
+    private readonly Button previousPage=new(){Content="Vorherige Seite"};
+    private readonly Button nextPage=new(){Content="Nächste Seite"};
+    private readonly StackPanel libraryPager=new(){Spacing=6,Margin=new(0,8,0,0)};
     private IReadOnlyList<Game> allGames=[];
     private string view="Alle Spiele";
     private CancellationTokenSource? operation;
@@ -116,7 +124,9 @@ public sealed partial class MainWindow : Window
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
         gamesList.ItemsPanel=new FuncTemplate<Panel?>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
         ScrollViewer.SetHorizontalScrollBarVisibility(gamesList,Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
-        var library=new Grid();library.Children.Add(gamesList);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
+        var library=new Grid{RowDefinitions=new("*,Auto")};library.Children.Add(gamesList);
+        var pageButtons=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};pageButtons.Children.Add(previousPage);pageButtons.Children.Add(nextPage);libraryPager.Children.Add(pageLabel);libraryPager.Children.Add(pageButtons);Grid.SetRow(libraryPager,1);library.Children.Add(libraryPager);
+        previousPage.Click+=(_,_)=>ChangeLibraryPage(-1);nextPage.Click+=(_,_)=>ChangeLibraryPage(1);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
         AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);AddRow(main,footer,4);
         var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
         var details=new StackPanel {Spacing=16,Margin=new(22,30)};details.Children.Add(new TextBlock{Text="IM FOKUS",FontSize=10,LetterSpacing=2,Opacity=0.6});details.Children.Add(new Border{CornerRadius=new(16),Padding=new Thickness(14),Background=new SolidColorBrush(Color.Parse("#10203030")),Child=detailCover});details.Children.Add(detailTitle);details.Children.Add(detailInfo);
@@ -201,13 +211,22 @@ public sealed partial class MainWindow : Window
     }
     private void Reload(string? selected=null)
     {allGames=store.GetAll();UpdateSystems();Refresh(selected);}
-    private void Refresh(string? selectedPath=null)
+    private void Refresh(string? selectedPath=null,bool keepPage=false)
     {
-        selectedPath??=Selected?.Path;var query=search.Text?.Trim()??"";var console=systems.SelectedItem as string;
+        var explicitSelection=selectedPath!=null;if(!keepPage)libraryPage=0;selectedPath??=Selected?.Path;var query=search.Text?.Trim()??"";var console=systems.SelectedItem as string;
         var filtered=allGames.Where(g=>(console is null or "Alle Konsolen"||g.System==console)&&(g.Title.Contains(query,StringComparison.OrdinalIgnoreCase)||g.System.Contains(query,StringComparison.OrdinalIgnoreCase)));
         filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),_=>filtered};
         var result=(sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
-        gamesList.ItemsSource=result;gamesList.SelectedItem=result.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));
+        libraryResultCount=result.Length;
+        if(explicitSelection&&selectedPath!=null&&!keepPage){var position=Array.FindIndex(result,g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));if(position>=0)libraryPage=position/LibraryPageSize;}
+        libraryPage=Math.Clamp(libraryPage,0,Math.Max(0,(result.Length-1)/LibraryPageSize));
+        var page=result.Skip(libraryPage*LibraryPageSize).Take(LibraryPageSize).ToArray();
+        foreach(var imageControl in gamesList.GetVisualDescendants().OfType<Image>())imageControl.Source=null;
+        gamesList.ItemsSource=null;detailCover.Content=null;
+        foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();
+        gamesList.ItemsSource=page;gamesList.SelectedItem=page.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));
+        libraryPager.IsVisible=result.Length>LibraryPageSize;previousPage.IsEnabled=libraryPage>0;nextPage.IsEnabled=(libraryPage+1)*LibraryPageSize<result.Length;
+        pageLabel.Text=$"Seite {libraryPage+1} / {Math.Max(1,(result.Length+LibraryPageSize-1)/LibraryPageSize)} · {libraryPage*LibraryPageSize+1}–{libraryPage*LibraryPageSize+page.Length} von {result.Length}";
         emptyState.IsVisible=empty.IsVisible=result.Length==0;emptyAction.Content=allGames.Count==0?"Ersten ROM-Ordner importieren":"Filter zurücksetzen";empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Deine Klassiker bekommen hier ein Zuhause. Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
         libraryHeading.Text=view=="Alle Spiele"?(console is null or "Alle Konsolen"?"Deine Spiele":console):view;
         libraryEyebrow.Text=view=="Favoriten"?"DEINE LIEBLINGSSTÜCKE":view=="Zuletzt gespielt"?"WEITERSPIELEN":"DEINE SAMMLUNG";
@@ -215,6 +234,13 @@ public sealed partial class MainWindow : Window
         ApplyExternalTheme();
         var selectedBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D5E9E5":"#273D3D");foreach(var(name,button)in viewButtons){button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;button.Background=name==view?selectedBrush:Brushes.Transparent;}
         foreach(var button in consoleNavigation.Children.OfType<Button>())button.Background=button.Tag as string==console?selectedBrush:Brushes.Transparent;
+    }
+    private void ChangeLibraryPage(int direction)
+    {
+        var target=libraryPage+direction;
+        if(target<0||target*LibraryPageSize>=libraryResultCount)return;
+        libraryPage=target;Refresh(keepPage:true);gamesList.SelectedIndex=direction>0?0:gamesList.ItemCount-1;
+        if(gamesList.SelectedItem!=null)gamesList.ScrollIntoView(gamesList.SelectedItem);
     }
     private Control Artwork(Game game,int width)
     {
@@ -341,16 +367,17 @@ public sealed partial class MainWindow : Window
     private Task FetchAllCoversAsync()=>BusyAsync(token=>DownloadMissingCoversAsync(allGames,token));
     private async Task DownloadMissingCoversAsync(IReadOnlyList<Game> games,CancellationToken token)
     {
-        var pending=games.Where(g=>!settings.Covers.TryGetValue(g.Path,out var cover)||!File.Exists(cover)).ToArray();if(pending.Length==0){status.Text="Alle Spiele haben bereits ein Cover.";return;}
+        var coverSnapshot=new Dictionary<string,string>(settings.Covers,StringComparer.OrdinalIgnoreCase);
+        var pending=await Task.Run(()=>games.Where(g=>!coverSnapshot.TryGetValue(g.Path,out var cover)||!File.Exists(cover)).ToArray(),token);if(pending.Length==0){status.Text="Alle Spiele haben bereits ein Cover.";return;}
         status.Text="Coverkatalog wird geladen …";using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,Path.Combine(dataDir,"cache","cover-index"),settings.CoverRegion);
-        var complete=false;var updates=new Progress<CoverBatchProgress>(p=>{if(complete)return;progress.IsIndeterminate=false;progress.Value=p.Completed*100.0/Math.Max(1,p.Total);status.Text=$"Cover {p.Completed}/{p.Total} · {p.Found} geladen · {p.Title}";});
+        var complete=false;var updates=new Progress<CoverBatchProgress>(p=>{if(complete||isClosed)return;progress.IsIndeterminate=false;progress.Value=p.Completed*100.0/Math.Max(1,p.Total);status.Text=$"Cover {p.Completed}/{p.Total} · {p.Found} geladen · {p.Title}";});
         try
         {
-            var result=await source.DownloadMissingAsync(pending,settings.Covers,Path.Combine(dataDir,"covers"),(game,file)=>{settings.Covers[game.Path]=file;settingsStore.Save(settings);},updates,token);
+            var result=await Task.Run(()=>source.DownloadMissingAsync(pending,coverSnapshot,Path.Combine(dataDir,"covers"),(game,file)=>{coverSnapshot[game.Path]=file;},updates,token),token);
             AtomicFile.WriteText(Path.Combine(dataDir,"cover-report.txt"),string.Join(Environment.NewLine,result.Report));
             status.Text=$"Cover fertig · {result.Found} geladen · {result.Missing} ohne Treffer · {result.Failed} Fehler. Details: cover-report.txt im Datenordner.";
         }
-        finally{complete=true;Refresh();}
+        finally{complete=true;foreach(var entry in coverSnapshot)settings.Covers.TryAdd(entry.Key,entry.Value);foreach(var game in pending)if(coverSnapshot.TryGetValue(game.Path,out var file))settings.Covers[game.Path]=file;settingsStore.Save(settings);if(!isClosed)Refresh(keepPage:true);}
     }
     private async Task TrackProcessAsync(Process process,Game game,string emulator)
     {
@@ -382,18 +409,20 @@ public sealed partial class MainWindow : Window
     }
     public async Task HandleLibraryControllerAsync(ushort pressed)
     {
-        if(operation!=null){if((pressed&0x2000)!=0)operation.Cancel();return;}
+        if(operation!=null&&(pressed&0x2000)!=0){operation.Cancel();return;}
         if(running.Count>0||pressed==0)return;
-        if((pressed&0x10)!=0){await ShowSettingsAsync();return;}
+        if((pressed&0x10)!=0){if(operation==null)await ShowSettingsAsync();return;}
         if((pressed&0x20)!=0){controllerUiMode=!controllerUiMode;if(controllerUiMode)ControllerUi.Handle(this,2);else gamesList.Focus();return;}
         if(controllerUiMode){if((pressed&0x2000)!=0){controllerUiMode=false;gamesList.Focus();}else ControllerUi.Handle(this,(ushort)pressed);return;}
         if((pressed&0x300)!=0&&systems.ItemCount>0)systems.SelectedIndex=(systems.SelectedIndex+((pressed&0x200)!=0?1:systems.ItemCount-1))%systems.ItemCount;
         if((pressed&0x2000)!=0){search.Text="";gamesList.Focus();return;}
         var count=gamesList.ItemCount;if(count==0)return;var index=Math.Max(0,gamesList.SelectedIndex);var columns=LibraryColumns();
         if((pressed&1)!=0)index-=columns;if((pressed&2)!=0)index+=columns;if((pressed&4)!=0)index--;if((pressed&8)!=0)index++;
-        gamesList.SelectedIndex=Math.Clamp(index,0,count-1);gamesList.ScrollIntoView(gamesList.SelectedItem!);
-        if((pressed&0x1000)!=0)await PlayAsync();
-        if((pressed&0x8000)!=0&&Selected is{} game)Guard(()=>{store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);});
+        if(index>=count&&(libraryPage+1)*LibraryPageSize<libraryResultCount)ChangeLibraryPage(1);
+        else if(index<0&&libraryPage>0)ChangeLibraryPage(-1);
+        else gamesList.SelectedIndex=Math.Clamp(index,0,count-1);gamesList.ScrollIntoView(gamesList.SelectedItem!);
+        if(operation==null&&(pressed&0x1000)!=0)await PlayAsync();
+        if(operation==null&&(pressed&0x8000)!=0&&Selected is{} game)Guard(()=>{store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);});
     }
     private async Task InstallManagedAsync(string id,CancellationToken token)
     {
