@@ -20,6 +20,10 @@ Die Bibliothek zeigt höchstens 48 Cover-Karten gleichzeitig. Vorherige/Nächste
 
 SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads automatisch für Bibliothek und Dialoge. Unter **Einstellungen → Emulatoren → Controller prüfen** Namen, Verbindung und Eingaben ansehen. XInput bleibt als Rückfall erhalten. Xbox-Spielprofile bleiben erhalten; andere Spielprofile werden weiterhin im Emulator eingerichtet. [Umfang, Herkunft und Tests](CONTROLLERS.md).
 
+## Verbesserte Cover-Erkennung
+
+Zusätzliche Suchvarianten entfernen Sammlungsnummern und Release-Zusätze wie `_USA`. Vollständige Wortgruppen mit römischen Ziffern oder abweichender Reihenfolge werden nur bei eindeutigem Katalogtitel übernommen; ähnliche Namen und andere Fortsetzungen bleiben ausgeschlossen. Gespeicherte Spielnamen und vorhandene Cover werden nicht geändert. Bei abgeschnittenen großen GitHub-Katalogen wird der vollständige Boxart-Unterordner separat geladen. Nicht jedes Spiel oder Zusatzmaterial besitzt ein Cover in der Quelle.
+
 ## Neues Logo und Bibliotheksdesign
 
 EmuVora verwendet ein eigenes mintfarbenes App-Zeichen, ruhigere Navigation, überarbeitete Cover-Karten und eine klar gegliederte Detailansicht. Helles und dunkles Design sowie TV-Modus bleiben verfügbar. Der Einrichtungsassistent, erneutes Scannen und ES-DE liegen jetzt unter **Verwaltung**. [Vorschau, Gestaltung und Prüfungen](https://github.com/cpprograming/EmuVora/blob/main/design/README.md).

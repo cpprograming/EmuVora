@@ -14,15 +14,38 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
 {
     private readonly Dictionary<string,IndexedCover[]> indexes=[];
     private readonly Dictionary<string,string> unavailable=[];
-    private record IndexedCover(string Name,string Title);
+    private record IndexedCover(string Name,string Title,string Words);
+    private static readonly Dictionary<string,string> Roman=new(){{"i","1"},{"ii","2"},{"iii","3"},{"iv","4"},{"v","5"},{"vi","6"},{"vii","7"},{"viii","8"},{"ix","9"},{"x","10"},{"xi","11"},{"xii","12"},{"xiii","13"}};
+    private static string Words(string title)
+    {
+        var text=Tags.Replace(title,"").Normalize(NormalizationForm.FormD);
+        var tokens=Regex.Matches(text,@"[\p{L}\p{N}]+[\p{Mn}\p{L}\p{N}]*").Select(m=>new string(m.Value.Where(c=>System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)!=System.Globalization.UnicodeCategory.NonSpacingMark).Select(char.ToLowerInvariant).ToArray())).ToArray();
+        return string.Join(" ",tokens.Select((word,i)=>i>0&&Roman.TryGetValue(word,out var number)?number:word).Where(w=>w is not ("the" or "a" or "an")).OrderBy(w=>w,StringComparer.Ordinal));
+    }
+    private static IndexedCover Indexed(string name)=>new(name,Normalize(Path.GetFileNameWithoutExtension(name)),Words(Path.GetFileNameWithoutExtension(name)));
     private static readonly Regex Tags=new(@"\([^)]*\)|\[[^]]*\]",RegexOptions.Compiled);
     public static string Normalize(string title)
     {
         var text=Tags.Replace(title,"").Trim();text=Regex.Replace(text,@"^(the|a|an)\s+", "",RegexOptions.IgnoreCase);text=Regex.Replace(text,@",\s*(the|a|an)\s*$", "",RegexOptions.IgnoreCase);text=text.Normalize(NormalizationForm.FormD);
         return new string(text.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
     }
-    public static string? Match(string title,IEnumerable<string> names,string region="Europe")=>Match(title,names.Select(n=>new IndexedCover(n,Normalize(Path.GetFileNameWithoutExtension(n)))).ToArray(),region);
+    public static string? Match(string title,IEnumerable<string> names,string region="Europe")=>Match(title,names.Select(n=>Indexed(n)).ToArray(),region);
     private static string? Match(string title,IndexedCover[] names,string region)
+    {
+        var direct=MatchWhole(title,names,region);if(direct!=null)return direct;
+        // Collection numbering and scene region suffixes are lookup hints only.
+        // Never alter the library title or accept partial/fuzzy title matches.
+        var clean=Regex.Replace(title,@"^\d{3,5}[ ._-]+(?=\p{L})","");
+        clean=Regex.Replace(clean,@"_(USA|EUR|EUROPE|JPN|JAPAN|WORLD)(?:_.*)?$","",RegexOptions.IgnoreCase).Replace('_',' ');
+        var cleaned=clean==title?null:MatchWhole(clean,names,region);if(cleaned!=null)return cleaned;
+        if(Regex.IsMatch(clean,@"^\d"))return null;
+        var key=Words(clean);if(key.Length==0)return null;
+        var candidates=names.Where(n=>n.Words==key).ToArray();
+        // Reordering and Roman numerals are permitted only for a single full title.
+        // Multiple distinct catalog titles with the same words remain unresolved.
+        return candidates.Select(n=>n.Title).Distinct(StringComparer.Ordinal).Count()==1?MatchWhole(candidates[0].Title+string.Concat(Tags.Matches(clean).Select(m=>m.Value)),names,region):null;
+    }
+    private static string? MatchWhole(string title,IndexedCover[] names,string region)
     {
         var exact=names.FirstOrDefault(n=>n.Name.Equals(title+".png",StringComparison.OrdinalIgnoreCase));if(exact!=null)return exact.Name;
         var key=Normalize(title);if(key.Length==0)return null;
@@ -57,15 +80,40 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
                 else
                 {
                     using var json=JsonDocument.Parse(await ReadBounded(response,24_000_000,token));
-                    if(json.RootElement.TryGetProperty("truncated",out var truncated)&&truncated.GetBoolean())throw new IOException("Der Coverkatalog ist unvollständig.");
+                    if(json.RootElement.TryGetProperty("truncated",out var truncated)&&truncated.GetBoolean())
+                    {
+                        names=await BoxartIndex(repository,token);
+                    }
+                    else
                     names=json.RootElement.GetProperty("tree").EnumerateArray().Where(e=>e.GetProperty("type").GetString()=="blob").Select(e=>e.GetProperty("path").GetString()!).Where(p=>p.StartsWith("Named_Boxarts/",StringComparison.Ordinal)&&p.EndsWith(".png",StringComparison.OrdinalIgnoreCase)&&!p[14..].Contains('/')).Select(p=>p[14..]).ToArray();
                 }
                 Directory.CreateDirectory(cacheDirectory);AtomicFile.WriteText(file,JsonSerializer.Serialize(names));
             }
             catch(Exception ex) when(ex is HttpRequestException or IOException){unavailable[repository]=ex.Message;throw;}
         }
-        var index=await Task.Run(()=>names.Where(n=>!string.IsNullOrWhiteSpace(n)&&n.Length<512&&Path.GetFileName(n)==n&&n.EndsWith(".png",StringComparison.OrdinalIgnoreCase)).Take(100_000).Select(n=>new IndexedCover(n,Normalize(Path.GetFileNameWithoutExtension(n)))).ToArray(),token);
+        var index=await Task.Run(()=>names.Where(n=>!string.IsNullOrWhiteSpace(n)&&n.Length<512&&Path.GetFileName(n)==n&&n.EndsWith(".png",StringComparison.OrdinalIgnoreCase)).Take(100_000).Select(n=>Indexed(n)).ToArray(),token);
         indexes[repository]=index;return index;
+    }
+    private async Task<string[]> BoxartIndex(string repository,CancellationToken token)
+    {
+        async Task<JsonDocument> Tree(string revision)
+        {
+            using var request=new HttpRequestMessage(HttpMethod.Get,$"https://api.github.com/repos/libretro-thumbnails/{repository}/git/trees/{revision}");
+            request.Headers.UserAgent.ParseAdd("EmuVora/0.14");
+            if(!string.IsNullOrEmpty(apiToken))request.Headers.Authorization=new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",apiToken);
+            using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,token);
+            if(response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests)throw new IOException("GitHub-Coverlimit erreicht. Später erneut versuchen; vorhandene Cover bleiben erhalten.");
+            var json=JsonDocument.Parse(await ReadBounded(response,24_000_000,token));
+            if(json.RootElement.TryGetProperty("truncated",out var cut)&&cut.GetBoolean()){json.Dispose();throw new IOException("Der Coverkatalog ist unvollständig.");}
+            return json;
+        }
+        using var root=await Tree("master");
+        var entry=root.RootElement.GetProperty("tree").EnumerateArray().FirstOrDefault(e=>e.GetProperty("type").GetString()=="tree"&&e.GetProperty("path").GetString()=="Named_Boxarts");
+        if(entry.ValueKind==JsonValueKind.Undefined)return [];
+        var sha=entry.GetProperty("sha").GetString()??"";
+        if(sha.Length!=40||!sha.All(Uri.IsHexDigit))throw new IOException("Ungültiger Coverkatalog-Verweis.");
+        using var boxarts=await Tree(sha);
+        return boxarts.RootElement.GetProperty("tree").EnumerateArray().Where(e=>e.GetProperty("type").GetString()=="blob").Select(e=>e.GetProperty("path").GetString()!).Where(p=>!p.Contains('/')&&p.EndsWith(".png",StringComparison.OrdinalIgnoreCase)).ToArray();
     }
     public async Task<string?> DownloadAsync(Game game,string folder,CancellationToken token=default)
     {
@@ -97,9 +145,9 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
         foreach(var game in pending)
         {
             token.ThrowIfCancellationRequested();
-            try{var file=await DownloadAsync(game,folder,token);if(file!=null){saved(game,file);found++;}else{missing++;report.Add(game.System+" · "+game.Title+": kein passender Titel im Coverkatalog.");}}
+            try{var file=await DownloadAsync(game,folder,token);if(file!=null){saved(game,file);found++;}else{missing++;report.Add(game.System+" Â· "+game.Title+": kein passender Titel im Coverkatalog.");}}
             catch(OperationCanceledException) when(token.IsCancellationRequested){throw;}
-            catch(Exception ex) when(ex is HttpRequestException or IOException or TaskCanceledException or JsonException){failed++;report.Add(game.System+" · "+game.Title+": "+ex.Message);}
+            catch(Exception ex) when(ex is HttpRequestException or IOException or TaskCanceledException or JsonException){failed++;report.Add(game.System+" Â· "+game.Title+": "+ex.Message);}
             progress?.Report(new(++completed,pending.Length,found,missing,failed,game.Title));
         }
         return new(found,missing,failed,report);
