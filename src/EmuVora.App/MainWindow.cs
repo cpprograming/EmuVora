@@ -56,6 +56,7 @@ public sealed partial class MainWindow : Window
     private readonly Border detailBorder=new();
     private Button? detailsToggle;
     private readonly StackPanel consoleNavigation=new(){Spacing=4};
+    private readonly ConsoleLogos consoleLogos=new();
     private readonly TextBlock displayStatus=new(){FontSize=12,Opacity=0.75,TextWrapping=TextWrapping.Wrap};
     private readonly Grid layout=new(){ColumnDefinitions=new("240,*,300")};
     private readonly TextBlock libraryHeading=new(){Text="Deine Spiele",FontSize=34,FontWeight=FontWeight.Bold,LetterSpacing=-0.8,TextWrapping=TextWrapping.Wrap};
@@ -145,7 +146,7 @@ public sealed partial class MainWindow : Window
         status.Text=settingsStore.LoadWarning??(allGames.Count==0?"Importiere deine Spiele, um loszulegen.":"Bereit zum Spielen · Strg+F zum Suchen");
         Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
-        Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
+        Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();consoleLogos.Dispose();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
     private void ApplyLayout(){if(detailsToggle!=null){detailsToggle.IsEnabled=!settings.TvMode&&(ClientSize.Width==0||ClientSize.Width>=1120);ToolTip.SetTip(detailsToggle,"Die rechte Detailspalte ist im Desktop-Modus ab 1120 Pixel Fensterbreite verfügbar.");}var show=!settings.TvMode&&settings.ShowGameDetails&&(ClientSize.Width==0||ClientSize.Width>=1120);detailBorder.IsVisible=show;layout.ColumnDefinitions[0].Width=new GridLength(settings.TvMode?320:240);layout.ColumnDefinitions[2].Width=new GridLength(show?300:0);}
@@ -207,7 +208,8 @@ public sealed partial class MainWindow : Window
     {
         var previous=systems.SelectedItem as string;var choices=new[]{"Alle Konsolen"}.Concat(allGames.Select(g=>g.System).Distinct().Order()).ToArray();
         systems.ItemsSource=choices;systems.SelectedItem=previous!=null&&choices.Contains(previous)?previous:"Alle Konsolen";
-        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console+" · "+group.Count(),()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});item.Tag=console;StyleNavigation(item);consoleNavigation.Children.Add(item);}
+        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console,()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});item.Tag=console;item.Classes.Add("library-navigation");item.Classes.Add("console-filter");item.HorizontalContentAlignment=HorizontalAlignment.Stretch;item.ContentTemplate=null;item.Content=consoleLogos.CreateContent(console,group.Count());
+            Avalonia.Automation.AutomationProperties.SetName(item,console+" - "+group.Count()+" Spiele");Avalonia.Automation.AutomationProperties.SetAutomationId(item,"console-filter-"+Uri.EscapeDataString(console));ToolTip.SetTip(item,console+" - "+group.Count()+" Spiele");consoleNavigation.Children.Add(item);}
     }
     private void Reload(string? selected=null)
     {allGames=store.GetAll();UpdateSystems();Refresh(selected);}
@@ -233,7 +235,7 @@ public sealed partial class MainWindow : Window
         var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
         ApplyExternalTheme();
         var selectedBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D5E9E5":"#273D3D");foreach(var(name,button)in viewButtons){button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;button.Background=name==view?selectedBrush:Brushes.Transparent;}
-        foreach(var button in consoleNavigation.Children.OfType<Button>())button.Background=button.Tag as string==console?selectedBrush:Brushes.Transparent;
+        foreach(var button in consoleNavigation.Children.OfType<Button>()){var selectedConsole=button.Tag as string==console;button.Background=selectedConsole?selectedBrush:Brushes.Transparent;button.Classes.Set("selected-console",selectedConsole);}
     }
     private void ChangeLibraryPage(int direction)
     {

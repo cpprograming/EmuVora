@@ -20,6 +20,10 @@ Die Bibliothek zeigt höchstens 48 Cover-Karten gleichzeitig. Vorherige/Nächste
 
 SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads automatisch für Bibliothek und Dialoge. Unter **Einstellungen → Emulatoren → Controller prüfen** Namen, Verbindung und Eingaben ansehen. XInput bleibt als Rückfall erhalten. Xbox-Spielprofile bleiben erhalten; andere Spielprofile werden weiterhin im Emulator eingerichtet. [Umfang, Herkunft und Tests](CONTROLLERS.md).
 
+## Konsolenlogos im Seitenmenü
+
+Das Konsolenmenü zeigt offline mitgelieferte Logos für alle 47 unterstützten Systeme statt ausgeschriebener Namen. Spielanzahl und Auswahlrahmen bleiben sichtbar; Namen erscheinen als Tooltip und sind für die barrierefreie Bedienung hinterlegt. Neo Geo CD und FinalBurn Neo erhalten zusätzliche Kennzeichnungen. Unbekannte Systeme verwenden ein neutrales Symbol. Die Darstellung unterstützt helles Design, dunkles Design und TV-Modus. Herkunft und Lizenz: [Konsolenlogos](third-party/console-logos/README.md).
+
 ## Verbesserte Cover-Erkennung – neu in 0.14.81
 
 Zusätzliche Suchvarianten entfernen Sammlungsnummern und Release-Zusätze wie `_USA`. Explizite regionale Alternativtitel (`~`) sowie vollständige Wortgruppen mit römischen Ziffern oder abweichender Reihenfolge werden nur bei eindeutigem Katalogtitel übernommen; ähnliche Namen und andere Fortsetzungen bleiben ausgeschlossen. Gespeicherte Spielnamen und vorhandene Cover werden nicht geändert. Bei abgeschnittenen großen GitHub-Katalogen wird der vollständige Boxart-Unterordner separat geladen. Nicht jedes Spiel oder Zusatzmaterial besitzt ein Cover in der Quelle.

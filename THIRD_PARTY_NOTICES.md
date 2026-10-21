@@ -21,7 +21,9 @@ Downloaded emulator packages are provided by their original projects. Their bund
 - [Dolphin](https://dolphin-emu.org/).
 - [PPSSPP](https://github.com/hrydgard/ppsspp).
 
-Online cover requests use [libretro-thumbnails](https://github.com/libretro-thumbnails). Artwork rights remain with the original rights holders. No artwork is bundled with EmuVora.
+Online cover requests use [libretro-thumbnails](https://github.com/libretro-thumbnails). Artwork rights remain with the original rights holders. No game cover artwork is bundled with EmuVora.
+
+Console menu logos come from [RetroPie/es-theme-carbon](https://github.com/RetroPie/es-theme-carbon/tree/b09973e0b0c589cb11fe772c169a6ff5d588b390), by Rookervik, based on the Simple theme by Nils Bonenberger. The upstream README identifies CC-BY-NC-SA 2.0 and includes a 4.0 license text; its full original attribution, trademark notice and license text ship as `ConsoleLogos.LICENSE.txt`. Original SVGs and adaptation details are retained under `third-party/console-logos`. Derived PNGs are transparently cropped and proportionally scaled; they retain the upstream noncommercial/share-alike artwork terms and are separate from EmuVora's MIT license. Logos and trademarks remain with their respective owners.
 
 This notice is an index, not a replacement for upstream license texts. Refer to upstream repositories and the downloaded package notices for complete license conditions.
 

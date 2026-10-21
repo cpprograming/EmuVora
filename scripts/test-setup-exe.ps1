@@ -10,6 +10,7 @@ function Invoke-TestSetup{
 Invoke-TestSetup
 if(!(Test-Path -LiteralPath (Join-Path $taskInstall 'App/EmuVora.App.exe'))){throw 'Application missing.'}
 if(!(Test-Path -LiteralPath (Join-Path $taskInstall 'App/EmuVora.ico'))){throw 'Own shortcut icon missing.'}
+if(!(Test-Path -LiteralPath (Join-Path $taskInstall 'App/ConsoleLogos.LICENSE.txt'))){throw 'Console logo attribution and license missing.'}
 foreach($taskControllerFile in @('SDL3.dll','gamecontrollerdb.txt','SDL3.LICENSE.txt','GameControllerDB.LICENSE.txt')){
     if(!(Test-Path -LiteralPath (Join-Path $taskInstall ('App/'+$taskControllerFile)))){throw ('Controller component missing: '+$taskControllerFile)}
 }

@@ -16,6 +16,13 @@ public static class WindowAppearance
         window.Styles.Add(new Style(s=>s.OfType<TextBox>()){Setters={new Setter(TextBox.CornerRadiusProperty,new CornerRadius(8))}});
         window.Styles.Add(new Style(s=>s.OfType<ComboBox>()){Setters={new Setter(ComboBox.CornerRadiusProperty,new CornerRadius(8))}});
         window.Styles.Add(new Style(s=>s.OfType<Button>().Class("library-navigation")){Setters={new Setter(Button.BorderThicknessProperty,new Thickness(0)),new Setter(Button.MinHeightProperty,39d),new Setter(Button.BackgroundProperty,Brushes.Transparent),new Setter(Button.PaddingProperty,new Thickness(12,10))}});
+        window.Styles.Add(new Style(s=>s.OfType<Image>().Class("console-logo")){Setters={new Setter(Image.HeightProperty,24d),new Setter(Image.MaxWidthProperty,124d)}});
+        window.Styles.Add(new Style(s=>s.Class("tv-mode").Descendant().OfType<Image>().Class("console-logo")){Setters={new Setter(Image.HeightProperty,32d)}});
+        window.Styles.Add(new Style(s=>s.OfType<TextBlock>().Class("console-count")){Setters={new Setter(TextBlock.FontSizeProperty,12d)}});
+        window.Styles.Add(new Style(s=>s.OfType<TextBlock>().Class("console-variant")){Setters={new Setter(TextBlock.FontSizeProperty,10d)}});
+        window.Styles.Add(new Style(s=>s.Class("tv-mode").Descendant().OfType<TextBlock>().Class("console-count")){Setters={new Setter(TextBlock.FontSizeProperty,16d)}});
+        window.Styles.Add(new Style(s=>s.Class("tv-mode").Descendant().OfType<TextBlock>().Class("console-variant")){Setters={new Setter(TextBlock.FontSizeProperty,14d)}});
+        window.Styles.Add(new Style(s=>s.OfType<Button>().Class("console-filter").Class("selected-console")){Setters={new Setter(Button.BorderThicknessProperty,new Thickness(2)),new Setter(Button.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
         window.Styles.Add(new Style(s=>s.OfType<Button>().Class("primary-action")){Setters={new Setter(Button.BackgroundProperty,new DynamicResourceExtension("EmuAccent")),new Setter(Button.ForegroundProperty,new DynamicResourceExtension("EmuAccentText")),new Setter(Button.FontWeightProperty,FontWeight.SemiBold)}});
         window.Styles.Add(new Style(s=>s.OfType<Button>()){Setters={new Setter(Button.ContentTemplateProperty,new FuncDataTemplate<string>((text,_)=>new TextBlock{Text=text,TextWrapping=TextWrapping.Wrap,TextAlignment=TextAlignment.Center}))}});
         window.Styles.Add(new Style(s=>s.OfType<Button>().Class(":focus")){Setters={new Setter(Button.BorderBrushProperty,Brush.Parse("#37A5FF")),new Setter(Button.BorderThicknessProperty,new Thickness(2))}});

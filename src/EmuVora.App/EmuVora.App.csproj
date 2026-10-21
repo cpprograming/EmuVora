@@ -6,6 +6,7 @@
 <Content Include="$(ControllerRuntime)/SDL3.dll" Link="SDL3.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
 <Content Include="$(ControllerRuntime)/gamecontrollerdb.txt" Link="gamecontrollerdb.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
 <Content Include="../../third-party/controller-licenses/*.txt" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+<Content Include="../../third-party/console-logos/UPSTREAM-README.txt" Link="ConsoleLogos.LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
 </ItemGroup></Project>
 
 
