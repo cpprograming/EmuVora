@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.78](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.78)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.81](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.81)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -20,7 +20,7 @@ Die Bibliothek zeigt höchstens 48 Cover-Karten gleichzeitig. Vorherige/Nächste
 
 SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads automatisch für Bibliothek und Dialoge. Unter **Einstellungen → Emulatoren → Controller prüfen** Namen, Verbindung und Eingaben ansehen. XInput bleibt als Rückfall erhalten. Xbox-Spielprofile bleiben erhalten; andere Spielprofile werden weiterhin im Emulator eingerichtet. [Umfang, Herkunft und Tests](CONTROLLERS.md).
 
-## Verbesserte Cover-Erkennung
+## Verbesserte Cover-Erkennung – neu in 0.14.81
 
 Zusätzliche Suchvarianten entfernen Sammlungsnummern und Release-Zusätze wie `_USA`. Explizite regionale Alternativtitel (`~`) sowie vollständige Wortgruppen mit römischen Ziffern oder abweichender Reihenfolge werden nur bei eindeutigem Katalogtitel übernommen; ähnliche Namen und andere Fortsetzungen bleiben ausgeschlossen. Gespeicherte Spielnamen und vorhandene Cover werden nicht geändert. Bei abgeschnittenen großen GitHub-Katalogen wird der vollständige Boxart-Unterordner separat geladen. Nicht jedes Spiel oder Zusatzmaterial besitzt ein Cover in der Quelle.
 

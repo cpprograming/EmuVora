@@ -2,7 +2,14 @@
 
 Stand: 21. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.78](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.78).
+Aktueller geprüfter Release: [0.14.81](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.81).
+
+## 0.14.81 – Cover-Treffer (abgeschlossen)
+
+- [x] Sammlungsnummern und Release-Zusätze für die Suche bereinigen, ohne gespeicherte Titel zu verändern.
+- [x] Eindeutige vollständige Wortgruppen, römische Ziffern und explizite regionale Alternativtitel unterstützen; Mehrdeutigkeiten und andere Fortsetzungen ausschließen.
+- [x] Abgeschnittene große Cover-Kataloge über vollständige Boxart-Unterordner laden.
+- [x] 172 Funktionstests, 6 Netzwerktests und Installer-/Update-Prüfungen bestanden. Nicht alle Prototypen, Zusatzdateien oder Spiele besitzen ein Cover in der Quelle.
 
 ## 0.14.78 – Startstabilität (abgeschlossen)
 
