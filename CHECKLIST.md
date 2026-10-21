@@ -4,6 +4,8 @@ Stand: 21. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 
 ## Aktueller Stand
 
+- [x] Cover-Zuordnung in 0.14.86 präzisiert ([PR #24](https://github.com/cpprograming/EmuVora/pull/24)): echte Untertitel und bedeutungstragende Jahreszahlen bewahren, bekannte plattformgebundene Titelvarianten berücksichtigen und GB/GBC-Katalog anhand validierter ROM-Header bestimmen. Keine Änderung an gespeicherten Titeln, Konsolen oder ROMs. Acht zusätzliche Prüffälle; 184 Funktions- und 6 Netzwerktests sowie Installer-/Update-Prüfungen bestanden.
+
 - [x] Konsolenlogos statt ausgeschriebener Namen im Seitenmenü in 0.14.84 veröffentlicht ([PR #23](https://github.com/cpprograming/EmuVora/pull/23)): 47 Systeme, offline mitgelieferte Bilder, Spielzahlen, Tooltips, barrierefreie Namen und Auswahlrahmen. Helles Design, dunkles Design, TV-Größen und Controller-Filter geprüft. 176 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen einschließlich mitgelieferter Logo-Lizenz bestanden.
 
 - [x] Cover-Erkennung in 0.14.81 verbessert ([PR #22](https://github.com/cpprograming/EmuVora/pull/22)): Sammlungsnummern, Release-Zusätze, eindeutige vollständige Wortgruppen, römische Ziffern und explizite regionale Alternativtitel. Große abgeschnittene Kataloge über vollständigen Boxart-Unterordner laden. Fünf neue Regressionstests; 172 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
@@ -22,9 +24,9 @@ Stand: 21. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] EmulationStation-Theme-Import und optionaler ES-DE-/AlekFull-Start.
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
-- [x] 176 Funktionstests und 6 Netzwerktests auch im Release-Build 0.14.84 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] 184 Funktionstests und 6 Netzwerktests auch im Release-Build 0.14.86 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 
-Der aktuelle Stand ist als [Release 0.14.84](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.84) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.14.86](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.86) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 - [x] BIOS-Dateiauswahl mit sichtbarer Bestätigung, direktem Pfadimport, automatischer Benennung erkannter Inhalte und Ergebnisübersicht korrigiert ([PR #13](https://github.com/cpprograming/EmuVora/pull/13), ab 0.11.59). Originaldateien bleiben erhalten.
 

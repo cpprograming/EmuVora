@@ -2,7 +2,15 @@
 
 Stand: 21. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.84](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.84).
+Aktueller geprüfter Release: [0.14.86](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.86).
+
+## 0.14.86 – Präzise Cover-Zuordnung (abgeschlossen)
+
+- [x] Echte Untertitel in Klammern und bedeutungstragende Jahreszahlen erhalten; bekannte Metadaten getrennt behandeln.
+- [x] Kleine plattformgebundene Liste bekannter Titelvarianten ergänzen; exakte Editionsnamen bleiben vorrangig.
+- [x] GB/GBC-Coverkatalog aus validiertem Cartridge-Header und Prüfsumme wählen, auch für einzelne ROMs in ZIPs.
+- [x] Ungültige Header und mehrdeutige Archive lösen keinen geratenen Plattformwechsel aus; Bibliotheksdaten und ROMs bleiben erhalten.
+- [x] 184 Funktions- und 6 Netzwerktests sowie Installation, Update und Datenerhalt bestanden.
 
 ## 0.14.84 – Konsolenmenü (abgeschlossen)
 
