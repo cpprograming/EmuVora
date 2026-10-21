@@ -18,25 +18,51 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
     private static readonly Dictionary<string,string> Roman=new(){{"i","1"},{"ii","2"},{"iii","3"},{"iv","4"},{"v","5"},{"vi","6"},{"vii","7"},{"viii","8"},{"ix","9"},{"x","10"},{"xi","11"},{"xii","12"},{"xiii","13"}};
     private static string Words(string title)
     {
-        var text=Tags.Replace(title,"").Normalize(NormalizationForm.FormD);
+        var text=TitleText(title).Normalize(NormalizationForm.FormD);
         var tokens=Regex.Matches(text,@"[\p{L}\p{N}]+[\p{Mn}\p{L}\p{N}]*").Select(m=>new string(m.Value.Where(c=>System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)!=System.Globalization.UnicodeCategory.NonSpacingMark).Select(char.ToLowerInvariant).ToArray())).ToArray();
         return string.Join(" ",tokens.Select((word,i)=>i>0&&Roman.TryGetValue(word,out var number)?number:word).Where(w=>w is not ("the" or "a" or "an")).OrderBy(w=>w,StringComparer.Ordinal));
     }
     private static IndexedCover Indexed(string name)=>new(name,Normalize(Path.GetFileNameWithoutExtension(name)),Words(Path.GetFileNameWithoutExtension(name)));
     private static readonly Regex Tags=new(@"\([^)]*\)|\[[^]]*\]",RegexOptions.Compiled);
+    private static readonly HashSet<string> Metadata=new(StringComparer.OrdinalIgnoreCase)
+    {
+        "USA","US","U","Europe","EU","E","Japan","JPN","J","World","Asia","Brazil","BR","Germany","France","Spain","Italy","UK","United Kingdom","Australia","Canada","China","Taiwan","Hong Kong","Korea","Russia","Sweden","Netherlands","Denmark","Finland","Norway","Portugal","Unknown",
+        "SGB Enhanced","GB Compatible","Virtual Console","Rumble Version","Switch Online","Unl","Pirate","Hack","Proto","Prototype","Beta","Demo","Sample"
+    };
+    private static bool IsMetadata(string value)
+    {
+        value=value.Trim();
+        if(value.Split(',').All(part=>Metadata.Contains(part.Trim())))return true;
+        return Regex.IsMatch(value,@"^(?:(?:En|Fr|De|Es|It|Nl|Pt|Sv|Da|No|Fi|Pl|Ru|Ja|Ko|Zh|Cs|Hu|El|Tr|Ar|He)(?:,\s*|$))+$",RegexOptions.IgnoreCase)
+            ||Regex.IsMatch(value,@"^(?:(?:Rev|Beta|Proto|Demo|Sample)\s+[A-Za-z0-9.+-]+|v\d+(?:\.\d+)*|\d{4}(?:-\d{2}){1,2}|\d+\s*(?:Mb|Mbit|KB))$",RegexOptions.IgnoreCase);
+    }
+    private static string TitleText(string title)=>Tags.Replace(title,m=>m.Value[0]=='['||IsMetadata(m.Value[1..^1])?" ":" "+m.Value[1..^1]+" ");
+    private static string[] MetadataTags(string title)=>Tags.Matches(title).Where(m=>m.Value[0]=='['||IsMetadata(m.Value[1..^1])).Select(m=>m.Value).ToArray();
+    private static string LookupTitle(string title)=>Regex.Replace(Regex.Replace(title,@"^\d{3,5}[ ._-]+(?=\p{L})",""),@"_(USA|EUR|EUROPE|JPN|JAPAN|WORLD)(?:_.*)?$","",RegexOptions.IgnoreCase).Replace('_',' ');
+    private static readonly Dictionary<(string System,string Title),string> KnownTitles=new()
+    {
+        [("GB","harvestmoon")]="Harvest Moon GB",[("GBC","harvestmoon")]="Harvest Moon GB",
+        [("GB","spidermanandthexmenarcadesrevenge")]="Spider-Man - X-Men - Arcade's Revenge",
+        [("Saturn","megaman8anniversarycollectorsedition")]="Mega Man 8",
+        [("SNES","bugsbunnyinrabbitrampage")]="Bugs Bunny - Rabbit Rampage"
+    };
+    private static string? MatchSystem(string title,IndexedCover[] names,string region,string? system)
+    {
+        var match=Match(title,names,region);if(match!=null)return match;
+        return system!=null&&KnownTitles.TryGetValue((system,Normalize(LookupTitle(title))),out var alias)?Match(alias,names,region):null;
+    }
     public static string Normalize(string title)
     {
-        var text=Tags.Replace(title,"").Trim();text=Regex.Replace(text,@"^(the|a|an)\s+", "",RegexOptions.IgnoreCase);text=Regex.Replace(text,@",\s*(the|a|an)\s*$", "",RegexOptions.IgnoreCase);text=text.Normalize(NormalizationForm.FormD);
+        var text=TitleText(title).Trim();text=Regex.Replace(text,@"^(the|a|an)\s+", "",RegexOptions.IgnoreCase);text=Regex.Replace(text,@",\s*(the|a|an)\s*$", "",RegexOptions.IgnoreCase);text=text.Normalize(NormalizationForm.FormD);
         return new string(text.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
     }
-    public static string? Match(string title,IEnumerable<string> names,string region="Europe")=>Match(title,names.Select(n=>Indexed(n)).ToArray(),region);
+    public static string? Match(string title,IEnumerable<string> names,string region="Europe",string? system=null)=>MatchSystem(title,names.Select(n=>Indexed(n)).ToArray(),region,system);
     private static string? Match(string title,IndexedCover[] names,string region)
     {
         var direct=MatchWhole(title,names,region);if(direct!=null)return direct;
         // Collection numbering and scene region suffixes are lookup hints only.
         // Never alter the library title or accept partial/fuzzy title matches.
-        var clean=Regex.Replace(title,@"^\d{3,5}[ ._-]+(?=\p{L})","");
-        clean=Regex.Replace(clean,@"_(USA|EUR|EUROPE|JPN|JAPAN|WORLD)(?:_.*)?$","",RegexOptions.IgnoreCase).Replace('_',' ');
+        var clean=LookupTitle(title);
         var cleaned=clean==title?null:MatchWhole(clean,names,region);if(cleaned!=null)return cleaned;
         var aliases=clean.Split(" ~ ",StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries);
         if(aliases.Length>1)
@@ -46,13 +72,13 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
         var candidates=names.Where(n=>n.Words==key).ToArray();
         // Reordering and Roman numerals are permitted only for a single full title.
         // Multiple distinct catalog titles with the same words remain unresolved.
-        return candidates.Select(n=>n.Title).Distinct(StringComparer.Ordinal).Count()==1?MatchWhole(candidates[0].Title+string.Concat(Tags.Matches(clean).Select(m=>m.Value)),names,region):null;
+        return candidates.Select(n=>n.Title).Distinct(StringComparer.Ordinal).Count()==1?MatchWhole(candidates[0].Title+string.Concat(MetadataTags(clean)),names,region):null;
     }
     private static string? MatchWhole(string title,IndexedCover[] names,string region)
     {
         var exact=names.FirstOrDefault(n=>n.Name.Equals(title+".png",StringComparison.OrdinalIgnoreCase));if(exact!=null)return exact.Name;
         var key=Normalize(title);if(key.Length==0)return null;
-        var tags=Tags.Matches(title).Select(m=>m.Value).ToArray();
+        var tags=MetadataTags(title);
         int Rank(string name)=>tags.Length>0&&tags.All(t=>name.Contains(t,StringComparison.OrdinalIgnoreCase))?0:name.Contains("("+region,StringComparison.OrdinalIgnoreCase)?1:name.Contains("(World",StringComparison.OrdinalIgnoreCase)?2:name.Contains("(USA",StringComparison.OrdinalIgnoreCase)?3:4;
         return names.Where(n=>n.Title==key).OrderBy(n=>Rank(n.Name)).ThenBy(n=>n.Name,StringComparer.Ordinal).Select(n=>n.Name).FirstOrDefault();
     }
@@ -120,8 +146,10 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
     }
     public async Task<string?> DownloadAsync(Game game,string folder,CancellationToken token=default)
     {
-        var repository=CoverLookup.Repository(game.System);if(repository==null)return null;
-        var index=await Index(repository,token);var name=Match(game.Title,index,region);if(name==null)return null;
+        var lookupSystem=game.System;
+        if(lookupSystem is "GB" or "GBC")lookupSystem=await GameBoyCoverSystem.DetectAsync(game.Path,token)??lookupSystem;
+        var repository=CoverLookup.Repository(lookupSystem);if(repository==null)return null;
+        var index=await Index(repository,token);var name=MatchSystem(game.Title,index,region,lookupSystem);if(name==null)return null;
         byte[] image=[];var visited=new HashSet<string>(StringComparer.Ordinal);
         for(var hop=0;hop<5;hop++)
         {
