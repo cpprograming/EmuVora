@@ -22,7 +22,7 @@ SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads
 
 ## Verbesserte Cover-Erkennung
 
-Zusätzliche Suchvarianten entfernen Sammlungsnummern und Release-Zusätze wie `_USA`. Vollständige Wortgruppen mit römischen Ziffern oder abweichender Reihenfolge werden nur bei eindeutigem Katalogtitel übernommen; ähnliche Namen und andere Fortsetzungen bleiben ausgeschlossen. Gespeicherte Spielnamen und vorhandene Cover werden nicht geändert. Bei abgeschnittenen großen GitHub-Katalogen wird der vollständige Boxart-Unterordner separat geladen. Nicht jedes Spiel oder Zusatzmaterial besitzt ein Cover in der Quelle.
+Zusätzliche Suchvarianten entfernen Sammlungsnummern und Release-Zusätze wie `_USA`. Explizite regionale Alternativtitel (`~`) sowie vollständige Wortgruppen mit römischen Ziffern oder abweichender Reihenfolge werden nur bei eindeutigem Katalogtitel übernommen; ähnliche Namen und andere Fortsetzungen bleiben ausgeschlossen. Gespeicherte Spielnamen und vorhandene Cover werden nicht geändert. Bei abgeschnittenen großen GitHub-Katalogen wird der vollständige Boxart-Unterordner separat geladen. Nicht jedes Spiel oder Zusatzmaterial besitzt ein Cover in der Quelle.
 
 ## Neues Logo und Bibliotheksdesign
 

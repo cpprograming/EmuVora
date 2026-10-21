@@ -34,6 +34,7 @@ public class CoverDisplayTests
         var games=new[]{new Game("Mario","SNES","mario"),new Game("Zelda","SNES","zelda"),new Game("Owned","SNES","owned"),new Game("Unknown","SNES","unknown")};
         var source=new CoverCatalog(http,Path.Combine(dir.Path,"cache"));var result=await source.DownloadMissingAsync(games,covers,Path.Combine(dir.Path,"covers"),(game,file)=>covers[game.Path]=file);
         Assert.Equal(2,result.Found);Assert.Equal(1,result.Missing);Assert.Equal(0,result.Failed);Assert.Equal(1,handler.IndexRequests);Assert.Equal(2,handler.ImageRequests);Assert.Equal("own cover",File.ReadAllText(covers["owned"]));
+        Assert.StartsWith("SNES \u00b7 Unknown:",Assert.Single(result.Report));
         await new CoverCatalog(http,Path.Combine(dir.Path,"cache")).DownloadAsync(games[0],Path.Combine(dir.Path,"covers"));Assert.Equal(1,handler.IndexRequests);
         covers.Clear();using var cancellation=new CancellationTokenSource();await Assert.ThrowsAsync<OperationCanceledException>(()=>source.DownloadMissingAsync(games,covers,Path.Combine(dir.Path,"cancelled"),(game,file)=>{covers[game.Path]=file;cancellation.Cancel();},token:cancellation.Token));
         Assert.True(File.Exists(covers["mario"]));Assert.False(covers.ContainsKey("zelda"));Assert.Empty(Directory.GetFiles(Path.Combine(dir.Path,"cancelled"),"*.new"));

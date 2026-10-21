@@ -38,6 +38,9 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
         var clean=Regex.Replace(title,@"^\d{3,5}[ ._-]+(?=\p{L})","");
         clean=Regex.Replace(clean,@"_(USA|EUR|EUROPE|JPN|JAPAN|WORLD)(?:_.*)?$","",RegexOptions.IgnoreCase).Replace('_',' ');
         var cleaned=clean==title?null:MatchWhole(clean,names,region);if(cleaned!=null)return cleaned;
+        var aliases=clean.Split(" ~ ",StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries);
+        if(aliases.Length>1)
+            return aliases.Select(alias=>Match(alias,names,region)).Where(name=>name!=null).OrderBy(name=>name!.Contains("("+region,StringComparison.OrdinalIgnoreCase)?0:name.Contains("(World",StringComparison.OrdinalIgnoreCase)?1:2).ThenBy(name=>name,StringComparer.Ordinal).FirstOrDefault();
         if(Regex.IsMatch(clean,@"^\d"))return null;
         var key=Words(clean);if(key.Length==0)return null;
         var candidates=names.Where(n=>n.Words==key).ToArray();
@@ -145,9 +148,9 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
         foreach(var game in pending)
         {
             token.ThrowIfCancellationRequested();
-            try{var file=await DownloadAsync(game,folder,token);if(file!=null){saved(game,file);found++;}else{missing++;report.Add(game.System+" Â· "+game.Title+": kein passender Titel im Coverkatalog.");}}
+            try{var file=await DownloadAsync(game,folder,token);if(file!=null){saved(game,file);found++;}else{missing++;report.Add(game.System+" \u00b7 "+game.Title+": kein passender Titel im Coverkatalog.");}}
             catch(OperationCanceledException) when(token.IsCancellationRequested){throw;}
-            catch(Exception ex) when(ex is HttpRequestException or IOException or TaskCanceledException or JsonException){failed++;report.Add(game.System+" Â· "+game.Title+": "+ex.Message);}
+            catch(Exception ex) when(ex is HttpRequestException or IOException or TaskCanceledException or JsonException){failed++;report.Add(game.System+" \u00b7 "+game.Title+": "+ex.Message);}
             progress?.Report(new(++completed,pending.Length,found,missing,failed,game.Title));
         }
         return new(found,missing,failed,report);

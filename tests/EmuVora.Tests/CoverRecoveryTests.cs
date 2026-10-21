@@ -30,6 +30,15 @@ public class CoverRecoveryTests
         Assert.Null(CoverCatalog.Match("003 Star II Quest",["Star Quest 2 (USA).png","Quest Star 2 (Europe).png"]));
     }
 
+    [Fact] public void ExplicitRegionalAliasesMatchWholeTitlesWithoutSplittingCompilations()
+    {
+        string[] names=["Moon Pilot (USA).png","Lunar Pilot (Europe).png"];
+        Assert.Equal(names[1],CoverCatalog.Match("Moon Pilot ~ Lunar Pilot (USA, Europe)",names));
+        Assert.Null(CoverCatalog.Match("Moon Pilot + Lunar Pilot",names));
+        Assert.Null(CoverCatalog.Match("Moon Pilot & Lunar Pilot",names));
+        Assert.Null(CoverCatalog.Match("Moon ~ Lunar",names));
+    }
+
     private sealed class TruncatedSource(bool subtreeTruncated=false):HttpMessageHandler
     {
         public int Requests;
