@@ -2,7 +2,15 @@
 
 Stand: 21. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.81](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.81).
+Aktueller geprüfter Release: [0.14.84](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.84).
+
+## 0.14.84 – Konsolenmenü (abgeschlossen)
+
+- [x] Offline-Logos für alle 47 unterstützten Systeme statt ausgeschriebener Menünamen.
+- [x] Spielzahlen, Tooltips und barrierefreie Namen beibehalten; Neo Geo CD und FinalBurn Neo unterscheiden.
+- [x] Auswahlrahmen, Controller-Filter, helle/dunkle Darstellung und größere Logos/Zahlen im TV-Modus geprüft.
+- [x] Herkunft, Original-SVGs und vollständige Upstream-Lizenz erhalten; Lizenz im Setup mitliefern.
+- [x] 176 Funktions- und 6 Netzwerktests sowie Installation, Update und Datenerhalt bestanden.
 
 ## 0.14.81 – Cover-Treffer (abgeschlossen)
 
