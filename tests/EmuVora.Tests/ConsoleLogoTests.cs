@@ -34,11 +34,16 @@ public class ConsoleLogoTests
     {
         using var dir=new TestDirectory();
         new SettingsStore(Path.Combine(dir.Path,"settings.json")).Save(new(){Theme=theme,TvMode=tv,OnboardingCompleted=true,AutoDownloadCovers=false,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false});
-        new LibraryStore(Path.Combine(dir.Path,"library.db")).Upsert([new("Fixture A","SNES","D:/fixture/a.sfc"),new("Fixture B","SNES","D:/fixture/b.sfc"),new("Fixture C","PS1","D:/fixture/c.cue")]);
+        new LibraryStore(Path.Combine(dir.Path,"library.db")).Upsert([new("Fixture A","SNES","D:/fixture/a.sfc"),new("Fixture B","SNES","D:/fixture/b.sfc"),new("Fixture C","PS1","D:/fixture/c.cue"),new("Fixture D","Neo Geo CD","D:/fixture/d.cue"),new("Fixture E","Arcade (FinalBurn Neo)","D:/fixture/e.zip")]);
         var window=new MainWindow(dir.Path){Width=1320,Height=820};window.Show();Render(window);
         try
         {
-            var buttons=window.GetVisualDescendants().OfType<Button>().Where(b=>b.Classes.Contains("console-filter")).ToArray();Assert.Equal(2,buttons.Length);
+            var buttons=window.GetVisualDescendants().OfType<Button>().Where(b=>b.Classes.Contains("console-filter")).ToArray();Assert.Equal(4,buttons.Length);
+            foreach(var button in buttons)
+            {
+                var badge=button.GetVisualDescendants().OfType<TextBlock>().Single(t=>t.Classes.Contains("console-count"));Assert.Equal(tv?16:12,badge.FontSize);
+                var artwork=button.GetVisualDescendants().OfType<Image>().Single();var position=artwork.TranslatePoint(default,button)!.Value;Assert.True(position.X>=0);Assert.True(position.X+artwork.Bounds.Width<=button.Bounds.Width);
+            }
             var snes=buttons.Single(b=>b.Tag as string=="SNES");Assert.Equal("SNES - 2 Spiele",AutomationProperties.GetName(snes));Assert.Equal("SNES - 2 Spiele",ToolTip.GetTip(snes));
             Assert.DoesNotContain(snes.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="SNES");
             Assert.Contains(snes.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="2");
