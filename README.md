@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.92](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.92)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.94](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.94)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -24,7 +24,7 @@ SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads
 
 Das Konsolenmenü zeigt offline mitgelieferte Logos für alle 47 unterstützten Systeme statt ausgeschriebener Namen. Spielanzahl und Auswahlrahmen bleiben sichtbar; Namen erscheinen als Tooltip und sind für die barrierefreie Bedienung hinterlegt. Neo Geo CD und FinalBurn Neo erhalten zusätzliche Kennzeichnungen. Unbekannte Systeme verwenden ein neutrales Symbol. Die Darstellung unterstützt helles Design, dunkles Design und TV-Modus. Herkunft und Lizenz: [Konsolenlogos](third-party/console-logos/README.md).
 
-## Verschobene ROM-Ordner neu zuordnen
+## Verschobene ROM-Ordner neu zuordnen – neu in 0.14.94
 
 Unter **Einstellungen → Bibliothek → Verschobenen ROM-Ordner neu zuordnen** den bisherigen und neuen Ordner angeben. EmuVora sucht fehlende Einträge am gleichen relativen Dateipfad und zeigt eine Vorschau. Erst nach Bestätigung werden die Bibliothekspfade geändert; Cover, Favoriten, Verlauf, Importdatum, Bildprofile und Sammlungen bleiben erhalten. Bereits erreichbare Originale, doppelte Ziele und geänderte Vorschläge werden nicht übernommen. Bibliothek und Einstellungen werden vorher gesichert; eine unterbrochene Übernahme wird beim nächsten Start abgeglichen. ROMs und Spielstände werden nicht verschoben. [Anleitung und Grenzen](LIBRARY_AND_DISPLAY.md).
 

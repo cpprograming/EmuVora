@@ -4,9 +4,12 @@ Stand: 23. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 
 ## Aktueller Stand
 
+- [x] ROM-Ordnerzuordnung in 0.14.94 veröffentlicht ([PR #27](https://github.com/cpprograming/EmuVora/pull/27)): fehlende Dateien am gleichen relativen Zielpfad vorschlagen, vor Übernahme prüfen, Konflikte und geänderte Ziele abweisen. Titel, Favoriten, Verlauf, Importdatum, Cover/Sperren, Bildprofile und Sammlungen erhalten. Metadaten vorher sichern und unterbrochene Übernahmen konsistent wieder aufnehmen. 20 neue Prüffälle; 223 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
+
 - [x] Eigene Sammlungen und neue Importe in 0.14.92 veröffentlicht ([PR #26](https://github.com/cpprograming/EmuVora/pull/26)): mehrere Sammlungen pro Spiel, Umbenennen/Löschen ohne Spielverlust, gemeinsame Suche/Konsolenfilter, Controller-/TV-Bedienung und vollständige Sicherung. Importdatum neuer Einträge ohne erfundene Daten für alte Spiele; erneute Scans bewahren den ersten Zeitpunkt. Acht neue Prüffälle; 203 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
 - [x] Freiwilliges GitHub Sponsoring mit FUNDING.yml, Profilentwurf und Anleitung vorbereitet; öffentliche Downloads bleiben kostenlos. [SPONSORS.md](SPONSORS.md).
-- [ ] Sponsors-Empfängerprofil durch den Kontoinhaber anmelden, persönliche Auszahlungs-/Steuerangaben ergänzen und GitHub-Freigabe erhalten; aktiven Sponsor-Button anschließend prüfen.
+- [x] Sponsors-Antrag durch den Kontoinhaber eingereicht; Dashboard zeigt ausstehende zusätzliche Prüfung.
+- [ ] GitHub-Freigabe erhalten und aktiven öffentlichen Sponsor-Button anschließend prüfen.
 
 - [x] Cover-Verwaltung in 0.14.90 veröffentlicht ([PR #25](https://github.com/cpprograming/EmuVora/pull/25)): fehlende Bilder gesammelt mit Filtern anzeigen; lokale Bilder und Online-Treffer erst nach Vorschau übernehmen; abweichenden Suchnamen ohne Titeländerung nutzen. Eigene Bilder separat speichern und vor Sammelsuche sowie ES-DE schützen. Cover-Aktionen über Xbox X auch im TV-Modus erreichbar. Elf neue Prüffälle; 195 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
 
@@ -30,9 +33,9 @@ Stand: 23. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] EmulationStation-Theme-Import und optionaler ES-DE-/AlekFull-Start.
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
-- [x] 203 Funktionstests und 6 Netzwerktests auch im Release-Build 0.14.92 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] 223 Funktionstests und 6 Netzwerktests auch im Release-Build 0.14.94 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 
-Der aktuelle Stand ist als [Release 0.14.92](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.92) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.14.94](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.94) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 - [x] BIOS-Dateiauswahl mit sichtbarer Bestätigung, direktem Pfadimport, automatischer Benennung erkannter Inhalte und Ergebnisübersicht korrigiert ([PR #13](https://github.com/cpprograming/EmuVora/pull/13), ab 0.11.59). Originaldateien bleiben erhalten.
 
@@ -81,7 +84,8 @@ Abnahme: Einrichtung, Bibliothek und Einstellungen wirken zusammengehörig und b
 - [x] Festgelegte libretro-/No-Intro-Kataloge mit SHA-256 prüfen und lokale ROMs per Größe/SHA-1 erkennen. Titelübernahme nach Vorschau; eigene Bearbeitungen, Pfade, Cover und Verlauf erhalten. [Umfang: 16 Systeme](ROM_RECOGNITION.md).
 
 - [x] Eigene Sammlungen und Ansichten für zuletzt hinzugefügt, zuletzt gespielt und Favoriten ergänzen (ab 0.14.92).
-- [ ] Mehrdisc-Spiele, doppelte Einträge und umbenannte ROM-Ordner verständlich verwalten.
+- [x] Unverändert verschobene ROM-Ordner mit Vorschau neu zuordnen (ab 0.14.94).
+- [ ] Mehrdisc-Spiele, doppelte Einträge und umbenannte Dateien verständlich verwalten.
 - [x] Cover-Treffer vor einem manuellen Austausch anzeigen und falsche Zuordnungen korrigierbar machen (ab 0.14.90).
 - [x] Fehlende Cover gesammelt anzeigen; bestehende eigene Cover bei erneutem Abruf erhalten und ausdrücklichen Schutz ergänzen (ab 0.14.90).
 - [ ] Optionale zusätzliche Metadatenquelle erst nach Prüfung ihrer Bedingungen integrieren.

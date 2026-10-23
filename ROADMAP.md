@@ -2,7 +2,15 @@
 
 Stand: 23. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.92](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.92).
+Aktueller geprüfter Release: [0.14.94](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.94).
+
+## 0.14.94 – Verschobene ROM-Ordner (abgeschlossen)
+
+- [x] Fehlende ROM-Pfade am gleichen relativen Zielpfad finden und vor Übernahme anzeigen.
+- [x] Bibliotheksmetadaten, Importdatum, Cover-Schutz, Bildprofile und Sammlungen erhalten; ROM-/Spielstandsdateien unverändert lassen.
+- [x] Ziele und Vorschau erneut prüfen; Konflikte, Pfad-Aliase und ungeeignete CUE/M3U-Verweise abweisen.
+- [x] Bibliothek/Einstellungen vorher sichern und nach Unterbrechung konsistent wieder aufnehmen; gegen verwaltete ES-DE-Spielstarts sperren.
+- [x] 223 Funktions- und 6 Netzwerktests sowie Installation, Update und Datenerhalt bestanden.
 
 ## 0.14.92 – Sammlungen und neue Importe (abgeschlossen)
 
@@ -12,7 +20,8 @@ Aktueller geprüfter Release: [0.14.92](https://github.com/cpprograming/EmuVora/
 - [x] Sammlungen und Importzeiten mit vollständiger Sicherung/Wiederherstellung bewahren.
 - [x] 203 Funktions- und 6 Netzwerktests sowie Installation, Update und Datenerhalt bestanden.
 - [x] Freiwilliges GitHub Sponsoring im Repository vorbereiten; kostenlose Downloads beibehalten.
-- [ ] Kontoinhaber schließt Sponsors-Anmeldung, Auszahlung/Steuerangaben und GitHub-Freigabe ab. [Anleitung und Profiltext](SPONSORS.md).
+- [x] Sponsors-Antrag eingereicht; Anmeldung durch den Kontoinhaber durchgeführt.
+- [ ] GitHub-Freigabe für das Sponsors-Profil abwarten; anschließend öffentlichen Sponsor-Button prüfen. [Status und Profiltext](SPONSORS.md).
 
 ## 0.14.90 – Cover-Verwaltung (abgeschlossen)
 
@@ -99,7 +108,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
-- [ ] Umgezogene ROM-Ordner neu zuordnen, ohne Favoriten und Verlauf zu verlieren.
+- [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 
 ## 0.15 – Bild und Leistung
