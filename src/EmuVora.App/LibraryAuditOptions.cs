@@ -19,12 +19,53 @@ public sealed partial class MainWindow
             if (!await BusyAsync(async token => groups = await Task.Run(() => LibraryAudit.Inspect(snapshot, token), token)) || groups == null || isClosed || !owner.IsVisible) return;
             var content = new StackPanel { Spacing = 14, Margin = new(24) };
             content.Children.Add(new TextBlock { Text = $"{groups.Count} Gruppen zur Prüfung. Es wurde nichts verändert.", TextWrapping = TextWrapping.Wrap });
-            content.Children.Add(new TextBlock { Text = "Mehrdisc-Kandidaten liegen im selben Ordner. Prüfe vor einer Playlist-Erstellung die Disc-Reihenfolge und die Unterstützung deines Emulators. Bereits vorhandene M3U-Playlists fasst der Import zusammen; früher importierte Einzeleinträge bleiben erhalten.", TextWrapping = TextWrapping.Wrap });
-            content.Children.Add(new ListBox { Height = 360, ItemsSource = groups, ItemTemplate = new FuncDataTemplate<LibraryAuditGroup>((group, _) => new TextBlock { Text = group == null ? "" : $"{group.Kind} · {group.System}\n{group.Title}\n" + string.Join("\n", group.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) });
+            content.Children.Add(new TextBlock { Text = "Eine Gruppe auswählen und deren Dateien per SHA-256 vergleichen oder einen PS1-Disc-Satz als neue Playlist vorbereiten. Verweisdateien (z. B. CUE/M3U) werden beim Inhaltsvergleich ausgelassen. Die Prüfung gilt für die Datei-Bytes, nicht für unterschiedliche Container desselben Spiels.", TextWrapping = TextWrapping.Wrap });
+            var list = new ListBox { Height = 240, ItemsSource = groups, ItemTemplate = new FuncDataTemplate<LibraryAuditGroup>((group, _) => new TextBlock { Text = group == null ? "" : $"{group.Kind} · {group.System}\n{group.Title}\n" + string.Join("\n", group.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) };
+            content.Children.Add(list);
             var dialog = Dialog("Duplikate und Mehrdisc-Spiele", content);
+            var message = new TextBlock { TextWrapping = TextWrapping.Wrap }; content.Children.Add(message);
+            content.Children.Add(AsyncButton("Ausgewählte Dateien per SHA-256 vergleichen", async () =>
+            {
+                if (list.SelectedItem is not LibraryAuditGroup selected) { message.Text = "Bitte zuerst eine Gruppe auswählen."; return; }
+                message.Text = "SHA-256-Prüfung läuft. Große Disc-Dateien können länger dauern; Prüfung abbrechen bleibt verfügbar.";
+                ContentCheck? check = null;
+                if (!await BusyAsync(async token => check = await LibraryContent.CompareAsync(selected.Games, token)) || check == null || isClosed || !dialog.IsVisible) { message.Text = status.Text; return; }
+                message.Text = $"{check.CheckedFiles} Dateien geprüft; {check.Matches.Count} Gruppen mit gleichen Datei-Bytes.";
+                var result = new StackPanel { Spacing = 14, Margin = new(24) };
+                result.Children.Add(new TextBlock { Text = $"{check.CheckedFiles} Dateien vollständig geprüft · {check.Matches.Count} Gruppen mit gleichen Datei-Bytes.\nErgebnis gilt zum Prüfzeitpunkt. Nichts wurde gelöscht oder zusammengeführt.", TextWrapping = TextWrapping.Wrap });
+                result.Children.Add(new ListBox { Height = 230, ItemsSource = check.Matches, ItemTemplate = new FuncDataTemplate<ContentMatch>((match, _) => new TextBlock { Text = match == null ? "" : $"SHA-256: {match.Sha256}\n{match.Length:N0} Bytes\n" + string.Join("\n", match.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) });
+                if (check.Notes.Count > 0) result.Children.Add(new TextBlock { Text = string.Join("\n", check.Notes), TextWrapping = TextWrapping.Wrap });
+                var review = Dialog("Datei-Inhalte vergleichen", result); result.Children.Add(ActionButton("Schließen", () => review.Close())); await review.ShowDialog(dialog);
+            }));
+            content.Children.Add(AsyncButton("PS1-Playlist vorbereiten", async () =>
+            {
+                if (list.SelectedItem is not LibraryAuditGroup selected || selected.Kind != "Mehrdisc-Kandidat") { message.Text = "Bitte einen Mehrdisc-Kandidaten auswählen."; return; }
+                await PrepareDiscPlaylistAsync(selected, dialog, message);
+            }));
+            content.Children.Add(ActionButton("Prüfung abbrechen", () => operation?.Cancel()));
             content.Children.Add(ActionButton("Schließen", () => dialog.Close()));
             await dialog.ShowDialog(owner);
         }));
         return new Expander { Header = "Duplikate und Mehrdisc-Spiele", Content = panel };
+    }
+
+    private async Task PrepareDiscPlaylistAsync(LibraryAuditGroup group, Window owner, TextBlock message)
+    {
+        if (operation != null || !CanBackUp()) return;
+        DiscPlaylistPlan? plan = null;
+        if (!await BusyAsync(async token => plan = await Task.Run(() => LibraryContent.PreviewPlaylist(group, token), token)) || plan == null || isClosed || !owner.IsVisible) return;
+        var content = new StackPanel { Spacing = 14, Margin = new(24) };
+        content.Children.Add(new TextBlock { Text = "Neue Playlist:\n" + plan.Path + "\n\nDisc-Reihenfolge:\n" + plan.Content, TextWrapping = TextWrapping.Wrap });
+        content.Children.Add(new TextBlock { Text = "Unterstützt zunächst PS1 mit CHD/CUE und DuckStation oder RetroArch/Beetle PSX. Discs müssen vollständig nummeriert sein. Bitte Reihenfolge selbst prüfen. Emulatorprofile werden nicht verändert.\n\nWichtig: Der neue Playlist-Name kann einen anderen Spielstands-/Memory-Card-Namen verwenden. Vorhandene Spielstände ggf. im Emulator zuordnen. EmuVora verschiebt oder benennt keine Spielstände um.\n\nEs entsteht eine zusätzliche Bibliothekskarte ohne bisherigen Verlauf. Die einzelnen Discs und ihre Favoriten, Cover und Verläufe bleiben erhalten. Bestehende Playlists werden nicht überschrieben.", TextWrapping = TextWrapping.Wrap });
+        var review = Dialog("PS1-Playlist erstellen", content);
+        content.Children.Add(ActionButton("Playlist erstellen und hinzufügen", () => review.Close(true)));
+        content.Children.Add(ActionButton("Abbrechen", () => review.Close(false)));
+        if (!await review.ShowDialog<bool>(owner) || isClosed || operation != null || !CanBackUp()) return;
+        await BusyAsync(async token =>
+        {
+            var game = await Task.Run(() => LibraryContent.CreatePlaylist(plan, token), token);
+            try { store.Upsert([game]); Reload(game.Path); message.Text = "Playlist hinzugefügt. Einzelne Discs und ihre Metadaten bleiben erhalten."; }
+            catch { message.Text = "Playlist wurde erstellt, konnte aber nicht importiert werden. Ordner erneut scannen: " + game.Path; throw; }
+        });
     }
 }

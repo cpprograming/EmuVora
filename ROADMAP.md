@@ -9,7 +9,8 @@ Aktueller geprüfter Release: [0.14.98](https://github.com/cpprograming/EmuVora/
 - [x] Gleiche Titel als ungeprüfte Kandidaten und explizit nummerierte Discs im selben Ordner anzeigen; Editionen und Regionen getrennt halten.
 - [x] Prüfung abbrechbar im Hintergrund ausführen; ROM-Dateien und Bibliotheksmetadaten unverändert lassen.
 - [x] 228 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Dialog zusätzlich mit einer privaten Bibliothekskopie geprüft.
-- [ ] Zusammenführen nach Inhaltsprüfung und unterstützte Playlist-Erstellung ergänzen.
+- [x] Inhaltsprüfung per SHA-256 und bestätigte PS1-Playlist-Erstellung für CHD/CUE implementieren (Entwicklungsstand).
+- [ ] Zusammenführen mit Erhalt aller Metadaten und weitere Playlist-Systeme ergänzen.
 
 ## 0.14.94 – Verschobene ROM-Ordner (abgeschlossen)
 
@@ -115,7 +116,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
-  - Prüfungsübersicht ab 0.14.98: gleiche Titel als ungeprüfte Kandidaten und nummerierte Disc-Sätze im selben Ordner anzeigen; keine automatische Löschung. Zusammenführen und Playlist-Erstellung bleiben offen.
+  - Prüfungsübersicht ab 0.14.98; im Entwicklungsstand ergänzt um SHA-256-Vergleich und PS1-Playlists mit Vorschau. Automatisches Zusammenführen und weitere Playlist-Systeme bleiben offen.
 - [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 
