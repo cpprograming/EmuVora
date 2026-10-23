@@ -2,7 +2,17 @@
 
 Stand: 23. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.90](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.90).
+Aktueller geprüfter Release: [0.14.92](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.92).
+
+## 0.14.92 – Sammlungen und neue Importe (abgeschlossen)
+
+- [x] Eigene Sammlungen erstellen, umbenennen und löschen; mehrere Zuordnungen pro Spiel speichern.
+- [x] Sammlung mit Suche/Konsolenfilter und begrenzten Seiten anzeigen; Zuordnung auch im TV-Modus mit Controller erreichbar.
+- [x] Erste Importzeit für neue Einträge speichern; erneute Scans verändern sie nicht. Ältere Einträge bleiben ohne erfundenes Datum.
+- [x] Sammlungen und Importzeiten mit vollständiger Sicherung/Wiederherstellung bewahren.
+- [x] 203 Funktions- und 6 Netzwerktests sowie Installation, Update und Datenerhalt bestanden.
+- [x] Freiwilliges GitHub Sponsoring im Repository vorbereiten; kostenlose Downloads beibehalten.
+- [ ] Kontoinhaber schließt Sponsors-Anmeldung, Auszahlung/Steuerangaben und GitHub-Freigabe ab. [Anleitung und Profiltext](SPONSORS.md).
 
 ## 0.14.90 – Cover-Verwaltung (abgeschlossen)
 
@@ -87,7 +97,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Prüfsummen-Erkennung mit bestätigter Titelvorschau für 16 Cartridge-Systeme integriert; Schutz eigener Bearbeitungen und lokaler ROM-Dateien. [Anleitung](ROM_RECOGNITION.md).
 
-- [ ] Eigene Sammlungen und zusätzliche Ansichten ergänzen.
+- [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
 - [ ] Umgezogene ROM-Ordner neu zuordnen, ohne Favoriten und Verlauf zu verlieren.
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).

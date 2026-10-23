@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.90](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.90)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.92](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.92)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -24,7 +24,7 @@ SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads
 
 Das Konsolenmenü zeigt offline mitgelieferte Logos für alle 47 unterstützten Systeme statt ausgeschriebener Namen. Spielanzahl und Auswahlrahmen bleiben sichtbar; Namen erscheinen als Tooltip und sind für die barrierefreie Bedienung hinterlegt. Neo Geo CD und FinalBurn Neo erhalten zusätzliche Kennzeichnungen. Unbekannte Systeme verwenden ein neutrales Symbol. Die Darstellung unterstützt helles Design, dunkles Design und TV-Modus. Herkunft und Lizenz: [Konsolenlogos](third-party/console-logos/README.md).
 
-## Eigene Sammlungen und neue Importe
+## Eigene Sammlungen und neue Importe – neu in 0.14.92
 
 Über **Sammlungen verwalten** eigene Listen erstellen, umbenennen oder löschen. Ein Spiel auswählen und **Zu Sammlungen zuordnen** öffnen; mehrere Sammlungen sind möglich. Die Auswahl links lässt sich mit Suche und Konsolenfilter kombinieren. Entfernen aus einer Sammlung löscht keine ROMs, Cover, Favoriten oder Spielstände. Die vollständige Datensicherung enthält die Sammlungen.
 
