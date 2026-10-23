@@ -42,6 +42,7 @@ public sealed class SettingsStore(string file)
     public string? LoadWarning {get;private set;}
     public AppSettings Load()
     {
+        RomRelocation.Recover(Path.GetDirectoryName(Path.GetFullPath(file))!);
         if(!File.Exists(file))return new();
         try
         {
