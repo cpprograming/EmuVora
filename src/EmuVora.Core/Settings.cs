@@ -11,6 +11,7 @@ public sealed class AppSettings
     public Dictionary<string,string> CorePaths {get;set;}=[];
     public Dictionary<string,string> Covers {get;set;}=[];
     public HashSet<string> ProtectedCovers {get;set;}=new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string,HashSet<string>> Collections {get;set;}=new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string,string> PreferredEmulators {get;set;}=[];
     public Dictionary<string,InstalledPackage> Packages {get;set;}=[];
     public List<string> RomFolders {get;set;}=[];
@@ -48,6 +49,7 @@ public sealed class SettingsStore(string file)
             settings.EmulatorPaths??=[];settings.CorePaths??=[];settings.Covers??=[];settings.PreferredEmulators??=[];settings.Packages??=[];settings.RomFolders??=[];
             settings.GameAspectRatios??=[];settings.ExternalSaveFolders??=[];
             settings.ProtectedCovers=new(settings.ProtectedCovers??[],StringComparer.OrdinalIgnoreCase);
+            settings.Collections=(settings.Collections??[]).Where(c=>!string.IsNullOrWhiteSpace(c.Key)).GroupBy(c=>c.Key,StringComparer.OrdinalIgnoreCase).ToDictionary(g=>g.First().Key,g=>new HashSet<string>(g.SelectMany(c=>c.Value??[]),StringComparer.OrdinalIgnoreCase),StringComparer.OrdinalIgnoreCase);
             // Older releases stored manually selected images under a random GUID filename.
             using(var document=JsonDocument.Parse(json))
                 if(document.RootElement.ValueKind==JsonValueKind.Object&&!document.RootElement.EnumerateObject().Any(p=>p.Name.Equals("ProtectedCovers",StringComparison.OrdinalIgnoreCase)))
