@@ -6,7 +6,7 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 ## Download und Installation
 
-Ab 0.14.98 ergänzt **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** eine unverändernde Prüfung: gleiche Titel pro System und nummerierte Disc-Sätze im selben Ordner mit allen Dateipfaden. Gleiche Titel sind kein Inhaltsnachweis; Editionen und Regionen bleiben getrennt. Automatisches Zusammenführen und das Erstellen neuer Playlists sind noch nicht enthalten.
+Unter **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** werden gleiche Titel pro System und nummerierte Disc-Sätze im selben Ordner angezeigt. Neu im Entwicklungsstand: ausgewählte Dateien per SHA-256 vergleichen und PS1-Playlists aus CHD/CUE nach bestätigter Vorschau erstellen. Dateiverweise werden beim Inhaltsvergleich ausgelassen. Einzelne Discs, Favoriten und Verläufe bleiben erhalten; es wird nichts automatisch gelöscht oder zusammengeführt. Vorhandene Spielstände können im Emulator eine Zuordnung zum neuen Playlist-Namen benötigen. [Anleitung und Grenzen](LIBRARY_AND_DISPLAY.md).
 
 - **[Windows-Setup herunterladen](https://github.com/cpprograming/EmuVora/releases/latest/download/EmuVora-Setup.exe)** – Installationslaufwerk und Ordner wählen; eigene Desktop- und Startmenü-Verknüpfungen sind optional.
 - **[Portable Windows-Version herunterladen](https://github.com/cpprograming/EmuVora/releases/latest/download/EmuVora-win-x64.zip)** – ZIP vollständig entpacken und `EmuVora.App.exe` starten.
