@@ -24,6 +24,10 @@ SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads
 
 Das Konsolenmenü zeigt offline mitgelieferte Logos für alle 47 unterstützten Systeme statt ausgeschriebener Namen. Spielanzahl und Auswahlrahmen bleiben sichtbar; Namen erscheinen als Tooltip und sind für die barrierefreie Bedienung hinterlegt. Neo Geo CD und FinalBurn Neo erhalten zusätzliche Kennzeichnungen. Unbekannte Systeme verwenden ein neutrales Symbol. Die Darstellung unterstützt helles Design, dunkles Design und TV-Modus. Herkunft und Lizenz: [Konsolenlogos](third-party/console-logos/README.md).
 
+## Verschobene ROM-Ordner neu zuordnen
+
+Unter **Einstellungen → Bibliothek → Verschobenen ROM-Ordner neu zuordnen** den bisherigen und neuen Ordner angeben. EmuVora sucht fehlende Einträge am gleichen relativen Dateipfad und zeigt eine Vorschau. Erst nach Bestätigung werden die Bibliothekspfade geändert; Cover, Favoriten, Verlauf, Importdatum, Bildprofile und Sammlungen bleiben erhalten. Bereits erreichbare Originale, doppelte Ziele und geänderte Vorschläge werden nicht übernommen. Bibliothek und Einstellungen werden vorher gesichert; eine unterbrochene Übernahme wird beim nächsten Start abgeglichen. ROMs und Spielstände werden nicht verschoben. [Anleitung und Grenzen](LIBRARY_AND_DISPLAY.md).
+
 ## Eigene Sammlungen und neue Importe – neu in 0.14.92
 
 Über **Sammlungen verwalten** eigene Listen erstellen, umbenennen oder löschen. Ein Spiel auswählen und **Zu Sammlungen zuordnen** öffnen; mehrere Sammlungen sind möglich. Die Auswahl links lässt sich mit Suche und Konsolenfilter kombinieren. Entfernen aus einer Sammlung löscht keine ROMs, Cover, Favoriten oder Spielstände. Die vollständige Datensicherung enthält die Sammlungen.
@@ -221,7 +225,7 @@ Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fe
 
 ## Entwicklung unterstützen
 
-EmuVora bleibt kostenlos erhältlich. Freiwillige Unterstützung über GitHub Sponsors ist vorbereitet; das Empfängerprofil muss noch vom Kontoinhaber eingerichtet und von GitHub freigegeben werden. Es gibt keine kostenpflichtigen Funktionen oder exklusiven Downloads. [Einrichtung und Profilentwurf](SPONSORS.md).
+EmuVora bleibt kostenlos erhältlich. Freiwillige Unterstützung über GitHub Sponsors ist vorbereitet; der Antrag ist eingereicht und wartet auf GitHubs Freigabe. Es gibt keine kostenpflichtigen Funktionen oder exklusiven Downloads. [Einrichtung und Profilentwurf](SPONSORS.md).
 
 ## Lizenz
 

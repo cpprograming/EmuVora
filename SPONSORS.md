@@ -4,9 +4,9 @@ EmuVora bleibt als kostenloser Download und mit öffentlichem Quellcode verfügb
 
 ## Einrichtung und aktueller Status
 
-Stand der Prüfung: 23. Oktober 2026. GitHub zeigt für `cpprograming` noch keinen gestellten Sponsors-Antrag. Der Repository-Link ist in `.github/FUNDING.yml` vorbereitet. Eine empfangsbereite Sponsors-Seite ist damit noch nicht freigeschaltet.
+Stand der Prüfung: 23. Oktober 2026. Der Sponsors-Antrag für `cpprograming` wurde eingereicht. Das Dashboard zeigt „Pending approval“ und eine zusätzliche Prüfung durch GitHub. Der Repository-Link ist in `.github/FUNDING.yml` vorbereitet. Die öffentliche Sponsors-Seite ist noch nicht freigeschaltet.
 
-Der Kontoinhaber muss die Einrichtung unter [GitHub Sponsors](https://github.com/sponsors/accounts) abschließen: Zugriff bestätigen, Profil vervollständigen, Auszahlung und erforderliche Steuerinformationen bei GitHub beziehungsweise dessen Zahlungsdienstleister selbst angeben und die Freigabe beantragen. Vertrauliche Konto- und Steuerdaten gehören nicht ins Repository, in Issues oder in Chatnachrichten.
+Der Antrag wartet auf GitHubs Entscheidung; laut Dashboard kommt nach Freigabe eine E-Mail. Weitere Kontoschritte oder Rückfragen sind unter [GitHub Sponsors](https://github.com/sponsors/accounts) zu bearbeiten. Persönliche Auszahlungs- und Steuerinformationen gibt der Kontoinhaber selbst bei GitHub beziehungsweise dessen Zahlungsdienstleister an. Vertrauliche Konto- und Steuerdaten gehören nicht ins Repository, in Issues oder in Chatnachrichten.
 
 Nach Freigabe lautet die öffentliche Adresse [github.com/sponsors/cpprograming](https://github.com/sponsors/cpprograming). Erst dann die Zahlungsbereitschaft der Seite und den Sponsor-Button im Repository praktisch prüfen. Falls nötig unter Repository Settings → General → Features → Sponsorships aktivieren.
 
