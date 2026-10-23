@@ -2,7 +2,14 @@
 
 Stand: 23. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.94](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.94).
+Aktueller geprüfter Release: [0.14.98](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.98).
+
+## 0.14.98 – Bibliotheksprüfung (Prüfungsübersicht abgeschlossen)
+
+- [x] Gleiche Titel als ungeprüfte Kandidaten und explizit nummerierte Discs im selben Ordner anzeigen; Editionen und Regionen getrennt halten.
+- [x] Prüfung abbrechbar im Hintergrund ausführen; ROM-Dateien und Bibliotheksmetadaten unverändert lassen.
+- [x] 228 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Dialog zusätzlich mit einer privaten Bibliothekskopie geprüft.
+- [ ] Zusammenführen nach Inhaltsprüfung und unterstützte Playlist-Erstellung ergänzen.
 
 ## 0.14.94 – Verschobene ROM-Ordner (abgeschlossen)
 
@@ -108,7 +115,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
-  - Prüfungsübersicht in Entwicklung: gleiche Titel als ungeprüfte Kandidaten und nummerierte Disc-Sätze im selben Ordner anzeigen; keine automatische Löschung. Zusammenführen und Playlist-Erstellung bleiben offen.
+  - Prüfungsübersicht ab 0.14.98: gleiche Titel als ungeprüfte Kandidaten und nummerierte Disc-Sätze im selben Ordner anzeigen; keine automatische Löschung. Zusammenführen und Playlist-Erstellung bleiben offen.
 - [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 
