@@ -24,6 +24,12 @@ SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads
 
 Das Konsolenmenü zeigt offline mitgelieferte Logos für alle 47 unterstützten Systeme statt ausgeschriebener Namen. Spielanzahl und Auswahlrahmen bleiben sichtbar; Namen erscheinen als Tooltip und sind für die barrierefreie Bedienung hinterlegt. Neo Geo CD und FinalBurn Neo erhalten zusätzliche Kennzeichnungen. Unbekannte Systeme verwenden ein neutrales Symbol. Die Darstellung unterstützt helles Design, dunkles Design und TV-Modus. Herkunft und Lizenz: [Konsolenlogos](third-party/console-logos/README.md).
 
+## Cover prüfen und eigene Bilder schützen
+
+Unter **Fehlende Cover** zeigt EmuVora Einträge ohne vorhandene Bilddatei. Suche, Konsolenfilter und Seitenwechsel bleiben verfügbar. Ein Spiel auswählen und **Cover bearbeiten · X** öffnen; das funktioniert auch bei ausgeblendeter Detailspalte und im TV-Modus mit der Xbox-X-Taste. Eigene Bilder und Online-Treffer erscheinen vor dem Übernehmen neben dem bisherigen Cover. Für die Online-Suche lässt sich ein anderer Suchname eingeben, ohne den Bibliothekstitel zu ändern.
+
+Bestätigte Bilder werden separat kopiert und geschützt. Sammelsuche und ES-DE-Abgleich ersetzen geschützte Cover nicht; auch eine fehlende geschützte Datei wird nicht automatisch ersetzt. **Cover-Schutz aufheben** erlaubt den erneuten Abruf fehlender Bilder. Bereits vorhandene Bilder bleiben bei der Sammelsuche erhalten. Frühere manuell gewählte Bilder mit dem bisherigen GUID-Dateinamen erhalten beim ersten Laden Schutz. Abbrechen verändert keine Zuordnung; alte Cover und Originalbilder bleiben erhalten. Lokale Bilder: PNG, JPEG, WebP oder BMP bis 20 MiB, maximal 8192 Pixel je Seite und 32 Megapixel. [Anleitung](LIBRARY_AND_DISPLAY.md).
+
 ## Untertitel und passender GB/GBC-Coverkatalog – neu in 0.14.86
 
 Die Suche bewahrt echte Untertitel in Klammern und entfernt nur bekannte Regions-, Sprach- und Versionsangaben. Eine kleine, plattformgebundene Liste bekannter Titelvarianten ergänzt exakte Treffer; andere Fortsetzungen werden nicht geraten. Bei GB/GBC wird der Coverkatalog anhand eines validierten ROM-Headers gewählt, auch bei falsch benannten Dateiendungen oder einzelnen ROMs in ZIPs. Gespeicherte Konsole, Titel, ROM-Dateien und vorhandene Cover bleiben erhalten. Ungültige Header und Mehrspiel-ZIPs lösen keinen Katalogwechsel aus.
