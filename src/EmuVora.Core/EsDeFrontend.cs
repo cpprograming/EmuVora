@@ -114,7 +114,7 @@ public static class EsDeFrontend
                     store.Update(game with{Favorite=favorite,PlayCount=count,LastPlayed=last});
                 }
                 var covers=Path.Combine(AppData(data),"downloaded_media",native,"covers");
-                if(Directory.Exists(covers)){var cover=new[]{".png",".jpg",".jpeg",".webp"}.Select(ext=>Path.Combine(covers,id+ext)).FirstOrDefault(File.Exists);if(cover!=null)settings.Covers[game.Path]=cover;}
+                if(!settings.ProtectedCovers.Contains(game.Path)&&Directory.Exists(covers)){var cover=new[]{".png",".jpg",".jpeg",".webp"}.Select(ext=>Path.Combine(covers,id+ext)).FirstOrDefault(File.Exists);if(cover!=null)settings.Covers[game.Path]=cover;}
             }
         }
     }

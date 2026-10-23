@@ -50,6 +50,8 @@ public sealed partial class MainWindow : Window
     private readonly Button edit=new(){Content="Titel / Konsole bearbeiten",IsEnabled=false};
     private readonly Button cover=new(){Content="Cover wählen",IsEnabled=false};
     private readonly Button onlineCover=new(){Content="Cover online suchen",IsEnabled=false};
+    private readonly Button protectCover=new(){Content="Cover schützen",IsEnabled=false};
+    private readonly Button manageCover=new(){Content="Cover bearbeiten · X",IsEnabled=false,HorizontalAlignment=HorizontalAlignment.Stretch};
     private readonly Button remove=new(){Content="Aus Bibliothek entfernen",IsEnabled=false};
     private readonly Button reveal=new(){Content="ROM-Ordner öffnen",IsEnabled=false};
     private readonly Border sideBorder=new();
@@ -100,7 +102,7 @@ public sealed partial class MainWindow : Window
         sidebar.Children.Add(BrandIdentity.Lockup());
         sidebar.Children.Add(new TextBlock {Text="DEINE BIBLIOTHEK",FontSize=11,Opacity=0.65});
         sidebar.Children.Add(backupReminder);backupReminder.Click+=async(_,_)=>await ShowSettingsAsync(initialTab:5);UpdateBackupReminder();
-        foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt"})
+        foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt","Fehlende Cover"})
         {
             var item=ActionButton(name,()=>{view=name;systems.SelectedItem="Alle Konsolen";Refresh();});StyleNavigation(item);viewButtons[name]=item;sidebar.Children.Add(item);
         }
@@ -121,6 +123,8 @@ public sealed partial class MainWindow : Window
         header.Children.Add(themeLogo);var heading=new StackPanel{Spacing=5};heading.Children.Add(libraryEyebrow);heading.Children.Add(libraryHeading);Grid.SetColumn(heading,1);header.Children.Add(heading);summary.VerticalAlignment=VerticalAlignment.Center;summary.TextAlignment=TextAlignment.Right;Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
         var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=10};Grid.SetColumnSpan(search,3);filters.Children.Add(search);Grid.SetRow(systems,1);filters.Children.Add(systems);Grid.SetRow(sort,1);Grid.SetColumn(sort,1);filters.Children.Add(sort);detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});Grid.SetRow(detailsToggle,1);Grid.SetColumn(detailsToggle,2);filters.Children.Add(detailsToggle);AddRow(main,filters,1);
         gamesList.Classes.Add("game-library");
+        filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);Grid.SetColumnSpan(manageCover,3);filters.Children.Add(manageCover);
+        manageCover.Click+=async(_,_)=>{try{await ManageCoverAsync();}catch(Exception ex){ShowError(ex);}};
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
         gamesList.ItemsPanel=new FuncTemplate<Panel?>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
@@ -132,10 +136,11 @@ public sealed partial class MainWindow : Window
         var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
         var details=new StackPanel {Spacing=16,Margin=new(22,30)};details.Children.Add(new TextBlock{Text="IM FOKUS",FontSize=10,LetterSpacing=2,Opacity=0.6});details.Children.Add(new Border{CornerRadius=new(16),Padding=new Thickness(14),Background=new SolidColorBrush(Color.Parse("#10203030")),Child=detailCover});details.Children.Add(detailTitle);details.Children.Add(detailInfo);
         details.Children.Add(displayStatus);details.Children.Add(play);details.Children.Add(favorite);
-        var more=new StackPanel{Spacing=8};foreach(var button in new[]{cover,onlineCover,edit,reveal,remove})more.Children.Add(button);details.Children.Add(new Expander{Header="Spieldetails bearbeiten",Content=more});
+        var more=new StackPanel{Spacing=8};foreach(var button in new[]{cover,onlineCover,protectCover,edit,reveal,remove})more.Children.Add(button);details.Children.Add(new Expander{Header="Spieldetails bearbeiten",Content=more});
         detailBorder.Child=new ScrollViewer {Content=details};Grid.SetColumn(detailBorder,2);layout.Children.Add(detailBorder);Content=layout;
         play.Click+=async(_,_)=>await PlayAsync();favorite.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);}});
         cover.Click+=async(_,_)=>await ChooseCoverAsync();edit.Click+=async(_,_)=>await EditAsync();remove.Click+=async(_,_)=>await RemoveAsync();reveal.Click+=(_,_)=>Guard(()=>{if(Selected is{} game)OpenPath(Path.GetDirectoryName(game.Path)!);});
+        protectCover.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){if(!settings.ProtectedCovers.Remove(game.Path))settings.ProtectedCovers.Add(game.Path);settingsStore.Save(settings);UpdateSelected();}});
         onlineCover.Click+=async(_,_)=>await FetchCoverAsync();ToolTip.SetTip(onlineCover,"Sucht den Spieltitel bei libretro-thumbnails. Titel und Konsole werden dafür an GitHub gesendet.");
         gamesList.SelectionChanged+=(_,_)=>UpdateSelected();gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
         gamesList.KeyDown+=async(_,e)=>{if(e.Key==Key.Enter){e.Handled=true;await PlayAsync();}};
@@ -217,7 +222,7 @@ public sealed partial class MainWindow : Window
     {
         var explicitSelection=selectedPath!=null;if(!keepPage)libraryPage=0;selectedPath??=Selected?.Path;var query=search.Text?.Trim()??"";var console=systems.SelectedItem as string;
         var filtered=allGames.Where(g=>(console is null or "Alle Konsolen"||g.System==console)&&(g.Title.Contains(query,StringComparison.OrdinalIgnoreCase)||g.System.Contains(query,StringComparison.OrdinalIgnoreCase)));
-        filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),_=>filtered};
+        filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),"Fehlende Cover"=>filtered.Where(g=>CoverLibrary.IsMissing(settings,g.Path)),_=>filtered};
         var result=(sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
         libraryResultCount=result.Length;
         if(explicitSelection&&selectedPath!=null&&!keepPage){var position=Array.FindIndex(result,g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));if(position>=0)libraryPage=position/LibraryPageSize;}
@@ -231,6 +236,7 @@ public sealed partial class MainWindow : Window
         pageLabel.Text=$"Seite {libraryPage+1} / {Math.Max(1,(result.Length+LibraryPageSize-1)/LibraryPageSize)} · {libraryPage*LibraryPageSize+1}–{libraryPage*LibraryPageSize+page.Length} von {result.Length}";
         emptyState.IsVisible=empty.IsVisible=result.Length==0;emptyAction.Content=allGames.Count==0?"Ersten ROM-Ordner importieren":"Filter zurücksetzen";empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Deine Klassiker bekommen hier ein Zuhause. Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
         libraryHeading.Text=view=="Alle Spiele"?(console is null or "Alle Konsolen"?"Deine Spiele":console):view;
+        if(view=="Fehlende Cover"&&allGames.Count>0){empty.Title="Keine fehlenden Cover in dieser Auswahl";empty.Message="Alle passenden Spiele haben ein Cover. Suche oder Konsole ändern, um andere Einträge zu prüfen.";}
         libraryEyebrow.Text=view=="Favoriten"?"DEINE LIEBLINGSSTÜCKE":view=="Zuletzt gespielt"?"WEITERSPIELEN":"DEINE SAMMLUNG";
         var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
         ApplyExternalTheme();
@@ -266,12 +272,14 @@ public sealed partial class MainWindow : Window
     }
     private void UpdateSelected()
     {
-        var game=Selected;foreach(var button in new[]{favorite,edit,cover,onlineCover,remove,reveal})button.IsEnabled=game!=null&&operation==null;
+        var game=Selected;foreach(var button in new[]{favorite,edit,cover,onlineCover,protectCover,manageCover,remove,reveal})button.IsEnabled=game!=null&&operation==null;
+        protectCover.Content=game!=null&&settings.ProtectedCovers.Contains(game.Path)?"Cover-Schutz aufheben":"Cover schützen";
         play.IsEnabled=game!=null&&operation==null&&!running.ContainsKey(game.Path);
         detailTitle.Text=game?.Title??"Spiel auswählen";detailCover.Content=game==null?null:Artwork(game,220);
         favorite.Content=game?.Favorite==true?"★ Favorit entfernen":"☆ Als Favorit merken";
         detailInfo.Text=game==null?"Wähle ein Spiel, um zu starten oder Details zu bearbeiten.":$"{game.System}\n{game.PlayCount} Starts · {(game.LastPlayed is{} last?last.ToLocalTime().ToString("g"):"Noch nicht gespielt")}";
         ToolTip.SetTip(detailInfo,game?.Path);displayStatus.Text=game==null?"":DisplayProfiles.Description(game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,game.Path);
+        if(game!=null&&settings.ProtectedCovers.Contains(game.Path))detailInfo.Text+="\nCover geschützt"+(CoverLibrary.IsMissing(settings,game.Path)?" · Bilddatei fehlt; eigenes Bild wählen oder Schutz aufheben.":"");
         ApplyExternalTheme();
     }
     private async Task<bool> BusyAsync(Func<CancellationToken,Task> action)
@@ -320,15 +328,15 @@ public sealed partial class MainWindow : Window
     {if(Selected is{} game&&await ConfirmAsync($"„{game.Title}“ aus der Bibliothek entfernen? Deine ROM-Datei bleibt erhalten.")){Guard(()=>{store.Remove(game);Reload();});}}
     private async Task ChooseCoverAsync()
     {
-        if(Selected is not{} game)return;
-        var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="Cover auswählen",AllowMultiple=false,FileTypeFilter=[new("Bilder"){Patterns=["*.png","*.jpg","*.jpeg","*.webp","*.bmp"]}]});if(files.Count==0)return;
-        Guard(()=>
+        if(Selected is not{} game||operation!=null)return;
+        try
         {
-            var source=files[0].TryGetLocalPath()??throw new InvalidOperationException("Bitte eine lokale Bilddatei auswählen.");
-            using(var stream=File.OpenRead(source))using(var image=Bitmap.DecodeToWidth(stream,480)){ }
-            var folder=Path.Combine(dataDir,"covers");Directory.CreateDirectory(folder);var path=Path.Combine(folder,Guid.NewGuid().ToString("N")+Path.GetExtension(source));File.Copy(source,path);
-            settings.Covers[game.Path]=path;settingsStore.Save(settings);Refresh(game.Path);status.Text="Cover gespeichert.";
-        });
+            var files=await new ControllerPicker(this).OpenFilePickerAsync(new(){Title="Cover auswählen",AllowMultiple=false,FileTypeFilter=[new("Bilder"){Patterns=["*.png","*.jpg","*.jpeg","*.webp","*.bmp"]}]});
+            if(files.Count==0||isClosed)return;
+            var source=files[0].TryGetLocalPath()??throw new IOException("Bitte eine lokale Bilddatei auswählen.");
+            await PreviewCoverAsync(game,source,"Eigenes Bild · "+Path.GetFileName(source));
+        }
+        catch(Exception ex){ShowError(ex);}
     }
     private async Task PlayAsync()
     {
@@ -353,24 +361,36 @@ public sealed partial class MainWindow : Window
         }
         catch(Exception ex){ShowError(ex);}
     }
-    private Task FetchCoverAsync()
+    private async Task FetchCoverAsync()
     {
-        if(Selected is not{} game)return Task.CompletedTask;
-        return BusyAsync(async token=>
+        if(Selected is not{} game||operation!=null)return;
+        var panel=new StackPanel{Spacing=14,Margin=new(24)};
+        panel.Children.Add(new TextBlock{Text="Mit einem abweichenden Titel nach einem Cover suchen. Der gespeicherte Spielname bleibt erhalten. Anschließend den Treffer vor dem Übernehmen prüfen.",TextWrapping=TextWrapping.Wrap});
+        var title=new TextBox{Text=game.Title,Watermark="Titel für die Cover-Suche"};panel.Children.Add(title);
+        var dialog=Dialog("Cover online suchen",panel);
+        panel.Children.Add(ActionButton("Treffer suchen",()=>{if(!string.IsNullOrWhiteSpace(title.Text))dialog.Close(title.Text.Trim());}));
+        panel.Children.Add(ActionButton("Abbrechen",()=>dialog.Close()));
+        var query=await dialog.ShowDialog<string?>(this);if(query==null||isClosed)return;
+        await BusyAsync(async token=>
         {
-            status.Text="Cover bei libretro-thumbnails suchen …";using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,Path.Combine(dataDir,"cache","cover-index"),settings.CoverRegion);var file=await source.DownloadAsync(game,Path.Combine(dataDir,"covers"),token);
-            if(file==null){status.Text="Kein passender Cover-Titel. Titel / Konsole prüfen oder eigenes Cover wählen.";return;}
-            try{using var stream=File.OpenRead(file);using var image=Bitmap.DecodeToWidth(stream,480);}
-            catch{File.Delete(file);throw;}
-            if(coverImages.Remove(file,out var previousImage))previousImage.Dispose();
-            settings.Covers[game.Path]=file;settingsStore.Save(settings);Refresh(game.Path);status.Text="Cover gespeichert · Quelle: libretro-thumbnails.";
+            var temporary=Path.Combine(dataDir,"cache","cover-preview",Guid.NewGuid().ToString("N"));string? file=null;
+            try
+            {
+                status.Text="Cover bei libretro-thumbnails suchen …";using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};
+                var source=new CoverCatalog(http,Path.Combine(dataDir,"cache","cover-index"),settings.CoverRegion);
+                file=await source.DownloadAsync(game with{Title=query},temporary,token);
+                if(file==null){status.Text="Kein passender Cover-Titel. Anderen Suchnamen oder eigenes Bild wählen.";return;}
+                token.ThrowIfCancellationRequested();if(!isClosed)await PreviewCoverAsync(game,file,"libretro-thumbnails · Suchname: "+query);
+            }
+            finally{if(file!=null&&File.Exists(file))File.Delete(file);if(Directory.Exists(temporary)&&!Directory.EnumerateFileSystemEntries(temporary).Any())Directory.Delete(temporary);}
         });
     }
     private Task FetchAllCoversAsync()=>BusyAsync(token=>DownloadMissingCoversAsync(allGames,token));
     private async Task DownloadMissingCoversAsync(IReadOnlyList<Game> games,CancellationToken token)
     {
         var coverSnapshot=new Dictionary<string,string>(settings.Covers,StringComparer.OrdinalIgnoreCase);
-        var pending=await Task.Run(()=>games.Where(g=>!coverSnapshot.TryGetValue(g.Path,out var cover)||!File.Exists(cover)).ToArray(),token);if(pending.Length==0){status.Text="Alle Spiele haben bereits ein Cover.";return;}
+        var coverSettings=new AppSettings{Covers=coverSnapshot,ProtectedCovers=new(settings.ProtectedCovers,StringComparer.OrdinalIgnoreCase)};
+        var pending=await Task.Run(()=>games.Where(g=>CoverLibrary.CanDownload(coverSettings,g.Path)).ToArray(),token);if(pending.Length==0){status.Text="Keine ungeschützten Spiele ohne Cover vorhanden.";return;}
         status.Text="Coverkatalog wird geladen …";using var http=new HttpClient{Timeout=TimeSpan.FromSeconds(40)};var source=new CoverCatalog(http,Path.Combine(dataDir,"cache","cover-index"),settings.CoverRegion);
         var complete=false;var updates=new Progress<CoverBatchProgress>(p=>{if(complete||isClosed)return;progress.IsIndeterminate=false;progress.Value=p.Completed*100.0/Math.Max(1,p.Total);status.Text=$"Cover {p.Completed}/{p.Total} · {p.Found} geladen · {p.Title}";});
         try
@@ -424,6 +444,7 @@ public sealed partial class MainWindow : Window
         else if(index<0&&libraryPage>0)ChangeLibraryPage(-1);
         else gamesList.SelectedIndex=Math.Clamp(index,0,count-1);gamesList.ScrollIntoView(gamesList.SelectedItem!);
         if(operation==null&&(pressed&0x1000)!=0)await PlayAsync();
+        if(operation==null&&(pressed&0x4000)!=0)await ManageCoverAsync();
         if(operation==null&&(pressed&0x8000)!=0&&Selected is{} game)Guard(()=>{store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);});
     }
     private async Task InstallManagedAsync(string id,CancellationToken token)

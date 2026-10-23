@@ -10,6 +10,7 @@ public sealed class AppSettings
     public Dictionary<string,string> EmulatorPaths {get;set;}=[];
     public Dictionary<string,string> CorePaths {get;set;}=[];
     public Dictionary<string,string> Covers {get;set;}=[];
+    public HashSet<string> ProtectedCovers {get;set;}=new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string,string> PreferredEmulators {get;set;}=[];
     public Dictionary<string,InstalledPackage> Packages {get;set;}=[];
     public List<string> RomFolders {get;set;}=[];
@@ -43,9 +44,15 @@ public sealed class SettingsStore(string file)
         if(!File.Exists(file))return new();
         try
         {
-            var settings=JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(file),JsonOptions)??new();
+            var json=File.ReadAllText(file);var settings=JsonSerializer.Deserialize<AppSettings>(json,JsonOptions)??new();
             settings.EmulatorPaths??=[];settings.CorePaths??=[];settings.Covers??=[];settings.PreferredEmulators??=[];settings.Packages??=[];settings.RomFolders??=[];
             settings.GameAspectRatios??=[];settings.ExternalSaveFolders??=[];
+            settings.ProtectedCovers=new(settings.ProtectedCovers??[],StringComparer.OrdinalIgnoreCase);
+            // Older releases stored manually selected images under a random GUID filename.
+            using(var document=JsonDocument.Parse(json))
+                if(document.RootElement.ValueKind==JsonValueKind.Object&&!document.RootElement.EnumerateObject().Any(p=>p.Name.Equals("ProtectedCovers",StringComparison.OrdinalIgnoreCase)))
+                    foreach(var cover in settings.Covers)
+                        if(Guid.TryParseExact(Path.GetFileNameWithoutExtension(cover.Value),"N",out _))settings.ProtectedCovers.Add(cover.Key);
             if(settings.CorePaths.TryGetValue("retroarch",out var legacy))foreach(var system in EmulatorCatalog.Get("retroarch").Systems)settings.CorePaths.TryAdd(system,legacy);
             return settings;
         }
