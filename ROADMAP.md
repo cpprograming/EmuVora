@@ -1,8 +1,16 @@
 # EmuVora – Roadmap
 
-Stand: 21. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 23. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.86](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.86).
+Aktueller geprüfter Release: [0.14.90](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.90).
+
+## 0.14.90 – Cover-Verwaltung (abgeschlossen)
+
+- [x] Ansicht „Fehlende Cover“ mit Suche, Konsolenfilter und begrenzten Seiten ergänzen.
+- [x] Eigene Bilder und Online-Treffer vor dem Austausch neben dem bisherigen Cover anzeigen; abweichender Suchname ohne Titeländerung.
+- [x] Bestätigte Bilder separat kopieren und schützen; Sammelsuche und ES-DE beachten den Schutz. Frühere manuell gewählte GUID-Bilder beim Laden schützen.
+- [x] Cover-Aktionen bei ausgeblendeten Details und im TV-Modus über Xbox X erreichbar machen.
+- [x] 195 Funktions- und 6 Netzwerktests sowie Installation, Update und Datenerhalt bestanden.
 
 ## 0.14.86 – Präzise Cover-Zuordnung (abgeschlossen)
 
@@ -82,7 +90,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [ ] Eigene Sammlungen und zusätzliche Ansichten ergänzen.
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
 - [ ] Umgezogene ROM-Ordner neu zuordnen, ohne Favoriten und Verlauf zu verlieren.
-- [ ] Falsche Cover-Treffer leichter korrigieren und eigene Cover bewahren.
+- [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 
 ## 0.15 – Bild und Leistung
 
