@@ -24,6 +24,12 @@ SDL 3 und eine mitgelieferte Controller-Datenbank belegen unterstützte Gamepads
 
 Das Konsolenmenü zeigt offline mitgelieferte Logos für alle 47 unterstützten Systeme statt ausgeschriebener Namen. Spielanzahl und Auswahlrahmen bleiben sichtbar; Namen erscheinen als Tooltip und sind für die barrierefreie Bedienung hinterlegt. Neo Geo CD und FinalBurn Neo erhalten zusätzliche Kennzeichnungen. Unbekannte Systeme verwenden ein neutrales Symbol. Die Darstellung unterstützt helles Design, dunkles Design und TV-Modus. Herkunft und Lizenz: [Konsolenlogos](third-party/console-logos/README.md).
 
+## Eigene Sammlungen und neue Importe
+
+Über **Sammlungen verwalten** eigene Listen erstellen, umbenennen oder löschen. Ein Spiel auswählen und **Zu Sammlungen zuordnen** öffnen; mehrere Sammlungen sind möglich. Die Auswahl links lässt sich mit Suche und Konsolenfilter kombinieren. Entfernen aus einer Sammlung löscht keine ROMs, Cover, Favoriten oder Spielstände. Die vollständige Datensicherung enthält die Sammlungen.
+
+**Zuletzt hinzugefügt** zeigt neue Importe ab dieser Version nach ihrem ersten Importdatum. Erneutes Scannen verändert dieses Datum nicht. Bei älteren Bibliothekseinträgen ist das ursprüngliche Importdatum nicht bekannt; sie bleiben unter **Alle Spiele** erreichbar. Auch in Sammlungen und dieser Ansicht bleiben höchstens 48 Karten gleichzeitig sichtbar. [Details](LIBRARY_AND_DISPLAY.md).
+
 ## Cover prüfen und eigene Bilder schützen – neu in 0.14.90
 
 Unter **Fehlende Cover** zeigt EmuVora Einträge ohne vorhandene Bilddatei. Suche, Konsolenfilter und Seitenwechsel bleiben verfügbar. Ein Spiel auswählen und **Cover bearbeiten · X** öffnen; das funktioniert auch bei ausgeblendeter Detailspalte und im TV-Modus mit der Xbox-X-Taste. Eigene Bilder und Online-Treffer erscheinen vor dem Übernehmen neben dem bisherigen Cover. Für die Online-Suche lässt sich ein anderer Suchname eingeben, ohne den Bibliothekstitel zu ändern.
@@ -212,6 +218,10 @@ Die Tests decken unter anderem Bibliothek, Controller-Oberfläche, Sicherungsint
 ## Nächste Schritte
 
 Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fest. Die [Roadmap](ROADMAP.md) beschreibt die Etappen bis 1.0. Xbox-Hardwaretests bleiben offen. Der Softwareteil für Eingabewechsel und Diagnose ist ab 0.12.64 verfügbar; FluentAvalonia und TV-Modus sind ab 0.13.66 verfügbar. Prüfsummenbasierte Spielerkennung ist ab 0.14.68 verfügbar. Die neue Gestaltung ist ab 0.14.71 verfügbar; Windows-Build, Installation, Update und Datenerhalt sind geprüft. SDL/GameControllerDB unterstützt ab 0.14.76 weitere Controller in der Oberfläche. Als nächste Schritte folgen automatische Spielprofile für zusätzliche Modelle, Hardwaretests und zusätzliche Bibliotheksfunktionen. Geprüfte externe Projekte stehen im [Repository-Plan](REPOSITORY_PLAN.md).
+
+## Entwicklung unterstützen
+
+EmuVora bleibt kostenlos erhältlich. Freiwillige Unterstützung über GitHub Sponsors ist vorbereitet; das Empfängerprofil muss noch vom Kontoinhaber eingerichtet und von GitHub freigegeben werden. Es gibt keine kostenpflichtigen Funktionen oder exklusiven Downloads. [Einrichtung und Profilentwurf](SPONSORS.md).
 
 ## Lizenz
 

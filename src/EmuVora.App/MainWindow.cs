@@ -34,7 +34,7 @@ public sealed partial class MainWindow : Window
     private readonly ListBox gamesList=new();
     private readonly TextBox search=new(){Watermark="Spiele suchen …"};
     private readonly ComboBox systems=new(){MinWidth=150};
-    private readonly ComboBox sort=new(){ItemsSource=new[]{"Titel A–Z","Konsole","Zuletzt gespielt"},SelectedIndex=0,MinWidth=160};
+    private readonly ComboBox sort=new(){ItemsSource=new[]{"Titel A–Z","Konsole","Zuletzt gespielt","Zuletzt hinzugefügt"},SelectedIndex=0,MinWidth=160};
     private readonly TextBlock status=new(){TextWrapping=TextWrapping.Wrap};
     private readonly TextBlock summary=new(){FontSize=13,Opacity=0.7};
     private readonly FluentAvalonia.UI.Controls.InfoBar empty=new(){IsOpen=true,IsClosable=false,VerticalAlignment=VerticalAlignment.Center,Margin=new(20)};
@@ -95,17 +95,19 @@ public sealed partial class MainWindow : Window
     public MainWindow(string directory,bool setupOnly=false)
     {
         dataDir=directory;Directory.CreateDirectory(dataDir);
-        settingsStore=new(Path.Combine(dataDir,"settings.json"));settings=settingsStore.Load();store=new(Path.Combine(dataDir,"library.db"));allGames=store.GetAll();
+        settingsStore=new(Path.Combine(dataDir,"settings.json"));settings=settingsStore.Load();store=new(Path.Combine(dataDir,"library.db"));allGames=store.GetAll();addedTimes=store.GetAddedTimes();
         Title="EmuVora";Width=1320;Height=820;MinWidth=820;MinHeight=520;
         WindowAppearance.Apply(this);
         var sidebar=new StackPanel {Spacing=7,Margin=new(18,16)};
         sidebar.Children.Add(BrandIdentity.Lockup());
         sidebar.Children.Add(new TextBlock {Text="DEINE BIBLIOTHEK",FontSize=11,Opacity=0.65});
         sidebar.Children.Add(backupReminder);backupReminder.Click+=async(_,_)=>await ShowSettingsAsync(initialTab:5);UpdateBackupReminder();
-        foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt","Fehlende Cover"})
+        foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt","Zuletzt hinzugefügt","Fehlende Cover"})
         {
-            var item=ActionButton(name,()=>{view=name;systems.SelectedItem="Alle Konsolen";Refresh();});StyleNavigation(item);viewButtons[name]=item;sidebar.Children.Add(item);
+            var item=ActionButton(name,()=>{view=name;collectionChoice.SelectedItem=null;systems.SelectedItem="Alle Konsolen";Refresh();});StyleNavigation(item);viewButtons[name]=item;sidebar.Children.Add(item);
         }
+        sidebar.Children.Add(new TextBlock{Text="SAMMLUNGEN",FontSize=11,Opacity=0.65,Margin=new(0,12,0,4)});sidebar.Children.Add(collectionChoice);sidebar.Children.Add(AsyncButton("Sammlungen verwalten",()=>ManageCollectionsAsync()));
+        collectionChoice.SelectionChanged+=(_,_)=>{if(!updatingCollections&&collectionChoice.SelectedItem is string){view="Sammlung";Refresh();}};UpdateCollections();
         sidebar.Children.Add(new TextBlock{Text="KONSOLEN",FontSize=11,Opacity=0.65,Margin=new(0,16,0,4)});sidebar.Children.Add(consoleNavigation);
         sidebar.Children.Add(new Separator {Margin=new(0,12)});
         var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());import.Classes.Add("primary-action");import.Classes.Add("accent");sidebar.Children.Add(import);operationButtons.Add(import);
@@ -123,7 +125,8 @@ public sealed partial class MainWindow : Window
         header.Children.Add(themeLogo);var heading=new StackPanel{Spacing=5};heading.Children.Add(libraryEyebrow);heading.Children.Add(libraryHeading);Grid.SetColumn(heading,1);header.Children.Add(heading);summary.VerticalAlignment=VerticalAlignment.Center;summary.TextAlignment=TextAlignment.Right;Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
         var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=10};Grid.SetColumnSpan(search,3);filters.Children.Add(search);Grid.SetRow(systems,1);filters.Children.Add(systems);Grid.SetRow(sort,1);Grid.SetColumn(sort,1);filters.Children.Add(sort);detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});Grid.SetRow(detailsToggle,1);Grid.SetColumn(detailsToggle,2);filters.Children.Add(detailsToggle);AddRow(main,filters,1);
         gamesList.Classes.Add("game-library");
-        filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);Grid.SetColumnSpan(manageCover,3);filters.Children.Add(manageCover);
+        filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);var gameActions=new Grid{ColumnDefinitions=new("*,*"),ColumnSpacing=10};Grid.SetRow(gameActions,2);Grid.SetColumnSpan(gameActions,3);gameActions.Children.Add(manageCover);Grid.SetColumn(collectionGame,1);gameActions.Children.Add(collectionGame);filters.Children.Add(gameActions);
+        collectionGame.Click+=async(_,_)=>{try{await ChooseCollectionsAsync();}catch(Exception ex){ShowError(ex);}};
         manageCover.Click+=async(_,_)=>{try{await ManageCoverAsync();}catch(Exception ex){ShowError(ex);}};
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
@@ -217,13 +220,13 @@ public sealed partial class MainWindow : Window
             Avalonia.Automation.AutomationProperties.SetName(item,console+" - "+group.Count()+" Spiele");Avalonia.Automation.AutomationProperties.SetAutomationId(item,"console-filter-"+Uri.EscapeDataString(console));ToolTip.SetTip(item,console+" - "+group.Count()+" Spiele");consoleNavigation.Children.Add(item);}
     }
     private void Reload(string? selected=null)
-    {allGames=store.GetAll();UpdateSystems();Refresh(selected);}
+    {allGames=store.GetAll();addedTimes=store.GetAddedTimes();UpdateSystems();Refresh(selected);}
     private void Refresh(string? selectedPath=null,bool keepPage=false)
     {
         var explicitSelection=selectedPath!=null;if(!keepPage)libraryPage=0;selectedPath??=Selected?.Path;var query=search.Text?.Trim()??"";var console=systems.SelectedItem as string;
         var filtered=allGames.Where(g=>(console is null or "Alle Konsolen"||g.System==console)&&(g.Title.Contains(query,StringComparison.OrdinalIgnoreCase)||g.System.Contains(query,StringComparison.OrdinalIgnoreCase)));
-        filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),"Fehlende Cover"=>filtered.Where(g=>CoverLibrary.IsMissing(settings,g.Path)),_=>filtered};
-        var result=(sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
+        filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),"Fehlende Cover"=>filtered.Where(g=>CoverLibrary.IsMissing(settings,g.Path)),"Zuletzt hinzugefügt"=>filtered.Where(g=>addedTimes.ContainsKey(g.Path)),"Sammlung"=>filtered.Where(g=>collectionChoice.SelectedItem is string name&&settings.Collections.TryGetValue(name,out var members)&&members.Contains(g.Path)),_=>filtered};
+        var result=(sort.SelectedIndex==3||view=="Zuletzt hinzugefügt"?filtered.OrderByDescending(g=>addedTimes.GetValueOrDefault(g.Path)).ThenBy(g=>g.Title):sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
         libraryResultCount=result.Length;
         if(explicitSelection&&selectedPath!=null&&!keepPage){var position=Array.FindIndex(result,g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));if(position>=0)libraryPage=position/LibraryPageSize;}
         libraryPage=Math.Clamp(libraryPage,0,Math.Max(0,(result.Length-1)/LibraryPageSize));
@@ -235,8 +238,9 @@ public sealed partial class MainWindow : Window
         libraryPager.IsVisible=result.Length>LibraryPageSize;previousPage.IsEnabled=libraryPage>0;nextPage.IsEnabled=(libraryPage+1)*LibraryPageSize<result.Length;
         pageLabel.Text=$"Seite {libraryPage+1} / {Math.Max(1,(result.Length+LibraryPageSize-1)/LibraryPageSize)} · {libraryPage*LibraryPageSize+1}–{libraryPage*LibraryPageSize+page.Length} von {result.Length}";
         emptyState.IsVisible=empty.IsVisible=result.Length==0;emptyAction.Content=allGames.Count==0?"Ersten ROM-Ordner importieren":"Filter zurücksetzen";empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Deine Klassiker bekommen hier ein Zuhause. Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
-        libraryHeading.Text=view=="Alle Spiele"?(console is null or "Alle Konsolen"?"Deine Spiele":console):view;
+        libraryHeading.Text=view=="Sammlung"?collectionChoice.SelectedItem as string??"Sammlung":view=="Alle Spiele"?(console is null or "Alle Konsolen"?"Deine Spiele":console):view;
         if(view=="Fehlende Cover"&&allGames.Count>0){empty.Title="Keine fehlenden Cover in dieser Auswahl";empty.Message="Alle passenden Spiele haben ein Cover. Suche oder Konsole ändern, um andere Einträge zu prüfen.";}
+        if(view=="Zuletzt hinzugefügt"&&result.Length==0){empty.Title="Noch keine neuen Importe in dieser Auswahl";empty.Message="Das Importdatum wird ab dieser Version erfasst. Ältere Einträge bleiben unter Alle Spiele erhalten; ihr ursprüngliches Importdatum ist nicht bekannt.";}
         libraryEyebrow.Text=view=="Favoriten"?"DEINE LIEBLINGSSTÜCKE":view=="Zuletzt gespielt"?"WEITERSPIELEN":"DEINE SAMMLUNG";
         var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
         ApplyExternalTheme();
@@ -272,7 +276,7 @@ public sealed partial class MainWindow : Window
     }
     private void UpdateSelected()
     {
-        var game=Selected;foreach(var button in new[]{favorite,edit,cover,onlineCover,protectCover,manageCover,remove,reveal})button.IsEnabled=game!=null&&operation==null;
+        var game=Selected;foreach(var button in new[]{favorite,edit,cover,onlineCover,protectCover,manageCover,collectionGame,remove,reveal})button.IsEnabled=game!=null&&operation==null;
         protectCover.Content=game!=null&&settings.ProtectedCovers.Contains(game.Path)?"Cover-Schutz aufheben":"Cover schützen";
         play.IsEnabled=game!=null&&operation==null&&!running.ContainsKey(game.Path);
         detailTitle.Text=game?.Title??"Spiel auswählen";detailCover.Content=game==null?null:Artwork(game,220);

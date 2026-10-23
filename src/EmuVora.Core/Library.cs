@@ -136,17 +136,17 @@ public sealed class LibraryStore
         connection=new SqliteConnectionStringBuilder{DataSource=file}.ToString();using var c=Open();using var cmd=c.CreateCommand();
         cmd.CommandText="CREATE TABLE IF NOT EXISTS games(path TEXT PRIMARY KEY COLLATE NOCASE,title TEXT NOT NULL,system TEXT NOT NULL);";cmd.ExecuteNonQuery();
         cmd.CommandText="PRAGMA table_info(games)";var columns=new HashSet<string>();using(var reader=cmd.ExecuteReader())while(reader.Read())columns.Add(reader.GetString(1));
-        foreach(var(name,type)in new[]{("favorite","INTEGER NOT NULL DEFAULT 0"),("lastPlayed","TEXT"),("playCount","INTEGER NOT NULL DEFAULT 0"),("customized","INTEGER NOT NULL DEFAULT 0")})
+        foreach(var(name,type)in new[]{("favorite","INTEGER NOT NULL DEFAULT 0"),("lastPlayed","TEXT"),("playCount","INTEGER NOT NULL DEFAULT 0"),("customized","INTEGER NOT NULL DEFAULT 0"),("addedAt","TEXT")})
             if(!columns.Contains(name)){cmd.CommandText=$"ALTER TABLE games ADD COLUMN {name} {type}";cmd.ExecuteNonQuery();}
     }
     private SqliteConnection Open(){var c=new SqliteConnection(connection);c.Open();return c;}
     public void Upsert(IEnumerable<Game> games)
     {
-        using var c=Open();using var tx=c.BeginTransaction();foreach(var game in games)
+        using var c=Open();using var tx=c.BeginTransaction();var added=DateTimeOffset.UtcNow.ToString("O");foreach(var game in games)
         {
             using var cmd=c.CreateCommand();cmd.Transaction=tx;
-            cmd.CommandText="INSERT INTO games(path,title,system) SELECT $p,$t,$s WHERE NOT EXISTS(SELECT 1 FROM games WHERE path=$p COLLATE NOCASE);";
-            cmd.Parameters.AddWithValue("$p",game.Path);cmd.Parameters.AddWithValue("$t",game.Title);cmd.Parameters.AddWithValue("$s",game.System);cmd.ExecuteNonQuery();
+            cmd.CommandText="INSERT INTO games(path,title,system,addedAt) SELECT $p,$t,$s,$added WHERE NOT EXISTS(SELECT 1 FROM games WHERE path=$p COLLATE NOCASE);";
+            cmd.Parameters.AddWithValue("$p",game.Path);cmd.Parameters.AddWithValue("$t",game.Title);cmd.Parameters.AddWithValue("$s",game.System);cmd.Parameters.AddWithValue("$added",added);cmd.ExecuteNonQuery();
         }
         tx.Commit();
     }
@@ -185,6 +185,13 @@ public sealed class LibraryStore
     {
         var result=new List<Game>();using var c=Open();using var cmd=c.CreateCommand();cmd.CommandText="SELECT title,system,path,favorite,lastPlayed,playCount FROM games ORDER BY system,title";
         using var r=cmd.ExecuteReader();while(r.Read())result.Add(new(r.GetString(0),r.GetString(1),r.GetString(2),r.GetInt32(3)!=0,r.IsDBNull(4)?null:DateTimeOffset.Parse(r.GetString(4)),r.GetInt32(5)));return result;
+    }
+    public IReadOnlyDictionary<string,DateTimeOffset> GetAddedTimes()
+    {
+        using var c=Open();using var cmd=c.CreateCommand();cmd.CommandText="SELECT path,addedAt FROM games WHERE addedAt IS NOT NULL";
+        var result=new Dictionary<string,DateTimeOffset>(StringComparer.OrdinalIgnoreCase);using var reader=cmd.ExecuteReader();
+        while(reader.Read())if(DateTimeOffset.TryParse(reader.GetString(1),out var added))result[reader.GetString(0)]=added;
+        return result;
     }
     public void Restore(IEnumerable<Game> games)
     {
