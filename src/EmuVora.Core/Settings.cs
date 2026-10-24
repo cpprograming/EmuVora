@@ -43,6 +43,7 @@ public sealed class SettingsStore(string file)
     public AppSettings Load()
     {
         RomRelocation.Recover(Path.GetDirectoryName(Path.GetFullPath(file))!);
+        DuplicateMerge.Recover(Path.GetDirectoryName(Path.GetFullPath(file))!);
         if(!File.Exists(file))return new();
         try
         {

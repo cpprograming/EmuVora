@@ -138,15 +138,27 @@ public sealed class LibraryStore
         cmd.CommandText="PRAGMA table_info(games)";var columns=new HashSet<string>();using(var reader=cmd.ExecuteReader())while(reader.Read())columns.Add(reader.GetString(1));
         foreach(var(name,type)in new[]{("favorite","INTEGER NOT NULL DEFAULT 0"),("lastPlayed","TEXT"),("playCount","INTEGER NOT NULL DEFAULT 0"),("customized","INTEGER NOT NULL DEFAULT 0"),("addedAt","TEXT")})
             if(!columns.Contains(name)){cmd.CommandText=$"ALTER TABLE games ADD COLUMN {name} {type}";cmd.ExecuteNonQuery();}
+        cmd.CommandText="CREATE TABLE IF NOT EXISTS merged_paths(path TEXT PRIMARY KEY COLLATE NOCASE,target TEXT NOT NULL COLLATE NOCASE,length INTEGER,lastWriteUtc TEXT,targetWriteUtc TEXT); CREATE TABLE IF NOT EXISTS merge_history(id TEXT PRIMARY KEY,mergedAt TEXT NOT NULL,keeper TEXT NOT NULL,originalRows TEXT NOT NULL,backup TEXT NOT NULL,originalSettings TEXT NOT NULL);";cmd.ExecuteNonQuery();
     }
     private SqliteConnection Open(){var c=new SqliteConnection(connection);c.Open();return c;}
     public void Upsert(IEnumerable<Game> games)
     {
         using var c=Open();using var tx=c.BeginTransaction();var added=DateTimeOffset.UtcNow.ToString("O");foreach(var game in games)
         {
+            var canonical=System.IO.Path.GetFullPath(game.Path);
+            using(var alias=c.CreateCommand())
+            {
+                alias.Transaction=tx;alias.CommandText="SELECT a.length,a.lastWriteUtc,g.path,a.targetWriteUtc FROM merged_paths a JOIN games g ON a.target=g.path COLLATE NOCASE WHERE a.path=$p COLLATE NOCASE";alias.Parameters.AddWithValue("$p",canonical);
+                using var reader=alias.ExecuteReader();
+                if(reader.Read()&&!reader.IsDBNull(0)&&!reader.IsDBNull(1))
+                {
+                    var file=new FileInfo(canonical);var target=new FileInfo(reader.GetString(2));
+                    if(file.Exists&&target.Exists&&!reader.IsDBNull(3)&&file.Length==reader.GetInt64(0)&&target.Length==file.Length&&file.LastWriteTimeUtc.ToString("O")==reader.GetString(1)&&target.LastWriteTimeUtc.ToString("O")==reader.GetString(3))continue;
+                }
+            }
             using var cmd=c.CreateCommand();cmd.Transaction=tx;
-            cmd.CommandText="INSERT INTO games(path,title,system,addedAt) SELECT $p,$t,$s,$added WHERE NOT EXISTS(SELECT 1 FROM games WHERE path=$p COLLATE NOCASE);";
-            cmd.Parameters.AddWithValue("$p",game.Path);cmd.Parameters.AddWithValue("$t",game.Title);cmd.Parameters.AddWithValue("$s",game.System);cmd.Parameters.AddWithValue("$added",added);cmd.ExecuteNonQuery();
+            cmd.CommandText="DELETE FROM merged_paths WHERE path=$canonical COLLATE NOCASE; INSERT INTO games(path,title,system,addedAt) SELECT $p,$t,$s,$added WHERE NOT EXISTS(SELECT 1 FROM games WHERE path=$p COLLATE NOCASE);";
+            cmd.Parameters.AddWithValue("$canonical",canonical);cmd.Parameters.AddWithValue("$p",game.Path);cmd.Parameters.AddWithValue("$t",game.Title);cmd.Parameters.AddWithValue("$s",game.System);cmd.Parameters.AddWithValue("$added",added);cmd.ExecuteNonQuery();
         }
         tx.Commit();
     }
@@ -171,7 +183,7 @@ public sealed class LibraryStore
             cmd.Parameters.AddWithValue("$p",suggestion.Path);cmd.Parameters.AddWithValue("$t",suggestion.Title);cmd.Parameters.AddWithValue("$old",suggestion.PreviousTitle);cmd.Parameters.AddWithValue("$s",suggestion.System);changed+=cmd.ExecuteNonQuery();
         }tx.Commit();return changed;
     }
-    public void Remove(Game game)=>Execute("DELETE FROM games WHERE path=$p COLLATE NOCASE",game);
+    public void Remove(Game game)=>Execute("DELETE FROM games WHERE path=$p COLLATE NOCASE; DELETE FROM merged_paths WHERE target=$p COLLATE NOCASE",game);
     public void MarkPlayed(Game game)
     {
         using var c=Open();using var cmd=c.CreateCommand();cmd.CommandText="UPDATE games SET lastPlayed=$d,playCount=playCount+1 WHERE path=$p COLLATE NOCASE";
@@ -198,7 +210,7 @@ public sealed class LibraryStore
         using var c=Open();using var tx=c.BeginTransaction();foreach(var game in games)
         {
             if(string.IsNullOrWhiteSpace(game.Title)||string.IsNullOrWhiteSpace(game.Path)||!System.IO.Path.IsPathFullyQualified(game.Path))throw new InvalidDataException("Invalid library entry.");
-            using var cmd=c.CreateCommand();cmd.Transaction=tx;cmd.CommandText="UPDATE games SET title=$t,system=$s,favorite=$f,lastPlayed=$d,playCount=$n,customized=1 WHERE path=$p COLLATE NOCASE; INSERT INTO games(path,title,system,favorite,lastPlayed,playCount,customized) SELECT $p,$t,$s,$f,$d,$n,1 WHERE NOT EXISTS(SELECT 1 FROM games WHERE path=$p COLLATE NOCASE)";
+            using var cmd=c.CreateCommand();cmd.Transaction=tx;cmd.CommandText="DELETE FROM merged_paths WHERE path=$p COLLATE NOCASE; UPDATE games SET title=$t,system=$s,favorite=$f,lastPlayed=$d,playCount=$n,customized=1 WHERE path=$p COLLATE NOCASE; INSERT INTO games(path,title,system,favorite,lastPlayed,playCount,customized) SELECT $p,$t,$s,$f,$d,$n,1 WHERE NOT EXISTS(SELECT 1 FROM games WHERE path=$p COLLATE NOCASE)";
             cmd.Parameters.AddWithValue("$p",game.Path);cmd.Parameters.AddWithValue("$t",game.Title);cmd.Parameters.AddWithValue("$s",game.System);cmd.Parameters.AddWithValue("$f",game.Favorite?1:0);cmd.Parameters.AddWithValue("$d",(object?)game.LastPlayed?.ToString("O")??DBNull.Value);cmd.Parameters.AddWithValue("$n",Math.Max(0,game.PlayCount));cmd.ExecuteNonQuery();
         }tx.Commit();
     }
