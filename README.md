@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.109](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.109)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.112](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.112)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -13,6 +13,12 @@ Unter **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** werden 
 - Alle Versionen und Änderungen findest du unter **[Releases](https://github.com/cpprograming/EmuVora/releases)**.
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
+
+## Native Oberfläche, Versionen und Themes – neu in 0.14.112
+
+Die Konsolenzeilen und Titelkarten sind gleichmäßig ausgerichtet. Gleichnamige Titel derselben Konsole erscheinen als eine Karte mit auswählbaren Dateiversionen, ohne Dateien oder Metadaten zu löschen. Aurora und Studio ergänzen die eigenen Basisstile. ES-DE-Themes lassen sich mit Importbericht an das native Layout anpassen; der separate ES-DE-Start entfällt. Die PS2-BIOS-Auswahl prüft ROMDIR/ROMVER und vermeidet gleich große DIFF-Begleitdateien. [Anleitung und Grenzen](NATIVE_THEMES.md).
+
+296 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Die Prüfung an einer privaten Bibliothekskopie mit 5.805 Einträgen bestätigt begrenzte 48 Karten pro Seite und reagierende Suche; das Original blieb unverändert.
 
 ## Fortschritt und Fehlerhinweise – neu in 0.14.109
 

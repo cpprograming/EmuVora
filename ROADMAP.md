@@ -2,7 +2,17 @@
 
 Stand: 24. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.109](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.109).
+Aktueller geprüfter Release: [0.14.112](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.112).
+
+## 0.14.112 – Native Oberfläche und Themes (abgeschlossen)
+
+- [x] Konsolenlogos, Zähler und Titelzeilen einheitlich ausrichten.
+- [x] Gleichnamige Titel pro Konsole mit Dateiauswahl bündeln; Abschalten der Gruppierung ermöglichen und Metadaten erhalten.
+- [x] Native Basisstile Aurora und Studio ergänzen; separaten ES-DE-Start, Download und Autostart entfernen.
+- [x] Unterstützte ES-DE-Themes automatisch an das native Layout anpassen; Variante/Farbschema wählen und Importbericht samt Grenzen anbieten.
+- [x] PS2-Haupt-BIOS strukturell prüfen; falsche DIFF-Auswahl verhindern und Emulatorfehler genauer anzeigen. Betroffener Spielstart nach Korrektur bestätigt.
+- [x] 296 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Bibliothekskopie mit 5.805 Einträgen und native Aurora-/Studio-Ansichten geprüft.
+- [ ] Weitere native Layouts und Theme-Optionen ausbauen; fremde ES-DE-Speziallayouts bleiben außerhalb der Anpassung.
 
 ## 0.14.109 – Status und Fehlerhinweise (abgeschlossen)
 
@@ -143,8 +153,8 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [x] Neue Marke, App-/Setup-/Shortcut-Icon, Navigation, Cover-Platzhalter und Detailansicht in 0.14.71 veröffentlicht; 152 Funktions- und 6 Netzwerktests, Installation und Selbstupdate einschließlich SHA-256 geprüft. [Vorschau](design/README.md).
 - [ ] Downloads und Fehlerzustände weiter vereinheitlichen.
   - Gemeinsamer Statusbereich mit Fortschritt, Abbruch und Fehlerdetails für Standarddialoge veröffentlicht (ab 0.14.109); Timeouts und veraltete Download-Meldungen gesondert behandeln. [Anleitung](OPERATIONS_AND_ERRORS.md).
-- [x] Native Themes Aurora/Studio und automatische ES-DE-Anpassung implementieren; separaten ES-DE-Start und Download aus der Oberfläche entfernen (Entwicklungsstand). [Umfang und Grenzen](NATIVE_THEMES.md).
-- [x] Einheitliche Konsolenzeilen und sichtbare Versionsgruppen statt doppelter Titelkarten implementieren (Entwicklungsstand).
+- [x] Native Themes Aurora/Studio und automatische ES-DE-Anpassung implementieren; separaten ES-DE-Start und Download aus der Oberfläche entfernen (ab 0.14.112). [Umfang und Grenzen](NATIVE_THEMES.md).
+- [x] Einheitliche Konsolenzeilen und sichtbare Versionsgruppen statt doppelter Titelkarten implementieren (ab 0.14.112).
 
 ## 0.14 – Spielebibliothek
 
