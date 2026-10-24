@@ -6,6 +6,8 @@ Aktueller geprüfter Release: [0.14.112](https://github.com/cpprograming/EmuVora
 
 ## 0.14.112 – Native Oberfläche und Themes (abgeschlossen)
 
+- [x] Deutsche Emulator-/Spielsprachprofile und sichtbare Startfehler-/BIOS-Dialoge implementieren (Entwicklungsstand). [Umfang und Grenzen](LANGUAGE_AND_ERRORS.md).
+
 - [x] Konsolenlogos, Zähler und Titelzeilen einheitlich ausrichten.
 - [x] Gleichnamige Titel pro Konsole mit Dateiauswahl bündeln; Abschalten der Gruppierung ermöglichen und Metadaten erhalten.
 - [x] Native Basisstile Aurora und Studio ergänzen; separaten ES-DE-Start, Download und Autostart entfernen.

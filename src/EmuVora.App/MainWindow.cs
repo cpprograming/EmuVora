@@ -154,7 +154,7 @@ public sealed partial class MainWindow : Window
         UpdateSystems();ApplyTheme();ApplyLibraryAppearance();Refresh();
         PropertyChanged+=(_,e)=>{if(e.Property==ClientSizeProperty)ApplyLayout();};
         status.Text=settingsStore.LoadWarning??(allGames.Count==0?"Importiere deine Spiele, um loszulegen.":"Bereit zum Spielen · Strg+F zum Suchen");
-        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();};
+        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(settings.PreferGerman)Guard(ApplyManagedLanguages);if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
         Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();consoleLogos.Dispose();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
@@ -166,7 +166,7 @@ public sealed partial class MainWindow : Window
     private Button AsyncButton(string text,Func<Task> action)
     {var button=new Button {Content=text,HorizontalAlignment=HorizontalAlignment.Stretch};button.Click+=async(_,_)=>{try{await action();}catch(Exception ex){ShowError(ex);}};return button;}
     private void Guard(Action action){try{action();}catch(Exception ex){ShowError(ex);}}
-    private void ShowError(Exception ex){operationFailure=OperationFailure.From(ex);status.Text="Fehler: "+operationFailure.Summary;NotifyFeedback();Log(ex);}
+    private void ShowError(Exception ex){operationFailure=OperationFailure.From(ex);status.Text="Fehler: "+operationFailure.Summary;NotifyFeedback();Log(ex);ShowErrorPopup();}
     private void Log(Exception ex){try{File.AppendAllText(Path.Combine(dataDir,"errors.log"),$"{DateTimeOffset.Now:O} {ex}\n");}catch{ }}
     private Game? Selected=>gamesList.SelectedItem as Game;
     private void ApplyTheme()
@@ -351,22 +351,24 @@ public sealed partial class MainWindow : Window
     private async Task PlayAsync()
     {
         if(Selected is not{} game||operation!=null||running.ContainsKey(game.Path))return;
-        if(Versions(game).Count>1){var chosen=await ChooseVersionAsync(game);if(chosen==null)return;game=chosen;}
         try
         {
+            if(Versions(game).Count>1){var chosen=await ChooseVersionAsync(game);if(chosen==null)return;game=chosen;}
+            if(!File.Exists(game.Path))throw new FileNotFoundException("ROM-Datei nicht gefunden. Prüfe das Laufwerk oder ordne den ROM-Ordner in Einstellungen → Bibliothek neu zu.",game.Path);
             var id=settings.PreferredEmulators.GetValueOrDefault(game.System);var definition=EmulatorCatalog.Known.FirstOrDefault(e=>e.Id==id&&e.Systems.Contains(game.System))??EmulatorCatalog.Known.FirstOrDefault(e=>e.Systems.Contains(game.System));
-            if(definition==null){status.Text="Zuerst die Konsole des Spiels zuordnen.";return;}
+            if(definition==null)throw new InvalidOperationException("Zuerst die Konsole des Spiels unter Spieldetails zuordnen.");
             if(runningEmulators.Contains(definition.Id)){status.Text="Das laufende Spiel zuerst im Emulator beenden.";return;}
             if(settings.AutomaticSetup&&!await BusyAsync(async token=>await EnsureReadyAsync(definition.Id,game.System,token)))return;
             var executable=settings.EmulatorPaths.GetValueOrDefault(definition.Id);
-            if(string.IsNullOrEmpty(executable)||!File.Exists(executable)){status.Text=$"{definition.Name} zuerst unter „Emulatoren einrichten“ installieren oder auswählen.";await ShowSettingsAsync(definition.Id);return;}
+            if(string.IsNullOrEmpty(executable)||!File.Exists(executable))throw new FileNotFoundException($"{definition.Name} zuerst unter Einstellungen → Emulatoren installieren oder auswählen.",executable);
             if(settings.Packages.TryGetValue(definition.Id,out var managed)&&managed.ExecutablePath==executable)
             {
                 DisplayProfiles.Apply(definition.Id,executable,game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,gamePath:game.Path);
                 var hint=EmulatorSetup.FirmwareHint(game.System,dataDir,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,dataDir));
-                if(hint!=null){status.Text=hint;await ShowSettingsAsync(definition.Id);return;}
+                if(settings.PreferGerman)EmulatorLanguage.Apply(definition.Id,executable);
+                if(hint!=null){await ShowFirmwareRequiredAsync(game.System,hint,definition.Id);return;}
             }
-            var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen);running[game.Path]=process;runningEmulators.Add(definition.Id);
+            var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen,settings.PreferGerman);running[game.Path]=process;runningEmulators.Add(definition.Id);
             store.MarkPlayed(game);Reload(game.Path);status.Text=$"{game.Title} läuft mit {definition.Name}.";
             _=TrackProcessAsync(process,game,definition.Id);
         }
@@ -464,7 +466,7 @@ public sealed partial class MainWindow : Window
         if(settings.Packages.TryGetValue(id,out var same)&&same.Version==package.Version&&File.Exists(same.ExecutablePath))
         {
             if(id=="retroarch-cores")ConfigureCores(same.ExecutablePath);
-            else{settings.EmulatorPaths[id]=same.ExecutablePath;EmulatorSetup.Configure(id,same.ExecutablePath,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.FirstXInputIndex);}
+            else{settings.EmulatorPaths[id]=same.ExecutablePath;EmulatorSetup.Configure(id,same.ExecutablePath,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.FirstXInputIndex,preferGerman:settings.PreferGerman);}
             return;
         }
         var executable=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
@@ -473,7 +475,7 @@ public sealed partial class MainWindow : Window
         else
         {
             if(previous!=null&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
-            EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.FirstXInputIndex);
+            EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.FirstXInputIndex,preferGerman:settings.PreferGerman);
             settings.EmulatorPaths[id]=executable;
         }
         settings.Packages[id]=new(package.Version,executable,previous);settingsStore.Save(settings);
@@ -484,7 +486,7 @@ public sealed partial class MainWindow : Window
         if(executable==null||!File.Exists(executable))await InstallManagedAsync(id,token);
         if(id=="retroarch"&&(!settings.CorePaths.TryGetValue(system,out var core)||!File.Exists(core)))await InstallManagedAsync("retroarch-cores",token);
         executable=settings.EmulatorPaths.GetValueOrDefault(id);
-        if(executable!=null&&settings.Packages.TryGetValue(id,out var managed)&&managed.ExecutablePath==executable)EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.FirstXInputIndex);
+        if(executable!=null&&settings.Packages.TryGetValue(id,out var managed)&&managed.ExecutablePath==executable)EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.FirstXInputIndex,preferGerman:settings.PreferGerman);
         settingsStore.Save(settings);
     }
     private async Task CheckUpdatesAsync(bool reportFailure=false)
@@ -504,7 +506,7 @@ public sealed partial class MainWindow : Window
                     settings.Packages[package.Id]=new(package.Version,path,old.ExecutablePath);
                     if(package.Id=="retroarch-cores")
                     {ConfigureCores(path,Path.GetDirectoryName(old.ExecutablePath));}
-                    else{EmulatorSetup.Configure(package.Id,path,dataDir,settings.XboxDefaults,settings.Fullscreen);settings.EmulatorPaths[package.Id]=path;}
+                    else{EmulatorSetup.Configure(package.Id,path,dataDir,settings.XboxDefaults,settings.Fullscreen,preferGerman:settings.PreferGerman);settings.EmulatorPaths[package.Id]=path;}
                     settingsStore.Save(settings);
                 }
                 status.Text="Verfügbare Updates installiert. Vorige Emulator-Versionen bleiben erhalten.";
@@ -533,6 +535,9 @@ public sealed partial class MainWindow : Window
         var autoInstall=new CheckBox {Content="Updates für verwaltete Installationen automatisch installieren",IsChecked=settings.AutoInstallUpdates};panel.Children.Add(autoInstall);
         autoInstall.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoInstallUpdates=autoInstall.IsChecked==true;settingsStore.Save(settings);});
         AddAutomaticSetupControls(panel);
+        var german=new CheckBox{Content="Emulatoren und unterstützte Spiele automatisch auf Deutsch einstellen",IsChecked=settings.PreferGerman};german.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.PreferGerman=german.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(german);
+        panel.Children.Add(new TextBlock{Text="Gilt für verwaltete Emulatoren. Deutsch wird beim Start und vor Spielen angewendet. Nicht jedes Spiel enthält Deutsch oder übernimmt die Konsolensprache. PS1/PS2-Spielsprache gegebenenfalls im Spiel bzw. BIOS-Menü auswählen. BIOS/NVRAM und Spielstände bleiben unverändert. Abschalten beendet die Vorgabe, setzt bisherige Werte aber nicht zurück.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(AsyncButton("Deutsch jetzt anwenden",async()=>{if(!settings.PreferGerman){status.Text="Die deutsche Sprachvorgabe zuerst aktivieren.";return;}if(await BusyAsync(_=>Task.Run(ApplyManagedLanguages)))status.Text="Deutsch für verwaltete Emulatoren angewendet; laufende Emulatoren werden beim nächsten Start umgestellt.";}));
         theme.SelectionChanged+=(_,_)=>Guard(()=>{settings.Theme=theme.SelectedItem as string??"Midnight";settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();});fullscreen.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.Fullscreen=fullscreen.IsChecked==true;settingsStore.Save(settings);});auto.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckUpdatesOnStartup=auto.IsChecked==true;settingsStore.Save(settings);});
         var emulator=new ComboBox {ItemsSource=EmulatorCatalog.Known.Select(e=>e.Name).ToArray(),SelectedIndex=Math.Max(0,Array.FindIndex(EmulatorCatalog.Known,e=>e.Id==initialEmulator))};panel.Children.Add(new Separator());panel.Children.Add(emulator);
         var path=new TextBox {Watermark="Pfad zur Emulator-EXE"};var packageInfo=new TextBlock {TextWrapping=TextWrapping.Wrap};panel.Children.Add(path);panel.Children.Add(packageInfo);
@@ -555,7 +560,7 @@ public sealed partial class MainWindow : Window
                 var executable=await packages.InstallAsync(package,Path.Combine(dataDir,"emulators"),DownloadProgress(),token);
                 var previous=settings.EmulatorPaths.GetValueOrDefault(id);
                 if(!string.IsNullOrEmpty(previous)&&File.Exists(previous))await Task.Run(()=>PreserveConfiguration(previous,executable),token);
-                EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.FirstXInputIndex);
+                EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,reset:previous==null,firstController:Gamepad.FirstXInputIndex,preferGerman:settings.PreferGerman);
                 settings.Packages[id]=new(package.Version,executable,previous);settings.EmulatorPaths[id]=executable;settingsStore.Save(settings);Load();status.Text=Current().Name+" automatisch eingerichtet. Eigene BIOS-Dateien bei Bedarf importieren.";
             });
         }));
@@ -564,7 +569,7 @@ public sealed partial class MainWindow : Window
         {
             var id=Current().Id;if(runningEmulators.Contains(id)){status.Text="Emulator zuerst schließen.";return;}
             if(!settings.Packages.TryGetValue(id,out var installed)||settings.EmulatorPaths.GetValueOrDefault(id)!=installed.ExecutablePath){status.Text="Automatische Profile sind für verwaltete Downloads verfügbar.";return;}
-            if(await ConfirmAsync("Xbox-Standardprofil erneut anwenden? Die bisherigen Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{EmulatorSetup.Configure(id,installed.ExecutablePath,dataDir,true,settings.Fullscreen,true,Gamepad.FirstXInputIndex);status.Text="Xbox-Profil angewendet.";});
+            if(await ConfirmAsync("Xbox-Standardprofil erneut anwenden? Die bisherigen Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{EmulatorSetup.Configure(id,installed.ExecutablePath,dataDir,true,settings.Fullscreen,true,Gamepad.FirstXInputIndex,settings.PreferGerman);status.Text="Xbox-Profil angewendet.";});
         }));
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="RetroArch-Core je Konsole",FontWeight=FontWeight.Bold});
         var coreSystem=new ComboBox {ItemsSource=EmulatorCatalog.Get("retroarch").Systems,SelectedIndex=0};var corePath=new TextBox();panel.Children.Add(coreSystem);panel.Children.Add(corePath);

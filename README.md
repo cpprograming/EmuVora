@@ -6,6 +6,8 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 ## Download und Installation
 
+**Deutsch und Startdialoge:** Die deutschen Sprachprofile für verwaltete Emulatoren und unterstützte Spielsysteme sind standardmäßig aktiv. Fehlendes BIOS erhält einen eigenen Importdialog; andere Fehler ein Fehlerfenster oder den Fehlerbereich des bereits geöffneten Dialogs. [Anleitung, Sprachumfang und Grenzen](LANGUAGE_AND_ERRORS.md).
+
 Unter **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** werden gleiche Titel pro System und nummerierte Disc-Sätze im selben Ordner angezeigt. Dateien lassen sich per SHA-256 vergleichen; Playlists aus CHD/CUE werden nach bestätigter Vorschau für PS1 sowie ab 0.14.105 für Saturn und Dreamcast erstellt. Neu ab 0.14.103: bestätigte Duplikate mit Auswahl des verbleibenden Eintrags, Covers und Bildprofils zusammenführen. Favoriten, Verlauf und Sammlungen werden übernommen, Originalmetadaten vorher gesichert. ROMs und Spielstände bleiben erhalten. Spielstände können im Emulator eine Zuordnung zum verbleibenden ROM- oder neuen Playlist-Namen benötigen. [Anleitung und Grenzen](LIBRARY_AND_DISPLAY.md).
 
 - **[Windows-Setup herunterladen](https://github.com/cpprograming/EmuVora/releases/latest/download/EmuVora-Setup.exe)** – Installationslaufwerk und Ordner wählen; eigene Desktop- und Startmenü-Verknüpfungen sind optional.

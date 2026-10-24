@@ -4,7 +4,7 @@ public static class EmulatorSetup
 {
     public static string FirmwareDirectory(string dataDirectory)=>Path.Combine(dataDirectory,"firmware");
     private static string Quoted(string value)=>"\""+value.Replace('\\','/').Replace("\"","")+"\"";
-    public static void Configure(string id,string executable,string dataDirectory,bool xbox=true,bool fullscreen=true,bool reset=false,int firstController=0)
+    public static void Configure(string id,string executable,string dataDirectory,bool xbox=true,bool fullscreen=true,bool reset=false,int firstController=0,bool preferGerman=true)
     {
         SaveData.RestorePending(id,executable,dataDirectory);
         var root=Path.GetDirectoryName(executable)!;var firmware=FirmwareDirectory(dataDirectory);Directory.CreateDirectory(firmware);
@@ -81,6 +81,7 @@ public static class EmulatorSetup
             Merge(Path.Combine(root,"memstick/PSP/SYSTEM/ppsspp.ini"),new(){{"Graphics",new(){{"FullScreen",fullscreen?"True":"False"}}}},replace);
         }
         WriteIfAbsent(marker,"EmuVora automatic setup v1");
+        if(preferGerman)EmulatorLanguage.Apply(id,executable);
     }
     private static Dictionary<string,string> PlayStationPad(bool duck,int index)
     {

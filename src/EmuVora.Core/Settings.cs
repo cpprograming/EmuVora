@@ -24,6 +24,7 @@ public sealed class AppSettings
     public bool CheckUpdatesOnStartup {get;set;}=true;
     public bool AutoInstallUpdates {get;set;}=false;
     public bool AutomaticSetup {get;set;}=true;
+    public bool PreferGerman {get;set;}=true;
     public bool XboxDefaults {get;set;}=true;
     public bool AutoDownloadCovers {get;set;}=true;
     public string CoverRegion {get;set;}="Europe";

@@ -217,7 +217,7 @@ public sealed class LibraryStore
 }
 public sealed class ExternalEmulatorAdapter(EmulatorDefinition definition)
 {
-    public ProcessStartInfo CreateStartInfo(Game? game,string executablePath,string? corePath=null,bool fullscreen=true)
+    public ProcessStartInfo CreateStartInfo(Game? game,string executablePath,string? corePath=null,bool fullscreen=true,bool preferGerman=false)
     {
         if(!File.Exists(executablePath))throw new FileNotFoundException("Emulator-Datei nicht gefunden.",executablePath);
         if(!System.IO.Path.GetExtension(executablePath).Equals(".exe",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Bitte eine Emulator-EXE wählen.");
@@ -233,8 +233,8 @@ public sealed class ExternalEmulatorAdapter(EmulatorDefinition definition)
         }
         if(definition.Id=="duckstation"){psi.ArgumentList.Add("-batch");if(fullscreen)psi.ArgumentList.Add("-fullscreen");}
         if(definition.Id=="pcsx2"){psi.ArgumentList.Add("-batch");if(fullscreen)psi.ArgumentList.Add("-fullscreen");}
-        if(definition.Id=="dolphin"){psi.ArgumentList.Add("-b");psi.ArgumentList.Add("-e");}
+        if(definition.Id=="dolphin"){if(preferGerman&&game.System=="Wii"){psi.ArgumentList.Add("-C");psi.ArgumentList.Add("SYSCONF.IPL.LNG=2");}psi.ArgumentList.Add("-b");psi.ArgumentList.Add("-e");}
         psi.ArgumentList.Add(game.Path);return psi;
     }
-    public Process Launch(Game? game,string executablePath,string? corePath=null,bool fullscreen=true)=>Process.Start(CreateStartInfo(game,executablePath,corePath,fullscreen))??throw new InvalidOperationException("Emulator konnte nicht gestartet werden.");
+    public Process Launch(Game? game,string executablePath,string? corePath=null,bool fullscreen=true,bool preferGerman=false)=>Process.Start(CreateStartInfo(game,executablePath,corePath,fullscreen,preferGerman))??throw new InvalidOperationException("Emulator konnte nicht gestartet werden.");
 }
