@@ -29,10 +29,10 @@ public class StorageThemeTests
     {
         using var dir=new TestDirectory();dir.File("theme/theme.xml","<theme><formatVersion>3</formatVersion>"+content+"</theme>");Assert.Throws<IOException>(()=>EmulationStationTheme.Load(System.IO.Path.Combine(dir.Path,"theme"),"NES"));
     }
-    [Fact] public void XmlEntitiesAndEsDeAreRejectedExplicitly()
+    [Fact] public void XmlEntitiesRemainRejectedWithOrWithoutCapabilities()
     {
         using var dir=new TestDirectory();dir.File("theme/theme.xml","<!DOCTYPE theme [<!ENTITY attack SYSTEM 'file:///secret'>]><theme>&attack;</theme>");Assert.Throws<System.Xml.XmlException>(()=>EmulationStationTheme.Load(System.IO.Path.Combine(dir.Path,"theme"),"NES"));
-        dir.File("theme/capabilities.xml","<themeCapabilities/>");Assert.Contains("ES-DE",Assert.Throws<IOException>(()=>EmulationStationTheme.Load(System.IO.Path.Combine(dir.Path,"theme"),"NES")).Message);
+        dir.File("theme/capabilities.xml","<themeCapabilities/>");Assert.Throws<System.Xml.XmlException>(()=>EmulationStationTheme.Load(System.IO.Path.Combine(dir.Path,"theme"),"NES"));
     }
     [Fact] public void SvgDoesNotFetchExternalImages()
     {

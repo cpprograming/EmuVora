@@ -23,7 +23,7 @@ public sealed partial class MainWindow : Window
     private readonly LibraryStore store;
     private readonly SettingsStore settingsStore;
     private AppSettings settings;
-    private Process? esDeProcess;
+
     private readonly HttpClient updateHttp=new(){Timeout=TimeSpan.FromMinutes(10)};
     private AppRelease? appRelease;
     private string? appUpdateFile;
@@ -115,7 +115,7 @@ public sealed partial class MainWindow : Window
         var covers=AsyncButton("Fehlende Cover laden",()=>FetchAllCoversAsync());sidebar.Children.Add(covers);operationButtons.Add(covers);
         var preferences=AsyncButton("Einstellungen",()=>ShowSettingsAsync());StyleNavigation(preferences);sidebar.Children.Add(preferences);
         var tools=new StackPanel{Spacing=6};foreach(var name in new[]{"Konsole zuordnen","Fehlende Dateien"}){var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;tools.Children.Add(item);}
-        tools.Children.Add(rescan);tools.Children.Add(AsyncButton("Einrichtungsassistent",()=>ShowOnboardingAsync()));tools.Children.Add(AsyncButton("AlekFull NX · ES-DE öffnen",()=>OpenEsDeAsync()));
+        tools.Children.Add(rescan);tools.Children.Add(AsyncButton("Einrichtungsassistent",()=>ShowOnboardingAsync()));
         tools.Children.Add(AsyncButton("Bibliothek sichern",()=>ExportAsync()));tools.Children.Add(AsyncButton("Sicherung wiederherstellen",()=>RestoreAsync()));tools.Children.Add(ActionButton("Hilfe",()=>ShowHelp()));sidebar.Children.Add(new Expander{Header="Verwaltung",Content=tools});
         sidebar.Children.Add(appUpdateStatus);sidebar.Children.Add(controllerStatus);
         sidebar.Children.Add(themeStatus);
@@ -127,6 +127,7 @@ public sealed partial class MainWindow : Window
         gamesList.Classes.Add("game-library");
         filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);var gameActions=new Grid{ColumnDefinitions=new("*,*"),ColumnSpacing=10};Grid.SetRow(gameActions,2);Grid.SetColumnSpan(gameActions,3);gameActions.Children.Add(manageCover);Grid.SetColumn(collectionGame,1);gameActions.Children.Add(collectionGame);filters.Children.Add(gameActions);
         collectionGame.Click+=async(_,_)=>{try{await ChooseCollectionsAsync();}catch(Exception ex){ShowError(ex);}};
+        chooseVersion.Click+=async(_,_)=>{try{if(Selected is{} game&&await ChooseVersionAsync(game) is{} chosen)Refresh(chosen.Path);}catch(Exception ex){ShowError(ex);}};filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(chooseVersion,3);Grid.SetColumnSpan(chooseVersion,3);filters.Children.Add(chooseVersion);
         manageCover.Click+=async(_,_)=>{try{await ManageCoverAsync();}catch(Exception ex){ShowError(ex);}};
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
@@ -153,7 +154,7 @@ public sealed partial class MainWindow : Window
         UpdateSystems();ApplyTheme();ApplyLibraryAppearance();Refresh();
         PropertyChanged+=(_,e)=>{if(e.Property==ClientSizeProperty)ApplyLayout();};
         status.Text=settingsStore.LoadWarning??(allGames.Count==0?"Importiere deine Spiele, um loszulegen.":"Bereit zum Spielen · Strg+F zum Suchen");
-        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();if(settings.StartInEsDe&&allGames.Count>0)await OpenEsDeAsync();};
+        Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();};
         gamepadTimer.Tick+=async(_,_)=>await HandleGamepadAsync();gamepadTimer.Start();
         Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();consoleLogos.Dispose();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
@@ -171,7 +172,7 @@ public sealed partial class MainWindow : Window
     private void ApplyTheme()
     {
         var palette=settings.Theme switch
-        {"Classic Light"=>("#F5F7F8","#182C32","#E9EEF0","#087F73"),"Retro Green"=>("#101B17","#EDF7EF","#14231C","#8AE6A8"),"Neon Purple"=>("#191623","#F5F0FF","#211C2E","#C9B1FF"),_=>("#11171D","#F0F4F6","#171F27","#71E1C4")};
+        {"Aurora"=>("#101827","#F0F5FF","#172338","#6ECBE3"),"Studio"=>("#1D1921","#F7F1EE","#29232D","#E8B993"),"Classic Light"=>("#F5F7F8","#182C32","#E9EEF0","#087F73"),"Retro Green"=>("#101B17","#EDF7EF","#14231C","#8AE6A8"),"Neon Purple"=>("#191623","#F5F0FF","#211C2E","#C9B1FF"),_=>("#11171D","#F0F4F6","#171F27","#71E1C4")};
         RequestedThemeVariant=settings.Theme=="Classic Light"?ThemeVariant.Light:ThemeVariant.Dark;
         Background=Brush.Parse(palette.Item1);Foreground=Brush.Parse(palette.Item2);sideBorder.Background=detailBorder.Background=Brush.Parse(palette.Item3);status.Opacity=0.7;play.Background=Brush.Parse(palette.Item4);play.Foreground=Brush.Parse(settings.Theme=="Classic Light"?"#FFFFFF":"#102720");play.FontWeight=FontWeight.Bold;play.MinHeight=46;
         Resources["EmuAccent"]=Brush.Parse(palette.Item4);Resources["EmuSelection"]=Brush.Parse(settings.Theme=="Classic Light"?"#D5E9E5":"#273D3D");
@@ -193,7 +194,7 @@ public sealed partial class MainWindow : Window
         if(settings.EmulationStationTheme==null)return;
         try
         {
-            if(!loadedThemes.TryGetValue(system,out var external)){external=EmulationStationTheme.Load(settings.EmulationStationTheme,system);loadedThemes[system]=external;}
+            if(!loadedThemes.TryGetValue(system,out var external)){external=EmulationStationTheme.Load(settings.EmulationStationTheme,system,settings.Theme!="Classic Light");loadedThemes[system]=external;}
             Bitmap? ImageFor(ThemeElement? element)
             {
                 var path=element?.Properties.GetValueOrDefault("path");if(string.IsNullOrEmpty(path)||!File.Exists(path))return null;
@@ -209,7 +210,8 @@ public sealed partial class MainWindow : Window
             themeBackground.Source=ImageFor(Find("background"));themeLogo.Source=ImageFor(Find("logo"));themeLogo.IsVisible=themeLogo.Source!=null;
             var gameList=Find("gamelist");gamesList.Foreground=ColorFor(gameList,"primaryColor")??Foreground;
             detailTitle.Foreground=ColorFor(Find("md_name"),"color")??Foreground;detailInfo.Foreground=ColorFor(Find("md_description")??Find("description"),"color")??Foreground;
-            themeStatus.Text="ES-Theme · "+system+"\nFarben / Hintergrund / Logo"+(external.Warnings.Count>0?"\n"+string.Join(" ",external.Warnings.Distinct()):"");
+            if(ColorFor(Find("canvas"),"color") is{} canvas)Background=canvas;
+            themeStatus.Text="Angepasstes Theme · "+system+"\nFarben / Hintergrund / Logo"+(external.Warnings.Count>0?"\n"+string.Join(" ",external.Warnings.Distinct().Take(2)):"");
         }
         catch(Exception ex){themeStatus.Text="Theme konnte nicht geladen werden: "+ex.Message;Log(ex);}
     }
@@ -217,8 +219,8 @@ public sealed partial class MainWindow : Window
     {
         var previous=systems.SelectedItem as string;var choices=new[]{"Alle Konsolen"}.Concat(allGames.Select(g=>g.System).Distinct().Order()).ToArray();
         systems.ItemsSource=choices;systems.SelectedItem=previous!=null&&choices.Contains(previous)?previous:"Alle Konsolen";
-        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console,()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});item.Tag=console;item.Classes.Add("library-navigation");item.Classes.Add("console-filter");item.HorizontalContentAlignment=HorizontalAlignment.Stretch;item.ContentTemplate=null;item.Content=consoleLogos.CreateContent(console,group.Count());
-            Avalonia.Automation.AutomationProperties.SetName(item,console+" - "+group.Count()+" Spiele");Avalonia.Automation.AutomationProperties.SetAutomationId(item,"console-filter-"+Uri.EscapeDataString(console));ToolTip.SetTip(item,console+" - "+group.Count()+" Spiele");consoleNavigation.Children.Add(item);}
+        consoleNavigation.Children.Clear();foreach(var group in allGames.GroupBy(g=>g.System).OrderBy(g=>g.Key)){var console=group.Key;var item=ActionButton(console,()=>{systems.SelectedItem=console;view="Alle Spiele";Refresh();});item.Tag=console;item.Classes.Add("library-navigation");item.Classes.Add("console-filter");item.HorizontalContentAlignment=HorizontalAlignment.Stretch;item.ContentTemplate=null;var displayCount=settings.GroupGameVersions?GameVariants.Group(group).Count:group.Count();item.Content=consoleLogos.CreateContent(console,displayCount);
+            Avalonia.Automation.AutomationProperties.SetName(item,console+" - "+displayCount+" Titel · "+group.Count()+" Dateien");Avalonia.Automation.AutomationProperties.SetAutomationId(item,"console-filter-"+Uri.EscapeDataString(console));ToolTip.SetTip(item,console+" - "+displayCount+" Titel · "+group.Count()+" Dateien");consoleNavigation.Children.Add(item);}
     }
     private void Reload(string? selected=null)
     {allGames=store.GetAll();addedTimes=store.GetAddedTimes();UpdateSystems();Refresh(selected);}
@@ -227,7 +229,8 @@ public sealed partial class MainWindow : Window
         var explicitSelection=selectedPath!=null;if(!keepPage)libraryPage=0;selectedPath??=Selected?.Path;var query=search.Text?.Trim()??"";var console=systems.SelectedItem as string;
         var filtered=allGames.Where(g=>(console is null or "Alle Konsolen"||g.System==console)&&(g.Title.Contains(query,StringComparison.OrdinalIgnoreCase)||g.System.Contains(query,StringComparison.OrdinalIgnoreCase)));
         filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),"Fehlende Cover"=>filtered.Where(g=>CoverLibrary.IsMissing(settings,g.Path)),"Zuletzt hinzugefügt"=>filtered.Where(g=>addedTimes.ContainsKey(g.Path)),"Sammlung"=>filtered.Where(g=>collectionChoice.SelectedItem is string name&&settings.Collections.TryGetValue(name,out var members)&&members.Contains(g.Path)),_=>filtered};
-        var result=(sort.SelectedIndex==3||view=="Zuletzt hinzugefügt"?filtered.OrderByDescending(g=>addedTimes.GetValueOrDefault(g.Path)).ThenBy(g=>g.Title):sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
+        var ordered=(sort.SelectedIndex==3||view=="Zuletzt hinzugefügt"?filtered.OrderByDescending(g=>addedTimes.GetValueOrDefault(g.Path)).ThenBy(g=>g.Title):sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
+        visibleVersions.Clear();var families=settings.GroupGameVersions?GameVariants.Group(ordered,selectedPath):ordered.Select(g=>new GameVariantGroup(g,new[]{g})).ToArray();foreach(var family in families)visibleVersions[family.Representative.Path]=family.Versions;var result=families.Select(g=>g.Representative).ToArray();
         libraryResultCount=result.Length;
         if(explicitSelection&&selectedPath!=null&&!keepPage){var position=Array.FindIndex(result,g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));if(position>=0)libraryPage=position/LibraryPageSize;}
         libraryPage=Math.Clamp(libraryPage,0,Math.Max(0,(result.Length-1)/LibraryPageSize));
@@ -243,7 +246,7 @@ public sealed partial class MainWindow : Window
         if(view=="Fehlende Cover"&&allGames.Count>0){empty.Title="Keine fehlenden Cover in dieser Auswahl";empty.Message="Alle passenden Spiele haben ein Cover. Suche oder Konsole ändern, um andere Einträge zu prüfen.";}
         if(view=="Zuletzt hinzugefügt"&&result.Length==0){empty.Title="Noch keine neuen Importe in dieser Auswahl";empty.Message="Das Importdatum wird ab dieser Version erfasst. Ältere Einträge bleiben unter Alle Spiele erhalten; ihr ursprüngliches Importdatum ist nicht bekannt.";}
         libraryEyebrow.Text=view=="Favoriten"?"DEINE LIEBLINGSSTÜCKE":view=="Zuletzt gespielt"?"WEITERSPIELEN":"DEINE SAMMLUNG";
-        var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
+        var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=settings.GroupGameVersions?$"{result.Length} Titel · {ordered.Length} Dateien\n{consoleCount} Konsolen":$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
         ApplyExternalTheme();
         var selectedBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D5E9E5":"#273D3D");foreach(var(name,button)in viewButtons){button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;button.Background=name==view?selectedBrush:Brushes.Transparent;}
         foreach(var button in consoleNavigation.Children.OfType<Button>()){var selectedConsole=button.Tag as string==console;button.Background=selectedConsole?selectedBrush:Brushes.Transparent;button.Classes.Set("selected-console",selectedConsole);}
@@ -272,12 +275,13 @@ public sealed partial class MainWindow : Window
     {
         var width=CardWidth;var card=new StackPanel {Width=width,Spacing=9,Margin=new(8,8,8,12)};
         card.Children.Add(new Border {Height=width*1.34,Padding=new Thickness(5),CornerRadius=new(12),Background=Brush.Parse(settings.Theme=="Classic Light"?"#E4EAEC":"#1E2932"),Child=Artwork(game,width),ClipToBounds=true});
-        card.Children.Add(new TextBlock {Text=(game.Favorite?"★ ":"")+game.Title,TextWrapping=TextWrapping.Wrap,MaxHeight=settings.TvMode?60:44,FontSize=settings.TvMode?18:14,FontWeight=FontWeight.SemiBold});
-        card.Children.Add(new TextBlock {Text=game.System+(File.Exists(game.Path)?"":" · Datei fehlt"),FontSize=settings.TvMode?16:12,Opacity=0.7});ToolTip.SetTip(card,game.Title+"\n"+game.Path);return card;
+        card.Children.Add(new TextBlock {Text=(game.Favorite?"★ ":"")+game.Title,TextWrapping=TextWrapping.Wrap,Height=settings.TvMode?60:44,TextTrimming=TextTrimming.CharacterEllipsis,FontSize=settings.TvMode?18:14,FontWeight=FontWeight.SemiBold});
+        card.Children.Add(new TextBlock {Text=game.System+(Versions(game).Count>1?$" · {Versions(game).Count} Versionen":"")+(File.Exists(game.Path)?"":" · Datei fehlt"),FontSize=settings.TvMode?16:12,Opacity=0.7});ToolTip.SetTip(card,game.Title+"\n"+game.Path);return card;
     }
     private void UpdateSelected()
     {
         var game=Selected;foreach(var button in new[]{favorite,edit,cover,onlineCover,protectCover,manageCover,collectionGame,remove,reveal})button.IsEnabled=game!=null&&operation==null;
+        chooseVersion.IsVisible=game!=null&&Versions(game).Count>1;chooseVersion.IsEnabled=operation==null;chooseVersion.Content=game==null?"Version auswählen":$"Version auswählen · {Versions(game).Count}";
         protectCover.Content=game!=null&&settings.ProtectedCovers.Contains(game.Path)?"Cover-Schutz aufheben":"Cover schützen";
         play.IsEnabled=game!=null&&operation==null&&!running.ContainsKey(game.Path);
         detailTitle.Text=game?.Title??"Spiel auswählen";detailCover.Content=game==null?null:Artwork(game,220);
@@ -347,6 +351,7 @@ public sealed partial class MainWindow : Window
     private async Task PlayAsync()
     {
         if(Selected is not{} game||operation!=null||running.ContainsKey(game.Path))return;
+        if(Versions(game).Count>1){var chosen=await ChooseVersionAsync(game);if(chosen==null)return;game=chosen;}
         try
         {
             var id=settings.PreferredEmulators.GetValueOrDefault(game.System);var definition=EmulatorCatalog.Known.FirstOrDefault(e=>e.Id==id&&e.Systems.Contains(game.System))??EmulatorCatalog.Known.FirstOrDefault(e=>e.Systems.Contains(game.System));
@@ -412,7 +417,7 @@ public sealed partial class MainWindow : Window
         try
         {
             await process.WaitForExitAsync();var code=process.ExitCode;
-            Dispatcher.UIThread.Post(()=>{running.Remove(game.Path);if(!running.Values.Any(p=>!p.HasExited))runningEmulators.Clear();else runningEmulators.Remove(emulator);process.Dispose();UpdateSelected();if(!isClosed&&running.Count==0&&esDeProcess==null&&!dialogOpen){Show();Activate();gamesList.Focus();}status.Text=code==0?$"{game.Title} beendet.":$"Emulator beendet (Code {code}). BIOS, Grafiktreiber und Emulator-Einstellungen prüfen.";});
+            Dispatcher.UIThread.Post(()=>{running.Remove(game.Path);if(!running.Values.Any(p=>!p.HasExited))runningEmulators.Clear();else runningEmulators.Remove(emulator);process.Dispose();UpdateSelected();if(!isClosed&&running.Count==0&&!dialogOpen){Show();Activate();gamesList.Focus();}if(code==0)status.Text=$"{game.Title} beendet.";else if(!isClosed)ReportEmulatorFailure(emulator,code);});
         }
         catch(Exception ex){Log(ex);}
     }
@@ -507,63 +512,28 @@ public sealed partial class MainWindow : Window
         }
         catch(Exception ex){if(reportFailure)ShowError(ex);else Log(ex);}
     }
-    private async Task OpenEsDeAsync()
-    {
-        if(esDeProcess!=null||operation!=null){status.Text="ES-DE oder ein anderer Vorgang läuft bereits.";return;}
-        if(running.Count>0){status.Text="Das laufende Spiel zuerst schließen.";return;}
-        if(!allGames.Any(g=>EmulatorCatalog.Systems.Contains(g.System))){status.Text="Zuerst mindestens ein Spiel importieren und seine Konsole zuordnen. Danach AlekFull NX öffnen.";return;}
-        try
-        {
-            if(!await BusyAsync(async token=>
-            {
-                await EsDeFrontend.InstallAsync(dataDir,settings,packages,DownloadProgress(),token);
-                EsDeFrontend.ImportChanges(dataDir,store,settings);
-                var launcher=Environment.ProcessPath??throw new IOException("EmuVora-Programmdatei wurde nicht gefunden.");
-                if(Path.GetFileNameWithoutExtension(launcher).Equals("dotnet",StringComparison.OrdinalIgnoreCase))throw new IOException("Den ES-DE-Modus bitte mit der veröffentlichten EmuVora.App.exe starten.");
-                await Task.Run(()=>EsDeFrontend.Export(dataDir,launcher,store.GetAll(),settings),token);settingsStore.Save(settings);
-            }))return;
-            esDeProcess=Process.Start(EsDeFrontend.CreateStartInfo(settings.EsDeExecutable!,dataDir))??throw new IOException("ES-DE konnte nicht gestartet werden.");
-            Hide();await esDeProcess.WaitForExitAsync();
-            if(esDeProcess.ExitCode!=0)throw new IOException("ES-DE wurde mit Fehlercode "+esDeProcess.ExitCode+" beendet. Protokoll: "+Path.Combine(EsDeFrontend.AppData(dataDir),"logs","es_log.txt"));
-            settings=settingsStore.Load();if(settingsStore.LoadWarning!=null)throw new IOException(settingsStore.LoadWarning);
-            EsDeFrontend.ImportChanges(dataDir,store,settings);settingsStore.Save(settings);
-            status.Text="Zurück aus ES-DE. Favoriten, Cover und Spielverlauf sind abgeglichen.";
-        }
-        catch(Exception ex){ShowError(ex);}
-        finally
-        {
-            esDeProcess?.Dispose();esDeProcess=null;
-            if(!isClosed)
-            {
-                var latest=settingsStore.Load();if(settingsStore.LoadWarning==null)settings=latest;
-                foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();Reload();Show();Activate();
-            }
-        }
-    }
     private async Task ShowSettingsAsync(string? initialEmulator=null,int? initialTab=null)
     {
         var panel=new StackPanel {Spacing=12,Margin=new(24)};panel.Children.Add(new TextBlock {Text="Emulatoren & Einstellungen",FontSize=25,FontWeight=FontWeight.Bold});
         if(initialEmulator!=null)panel.Children.Add(new TextBlock {Text=status.Text,TextWrapping=TextWrapping.Wrap});
-        var theme=new ComboBox {ItemsSource=new[]{"Midnight","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
-        var esDeStartup=new CheckBox{Content="Beim Start AlekFull NX in ES-DE öffnen",IsChecked=settings.StartInEsDe};esDeStartup.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.StartInEsDe=esDeStartup.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(esDeStartup);
-        panel.Children.Add(new TextBlock{Text="AlekFull NX nutzt die originale ES-DE-Oberfläche mit Varianten, Schriftarten, Sounds und Animationen. Spiele starten über EmuVora mit automatischer Emulator-/Core-Einrichtung. ES-DE und Theme werden beim ersten Öffnen auf dein gewähltes Laufwerk heruntergeladen. Theme-Optionen änderst du in ES-DE unter Menü → UI-Einstellungen.",TextWrapping=TextWrapping.Wrap});
-        panel.Children.Add(AsyncButton("ES-DE + AlekFull NX vorab herunterladen",async()=>{await BusyAsync(async token=>{await EsDeFrontend.InstallAsync(dataDir,settings,packages,DownloadProgress(),token);settingsStore.Save(settings);status.Text="ES-DE und AlekFull NX sind installiert. Links „AlekFull NX · ES-DE öffnen“ wählen.";});}));
+        var theme=new ComboBox {ItemsSource=new[]{"Midnight","Aurora","Studio","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
         panel.Children.Add(new TextBlock {Text="Datenordner: "+dataDir,TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
-        panel.Children.Add(new TextBlock {Text="Klassische EmulationStation-Themes: importierter Hintergrund, PNG/JPEG/SVG-Konsolenlogo und Listen-/Detailfarben. EmuVora behält sein Layout und seine Bedienelemente. Eigene Schriftdateien, Animationen, Videos, Extras und ES-DE-Varianten sind noch nicht kompatibel.",TextWrapping=TextWrapping.Wrap});
-        panel.Children.Add(AsyncButton("EmulationStation-Theme importieren …",async()=>
+        panel.Children.Add(new TextBlock {Text="Eigene EmuVora-Themes: Midnight, Aurora, Studio und weitere Farbstile. Ein externer ES-DE-Start ist nicht mehr erforderlich. EmulationStation-/ES-DE-Themes lassen sich als Hintergrund, Logo und Farben an das native Layout anpassen. Eine Variante, ein zur Basisdarstellung passendes Farbschema und ein Vorlagenformat werden automatisch gewählt. Videos, Sounds und vollständige Speziallayouts werden nicht nachgebaut; der Importbericht nennt Grenzen.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(AsyncButton("ES-DE-/EmulationStation-Theme anpassen …",async()=>
         {
             var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="Theme-Set mit theme.xml oder Konsolen-Unterordnern",AllowMultiple=false});
             if(folders.Count==0||folders[0].TryGetLocalPath() is not{} path)return;
-            await BusyAsync(async token=>{var imported=await Task.Run(()=>EmulationStationTheme.Import(path,dataDir),token);settings.EmulationStationTheme=imported;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();status.Text="EmulationStation-Theme importiert. Darstellung wechselt mit dem Konsolenfilter.";});
+            await BusyAsync(async token=>{var imported=await Task.Run(()=>EmulationStationTheme.Import(path,dataDir,settings.Theme!="Classic Light",token),token);settings.EmulationStationTheme=imported;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();status.Text="Theme für EmuVora angepasst. Importbericht unter Darstellung öffnen; Layout und Bedienung bleiben nativ.";});
         }));
+        panel.Children.Add(ActionButton("Theme-Importbericht öffnen",()=>{var report=settings.EmulationStationTheme==null?null:Path.Combine(settings.EmulationStationTheme,"emuvora-import-report.txt");if(report!=null&&File.Exists(report))OpenPath(report);else status.Text="Noch kein Importbericht vorhanden.";}));
         panel.Children.Add(ActionButton("EmuVora-Standarddarstellung verwenden",()=>{settings.EmulationStationTheme=null;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();}));
         var themePanel=new StackPanel{Spacing=12,Margin=new(24)};themePanel.Children.Add(TvModeOption());foreach(var child in panel.Children.Skip(1).ToArray()){panel.Children.Remove(child);themePanel.Children.Add(child);}
         var fullscreen=new CheckBox {Content="Spiele im Vollbild starten (wenn unterstützt)",IsChecked=settings.Fullscreen};var auto=new CheckBox {Content="Beim Start auf Updates prüfen",IsChecked=settings.CheckUpdatesOnStartup};panel.Children.Add(fullscreen);panel.Children.Add(auto);
         var autoInstall=new CheckBox {Content="Updates für verwaltete Installationen automatisch installieren",IsChecked=settings.AutoInstallUpdates};panel.Children.Add(autoInstall);
         autoInstall.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoInstallUpdates=autoInstall.IsChecked==true;settingsStore.Save(settings);});
         AddAutomaticSetupControls(panel);
-        theme.SelectionChanged+=(_,_)=>Guard(()=>{settings.Theme=theme.SelectedItem as string??"Midnight";settingsStore.Save(settings);ApplyTheme();Refresh();});fullscreen.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.Fullscreen=fullscreen.IsChecked==true;settingsStore.Save(settings);});auto.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckUpdatesOnStartup=auto.IsChecked==true;settingsStore.Save(settings);});
+        theme.SelectionChanged+=(_,_)=>Guard(()=>{settings.Theme=theme.SelectedItem as string??"Midnight";settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();});fullscreen.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.Fullscreen=fullscreen.IsChecked==true;settingsStore.Save(settings);});auto.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckUpdatesOnStartup=auto.IsChecked==true;settingsStore.Save(settings);});
         var emulator=new ComboBox {ItemsSource=EmulatorCatalog.Known.Select(e=>e.Name).ToArray(),SelectedIndex=Math.Max(0,Array.FindIndex(EmulatorCatalog.Known,e=>e.Id==initialEmulator))};panel.Children.Add(new Separator());panel.Children.Add(emulator);
         var path=new TextBox {Watermark="Pfad zur Emulator-EXE"};var packageInfo=new TextBlock {TextWrapping=TextWrapping.Wrap};panel.Children.Add(path);panel.Children.Add(packageInfo);
         EmulatorDefinition Current()=>EmulatorCatalog.Known[emulator.SelectedIndex];
@@ -649,7 +619,7 @@ public sealed partial class MainWindow : Window
         panel.Children.Add(ActionButton("Download abbrechen",RequestOperationCancel));
         panel.Children.Add(AsyncButton("Aktualisieren und neu starten",async()=>
         {
-            if(operation!=null||running.Count>0||esDeProcess!=null){message.Text="Downloads, Spiele und ES-DE zuerst beenden.";return;}
+            if(operation!=null||running.Count>0){message.Text="Downloads, Spiele zuerst beenden.";return;}
             if(appRelease==null||appUpdateFile==null){message.Text="Zuerst ein verfügbares Update herunterladen.";return;}
             try
             {
@@ -673,6 +643,7 @@ public sealed partial class MainWindow : Window
     {
         var panel=new StackPanel{Spacing=14,Margin=new(24)};panel.Children.Add(new TextBlock{Text="Deine Bibliothek",FontSize=25,FontWeight=FontWeight.Bold});panel.Children.Add(AsyncButton("Einrichtungsassistent öffnen",()=>ShowOnboardingAsync()));panel.Children.Add(DataDirectoryOptions());panel.Children.Add(RomRelocationOptions());panel.Children.Add(LibraryAuditOptions());panel.Children.Add(RecognitionOptions());
         var automatic=new CheckBox{Content="Fehlende Cover beim Start und nach einem Import automatisch laden",IsChecked=settings.AutoDownloadCovers};automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoDownloadCovers=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
+        var versions=new CheckBox{Content="Gleichnamige Spiele pro Konsole als Versionen bündeln (keine Dateien löschen)",IsChecked=settings.GroupGameVersions};versions.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.GroupGameVersions=versions.IsChecked==true;settingsStore.Save(settings);UpdateSystems();Refresh();});panel.Children.Add(versions);
         panel.Children.Add(new TextBlock{Text="Quelle: libretro-thumbnails auf GitHub, ohne Konto. Vorhandene Cover bleiben erhalten. Titelvarianten werden erkannt; ähnliche Spielnamen und Fortsetzungen werden nicht geraten. Nicht jeder Titel ist verfügbar.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(new TextBlock{Text="Bevorzugte Cover-Region"});var region=new ComboBox{ItemsSource=new[]{"Europe","Germany","USA","Japan","World"},SelectedItem=settings.CoverRegion};region.SelectionChanged+=(_,_)=>Guard(()=>{settings.CoverRegion=region.SelectedItem as string??"Europe";settingsStore.Save(settings);});panel.Children.Add(region);
         panel.Children.Add(AsyncButton("Alle fehlenden Cover laden",()=>FetchAllCoversAsync()));panel.Children.Add(ActionButton("Cover-Bericht öffnen",()=>{var file=Path.Combine(dataDir,"cover-report.txt");if(File.Exists(file))OpenPath(file);else status.Text="Noch kein Cover-Bericht vorhanden.";}));
@@ -688,8 +659,8 @@ public sealed partial class MainWindow : Window
         var mode=new ComboBox{ItemsSource=new[]{"Automatisch · scharf und im Originalformat","Pixelgenau · ganze Skalierungsstufen","Einpassen · scharf, mit originalem Seitenverhältnis","Weich · mit bilinearer Filterung"},SelectedIndex=Math.Max(0,Array.IndexOf(DisplayProfiles.Modes,settings.DisplayMode))};mode.SelectionChanged+=(_,_)=>Guard(()=>{settings.DisplayMode=DisplayProfiles.Modes[Math.Max(0,mode.SelectedIndex)];settingsStore.Save(settings);UpdateSelected();});panel.Children.Add(mode);
         panel.Children.Add(new TextBlock{Text="Maximale interne Auflösung für PS1, PS2, GameCube, Wii und PSP"});var scale=new ComboBox{ItemsSource=new[]{"1× · Original / sparsam","2×","3× · empfohlen","4×","5×","6×"},SelectedIndex=Math.Clamp(settings.MaximumRenderScale,1,6)-1};scale.SelectionChanged+=(_,_)=>Guard(()=>{settings.MaximumRenderScale=scale.SelectedIndex+1;settingsStore.Save(settings);UpdateSelected();});panel.Children.Add(scale);
         panel.Children.Add(new TextBlock{Text="Automatisch verwendet 2D-Pixel ohne Weichzeichner und ohne Abschneiden. 3D-Emulatoren skalieren intern passend zur Monitorhöhe bis zur gewählten Grenze. RetroArch erhält das Format vom jeweiligen Core; PS1/PS2/Dolphin erkennen ihr Spielformat, PSP bleibt im Originalformat. Schwarze Ränder sind bei unterschiedlichen Formaten gewollt. Die Desktopauflösung bleibt erhalten. Bei Ruckeln die maximale Auflösung reduzieren.",TextWrapping=TextWrapping.Wrap});
-        panel.Children.Add(new TextBlock{Text="Bildprofile gelten für von EmuVora verwaltete Emulatoren. Änderungen in deren Einstellungen bleiben nach der ersten Profil-Einrichtung erhalten. Beim nächsten Spielstart wird das Profil geprüft; auch im ES-DE-Modus.",TextWrapping=TextWrapping.Wrap});
-        panel.Children.Add(AsyncButton("Gewähltes Bildprofil erneut anwenden",async()=>{if(running.Count>0||esDeProcess!=null){status.Text="Laufende Spiele und ES-DE zuerst schließen.";return;}if(await ConfirmAsync("Bild-Einstellungen der verwalteten Emulatoren auf dieses Profil setzen? Andere Einstellungen bleiben erhalten; bisherige Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{foreach(var definition in EmulatorCatalog.Known)if(settings.Packages.TryGetValue(definition.Id,out var package)&&settings.EmulatorPaths.GetValueOrDefault(definition.Id)==package.ExecutablePath&&File.Exists(package.ExecutablePath))DisplayProfiles.Apply(definition.Id,package.ExecutablePath,Selected?.System??definition.Systems[0],DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,true);status.Text="Bildprofil angewendet.";});}));return panel;
+        panel.Children.Add(new TextBlock{Text="Bildprofile gelten für von EmuVora verwaltete Emulatoren. Änderungen in deren Einstellungen bleiben nach der ersten Profil-Einrichtung erhalten. Beim nächsten Spielstart wird das Profil geprüft.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(AsyncButton("Gewähltes Bildprofil erneut anwenden",async()=>{if(running.Count>0){status.Text="Laufende Spiele zuerst schließen.";return;}if(await ConfirmAsync("Bild-Einstellungen der verwalteten Emulatoren auf dieses Profil setzen? Andere Einstellungen bleiben erhalten; bisherige Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{foreach(var definition in EmulatorCatalog.Known)if(settings.Packages.TryGetValue(definition.Id,out var package)&&settings.EmulatorPaths.GetValueOrDefault(definition.Id)==package.ExecutablePath&&File.Exists(package.ExecutablePath))DisplayProfiles.Apply(definition.Id,package.ExecutablePath,Selected?.System??definition.Systems[0],DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,true);status.Text="Bildprofil angewendet.";});}));return panel;
     }
     private void AddAutomaticSetupControls(StackPanel panel)
     {

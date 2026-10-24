@@ -30,6 +30,7 @@ public sealed class AppSettings
     public int CoverSize {get;set;}=164;
     public bool TvMode {get;set;}
     public bool ShowGameDetails {get;set;}=true;
+    public bool GroupGameVersions {get;set;}=true;
     public bool AutomaticDisplay {get;set;}=true;
     public string DisplayMode {get;set;}="Automatic";
     public int MaximumRenderScale {get;set;}=3;

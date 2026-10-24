@@ -44,7 +44,7 @@ public class ConsoleLogoTests
                 var badge=button.GetVisualDescendants().OfType<TextBlock>().Single(t=>t.Classes.Contains("console-count"));Assert.Equal(tv?16:12,badge.FontSize);
                 var artwork=button.GetVisualDescendants().OfType<Image>().Single();var position=artwork.TranslatePoint(default,button)!.Value;Assert.True(position.X>=0);Assert.True(position.X+artwork.Bounds.Width<=button.Bounds.Width);
             }
-            var snes=buttons.Single(b=>b.Tag as string=="SNES");Assert.Equal("SNES - 2 Spiele",AutomationProperties.GetName(snes));Assert.Equal("SNES - 2 Spiele",ToolTip.GetTip(snes));
+            var snes=buttons.Single(b=>b.Tag as string=="SNES");Assert.Equal("SNES - 2 Titel · 2 Dateien",AutomationProperties.GetName(snes));Assert.Equal("SNES - 2 Titel · 2 Dateien",ToolTip.GetTip(snes));
             Assert.DoesNotContain(snes.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="SNES");
             Assert.Contains(snes.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text=="2");
             var image=snes.GetVisualDescendants().OfType<Image>().Single();Assert.Equal(tv?32:24,image.Height);

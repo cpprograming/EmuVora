@@ -30,7 +30,7 @@ Stand: 23. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] Automatische Einrichtung und Updates verwalteter Emulatoren.
 - [x] Xbox-Navigation einschließlich Dialogen und Bildschirmtastatur implementiert.
 - [x] Monitorerkennung und Profile für Seitenverhältnis und scharfe Skalierung implementiert.
-- [x] EmulationStation-Theme-Import und optionaler ES-DE-/AlekFull-Start.
+- [x] Eigene EmuVora-Themes und angepassten EmulationStation-/ES-DE-Import implementieren; separaten ES-DE-Start entfernen (Entwicklungsstand).
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
 - [x] 288 Funktionstests und 6 Netzwerktests auch im Release-Build 0.14.109 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
@@ -79,7 +79,7 @@ Abnahme: Die üblichen Abläufe funktionieren mit einem Xbox-Controller ohne fes
 - [ ] Abstände, Schriften, Farben, Schaltflächen und Dialoge durchgehend vereinheitlichen.
 - [x] Optionalen TV-Modus mit größeren Covern, gut lesbaren Bedienelementen und sichtbarer Spielauswahl ergänzen; Dialogübernahme und Controller-Raster automatisiert geprüft.
 - [ ] Leere Bibliothek, fehlende Cover, laufende Downloads und Fehlerzustände verständlich gestalten.
-- [ ] Theme-Kompatibilität klar kennzeichnen: direkt unterstützte Elemente gegenüber Themes, die über ES-DE laufen.
+- [x] Theme-Kompatibilität als native Anpassung mit Importbericht kennzeichnen; ES-DE ist nicht mehr als separater Frontend-Start nötig (Entwicklungsstand).
 - [ ] AlekFull-Darstellung auf echter Hardware mit 16:9, 16:10 und 4:3 prüfen; Theme-Lizenzhinweise erhalten.
 
 Abnahme: Einrichtung, Bibliothek und Einstellungen wirken zusammengehörig und bleiben am Fernseher gut bedienbar.
