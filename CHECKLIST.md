@@ -4,7 +4,7 @@ Stand: 24. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 
 ## Aktueller Stand
 
-- [x] Deutsche Vorgabe für verwaltete Emulatoren und unterstützte Spielsysteme sowie sichtbare BIOS-/Startfehlerdialoge implementieren (Entwicklungsstand). [Anleitung](LANGUAGE_AND_ERRORS.md).
+- [x] Deutsch und Startdialoge in 0.14.116 veröffentlicht ([PR #35](https://github.com/cpprograming/EmuVora/pull/35), [PR #36](https://github.com/cpprograming/EmuVora/pull/36)): deutsche Oberflächen für alle fünf verwalteten Emulatoren und unterstützte Spielsprachoptionen, abschaltbare Vorgabe mit Konfigurationssicherung, direkter BIOS-Importdialog und sichtbare Fehlerfenster. 306 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. [Grenzen und Anleitung](LANGUAGE_AND_ERRORS.md).
 
 - [x] Native Oberfläche und Themes in 0.14.112 veröffentlicht ([PR #34](https://github.com/cpprograming/EmuVora/pull/34)): gleichmäßige Konsolenzeilen und Titelkarten, auswählbare Versionen statt doppelter Karten, native Aurora-/Studio-Stile und automatische ES-DE-Anpassung mit Bericht. Separater ES-DE-Start entfernt. PS2-BIOS-Auswahl strukturell geprüft; betroffener Spielstart bestätigt. 296 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
 
@@ -37,14 +37,14 @@ Stand: 24. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] Eigene EmuVora-Themes und angepassten EmulationStation-/ES-DE-Import implementieren; separaten ES-DE-Start entfernen (ab 0.14.112).
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
-- [x] 296 Funktionstests und 7 Netzwerktests auch im Release-Build 0.14.112 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] 306 Funktionstests und 7 Netzwerktests auch im Release-Build 0.14.116 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 - [x] Gemeinsamen Statusbereich in Standarddialogen, Einstellungen und Einrichtung ergänzt ([PR #32](https://github.com/cpprograming/EmuVora/pull/32)): Fortschritt, Abbruch und Fehlerdetails; Timeouts, Anfragelimits, veraltete Meldungen und Controller-B geprüft; sofortigen Abbruch korrigiert ([PR #33](https://github.com/cpprograming/EmuVora/pull/33)).
 - [x] Saturn-/Dreamcast-Playlists für CHD/CUE mit Vorschau, korrekter Konsolenzuordnung und Erhalt der Einzel-Discs ergänzt ([PR #31](https://github.com/cpprograming/EmuVora/pull/31)).
 - [x] Bestätigte Duplikate mit Metadatenübernahme, Auswahl, Sicherung und Wiederaufnahme zusammenführen ([PR #30](https://github.com/cpprograming/EmuVora/pull/30)); unveränderte Duplikatpfade bei erneuten Scans unterdrücken. ROM-Dateien bleiben erhalten.
 - [x] SHA-256-Inhaltsvergleich und PS1-Playlist-Erstellung mit Vorschau veröffentlicht ([PR #29](https://github.com/cpprograming/EmuVora/pull/29)); Abbruch, CUE-Abhängigkeiten, geänderte Eingaben und Erhalt einzelner Disc-Metadaten geprüft. Keine automatische Zusammenführung oder Löschung.
 - [x] Prüfungsübersicht für gleiche Titel und nummerierte Disc-Sätze ergänzt ([PR #28](https://github.com/cpprograming/EmuVora/pull/28)); keine automatische Löschung oder Zusammenführung. Dialog mit einer privaten Bibliothekskopie zusätzlich geprüft.
 
-Der aktuelle Stand ist als [Release 0.14.112](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.112) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.14.116](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.116) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 - [x] BIOS-Dateiauswahl mit sichtbarer Bestätigung, direktem Pfadimport, automatischer Benennung erkannter Inhalte und Ergebnisübersicht korrigiert ([PR #13](https://github.com/cpprograming/EmuVora/pull/13), ab 0.11.59). Originaldateien bleiben erhalten.
 

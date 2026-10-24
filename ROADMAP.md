@@ -2,11 +2,19 @@
 
 Stand: 24. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.112](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.112).
+Aktueller geprüfter Release: [0.14.116](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.116).
+
+## 0.14.116 – Deutsch und Startdialoge (abgeschlossen)
+
+- [x] Deutsche Oberflächen für alle fünf verwalteten Emulatoren automatisch einrichten; abschaltbare Vorgabe und Konfigurationssicherung ergänzen.
+- [x] Unterstützte Spielsprachoptionen für RetroArch-Cores, Dreamcast, DS, GameCube, Wii und PSP setzen; Grenzen für einzelne Spiele und PS1/PS2 dokumentieren.
+- [x] Fehlende Pflicht-Firmware mit eigenem BIOS-Importdialog anzeigen; fehlende ROMs vor Downloads erkennen.
+- [x] Fehler außerhalb offener Aktionsdialoge als eigenes Fenster mit Details und Einstellungen anzeigen; bestehende Dialog-Fehlerbereiche und ruhige Hintergrundprüfungen erhalten.
+- [x] 306 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; neue Dialoge visuell und installierte Sprachwerte geprüft. [Anleitung](LANGUAGE_AND_ERRORS.md).
+- [ ] Deutsche Spielsprache mit repräsentativen echten Spielen weiter praktisch prüfen; nicht jedes Spiel übernimmt die Konsolensprache.
 
 ## 0.14.112 – Native Oberfläche und Themes (abgeschlossen)
 
-- [x] Deutsche Emulator-/Spielsprachprofile und sichtbare Startfehler-/BIOS-Dialoge implementieren (Entwicklungsstand). [Umfang und Grenzen](LANGUAGE_AND_ERRORS.md).
 
 - [x] Konsolenlogos, Zähler und Titelzeilen einheitlich ausrichten.
 - [x] Gleichnamige Titel pro Konsole mit Dateiauswahl bündeln; Abschalten der Gruppierung ermöglichen und Metadaten erhalten.
