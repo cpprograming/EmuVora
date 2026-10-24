@@ -84,4 +84,15 @@ public class OperationFeedbackTests
         }
         finally { completion.TrySetResult(); window.Close(); }
     }
+    [AvaloniaFact] public async Task ImmediateCancellationKeepsTheFinishedStatus()
+    {
+        using var dir = new TestDirectory(); var window = Open(dir); var completion = new TaskCompletionSource();
+        try
+        {
+            var task = Run(window, token => { token.Register(() => completion.TrySetCanceled(token)); return completion.Task; });
+            Call(window, "RequestOperationCancel"); Assert.False(await task);
+            var status = (TextBlock)typeof(MainWindow).GetField("status", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!; Assert.Equal("Vorgang abgebrochen.", status.Text);
+        }
+        finally { completion.TrySetResult(); window.Close(); }
+    }
 }

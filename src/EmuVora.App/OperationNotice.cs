@@ -69,8 +69,9 @@ public sealed partial class MainWindow
     }
     private void RequestOperationCancel()
     {
-        if (operation == null) return;
-        operation.Cancel(); status.Text = "Vorgang wird abgebrochen …"; NotifyFeedback();
+        var source = operation; if (source == null) return;
+        source.Cancel();
+        if (ReferenceEquals(source, operation)) { status.Text = "Vorgang wird abgebrochen …"; NotifyFeedback(); }
     }
     private bool CanReport(CancellationTokenSource? source) => !isClosed && source != null && ReferenceEquals(source, operation) && !source.IsCancellationRequested;
     private IProgress<double> OperationPercentage(Action<double> report)
