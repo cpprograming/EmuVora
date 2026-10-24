@@ -46,7 +46,7 @@ public class SetupTests
     }
     [Fact] public void Pcsx2SelectsImportedBiosUsingTheOfficialFilenamesSetting()
     {
-        using var dir=new TestDirectory();var exe=dir.File("pcsx2/program.exe");var firmware=EmulatorSetup.FirmwareDirectory(dir.Path);Directory.CreateDirectory(firmware);System.IO.File.WriteAllBytes(System.IO.Path.Combine(firmware,"ps2.bin"),new byte[4*1024*1024]);
+        using var dir=new TestDirectory();var exe=dir.File("pcsx2/program.exe");var firmware=EmulatorSetup.FirmwareDirectory(dir.Path);Directory.CreateDirectory(firmware);System.IO.File.WriteAllBytes(System.IO.Path.Combine(firmware,"ps2.bin"),NativeSurfaceTests.BiosFixture());
         EmulatorSetup.Configure("pcsx2",exe,dir.Path);var config=System.IO.File.ReadAllText(System.IO.Path.Combine(dir.Path,"pcsx2/inis/PCSX2.ini"));Assert.Contains("[Filenames]",config);Assert.Contains("BIOS = ps2.bin",config);Assert.Null(EmulatorSetup.FirmwareHint("PS2",dir.Path));
     }
     [Fact] public void RetroArchLaunchUsesItsManagedConfigAndKeepsPathsWithSpacesIntact()

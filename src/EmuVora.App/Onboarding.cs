@@ -10,7 +10,7 @@ public sealed partial class MainWindow
 {
     private async Task ShowOnboardingAsync()
     {
-        if(operation!=null||running.Count>0||esDeProcess!=null){status.Text="Laufende Spiele und Vorgänge zuerst beenden.";return;}
+        if(operation!=null||running.Count>0){status.Text="Laufende Spiele und Vorgänge zuerst beenden.";return;}
         int step=0;var panel=new StackPanel{Margin=new(24),Spacing=16};var title=new TextBlock{FontSize=26,TextWrapping=TextWrapping.Wrap};var content=new StackPanel{Spacing=12};var feedback=new TextBlock{TextWrapping=TextWrapping.Wrap};var pad=new TextBlock{TextWrapping=TextWrapping.Wrap};var navigation=new StackPanel{Orientation=Orientation.Horizontal,Spacing=12};
         panel.Children.Add(title);panel.Children.Add(content);panel.Children.Add(feedback);panel.Children.Add(navigation);panel.Children.Add(new TextBlock{Text="D-Pad: wählen · A: bestätigen / Texteingabe · B: zurück · LB/RB: Einstellungen-Tabs",TextWrapping=TextWrapping.Wrap,Opacity=0.75});
         var dialog=Dialog("EmuVora · Erste Einrichtung",panel);dialog.Width=760;dialog.Height=690;

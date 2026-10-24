@@ -1,6 +1,6 @@
 # AlekFull NX mit ES-DE (v0.5)
 
-Weitere ES-DE-Themes können über dessen Theme-Downloader installiert und im UI-Menü gewählt werden. Die Auswahl bleibt bei späteren Starts erhalten. Beim ersten Einrichten verwendet EmuVora das hier gewünschte AlekFull NX.
+Archiv: Diese Anleitung beschreibt den früheren separaten ES-DE-Modus. In der aktuellen Oberfläche sind Start, Autostart und ES-DE-Download entfernt. Eigene Themes und die automatische Anpassung unterstützter ES-DE-Elemente stehen unter [Native Themes](NATIVE_THEMES.md). Bereits vorhandene Dateien bleiben erhalten.
 
 Unter **Verwaltung → AlekFull NX · ES-DE öffnen** wählen. EmuVora lädt beim ersten Mal die offizielle portable Windows-Version von ES-DE 3.5.0 und den vollständigen AlekFull-NX-Port herunter und prüft beide ZIPs per SHA-256. Danach erscheint die originale ES-DE-Oberfläche, die das Theme mit seinen Varianten, Seitenverhältnissen, Schriftdateien, Sounds und Animationen rendert. In **ES-DE → Menü → UI-Einstellungen** lassen sich Layout, Farbschema, Schriftgröße und weitere Optionen ändern. Anfangs ist das dunkle Layout mit Metadaten und Boxart ausgewählt. Xbox-Controller und Tastatur werden von ES-DE über SDL automatisch erkannt; eigene Belegungen können in dessen Eingabeeinstellungen geändert werden.
 

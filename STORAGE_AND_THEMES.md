@@ -12,10 +12,8 @@ Bei direktem Start der entpackten EXE fragt EmuVora beim ersten Start nach dem D
 
 Ist ein ausgewähltes Laufwerk beim Start nicht erreichbar, erscheint die Pfadauswahl mit dem bisherigen Pfad und einer Fehlermeldung. EmuVora erstellt keine neue Ersatzbibliothek. Unter Einstellungen ist der aktive Datenordner sichtbar und kann geöffnet werden. Zum Wechseln bei geschlossenem Programm die entsprechende Locator-Datei umbenennen und neu starten; der bisherige Datenordner bleibt erhalten.
 
-# Klassische EmulationStation-Themes
+# Native Themes und angepasster Import
 
-Unter **Emulatoren einrichten → EmulationStation-Theme importieren** den vollständig entpackten Theme-Set-Ordner wählen. Er enthält `theme.xml` oder Konsolen-Unterordner wie `nes/theme.xml`, `snes/theme.xml`, `psx/theme.xml`. Der Import kopiert den Ordner in den gewählten Datenordner; die Quelle wird danach nicht benötigt. XML-Includes, gemeinsame Dateien innerhalb des Theme-Sets, Variablen und mehrere View-/Elementnamen werden gelesen. Listen-/Detailfarben und Hintergrund-/Logo-Bilder (PNG/JPEG/SVG) werden auf EmuVoras Bibliotheksoberfläche übertragen. Konsolenfilter und Spielauswahl wechseln automatisch die Systemgestaltung. **EmuVora-Standarddarstellung verwenden** deaktiviert das Theme.
+Unter **Einstellungen → Darstellung** einen eigenen EmuVora-Stil wählen oder einen vollständig entpackten EmulationStation-/ES-DE-Theme-Ordner anpassen. Unterstützte Hintergründe, Logos und Farben werden in EmuVoras Layout übernommen. Eine ES-DE-Installation ist dafür nicht nötig und wird nicht mehr aus EmuVora gestartet.
 
-Dies ist eine Anpassung der Gestaltung, keine vollständige EmulationStation-Layout-Engine: Positionen/Größen, Schriftdateien, zusätzliche Elemente, Animationen, Sounds, Video und View-Umschaltung werden nicht übernommen. ES-DE-Themes mit `capabilities.xml`/Varianten werden mit einem Hinweis abgelehnt. Themes sehen daher nicht pixelgenau wie in EmulationStation aus. Unlesbare/fehlende Ressourcen fallen auf die normale Oberfläche zurück.
-
-Imports erlauben maximal 256 MiB/10.000 Dateien und keine Verknüpfungen, externen XML-Includes oder SVG-Netzwerkressourcen. Formatquelle: https://github.com/Aloshi/EmulationStation/blob/master/THEMES.md. Importierte Themes unterliegen den Lizenzen ihrer Autoren; es werden keine fremden Theme-Bilder mitgeliefert.
+Varianten, Basisfarbschema und Vorlagenformat werden automatisch ausgewählt. Speziallayouts, Videos, Sounds und eigene Schriftarten werden nicht vollständig nachgebaut. Ein Importbericht listet nicht übernommene Elemente. Die Quelle bleibt unverändert; Ressourcen und Lizenzhinweise liegen in der verwalteten Kopie. Grenzen und Bedienung: [Native Themes](NATIVE_THEMES.md).

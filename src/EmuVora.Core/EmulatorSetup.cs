@@ -127,7 +127,7 @@ public static class EmulatorSetup
         var directory=firmwareDirectory??FirmwareDirectory(dataDirectory);
         if(system=="Dreamcast")return null; // Flycast provides HLE BIOS; a real BIOS is optional.
         if(system=="MSX")return new[]{"Machines","Databases"}.All(n=>Directory.Exists(Path.Combine(directory,n))&&Directory.EnumerateFiles(Path.Combine(directory,n),"*",SearchOption.AllDirectories).Any())?null:"MSX: eigenen blueMSX-Datenordner mit Machines und Databases importieren (gemeinsamen übergeordneten Ordner wählen).";
-        if(system is "PS1" or "PS2")return FindPlayStationBios(system,directory)!=null?null:$"{system}: eigenes BIOS in den Firmware-Ordner importieren (PS1: 512 KiB, PS2: 4 MiB).";
+        if(system is "PS1" or "PS2")return FindPlayStationBios(system,directory)!=null?null:$"{system}: eigenes BIOS in den Firmware-Ordner importieren (PS1: 512 KiB; PS2: gültiges ROM0/BIOS mit ROMDIR und ROMVER, keine DIFF-/ROM1-Begleitdatei).";
         var definition=SystemCatalog.Find(system);if(definition?.Firmware==null)return null;
         var names=definition.Firmware.Split('|');
         if(names.Any(n=>File.Exists(Path.Combine(directory,n))&&new FileInfo(Path.Combine(directory,n)).Length>0))
@@ -176,5 +176,5 @@ public static class EmulatorSetup
             var target=Path.Combine(targetRoot,FirmwareRecognition.Identify(file)??Path.GetRelativePath(source,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);if(File.Exists(target))File.Copy(target,target+".bak",true);File.Copy(file,target,true);
         }
     }
-    private static string? FindPlayStationBios(string system,string directory)=>Directory.Exists(directory)?Directory.EnumerateFiles(directory,"*",SearchOption.TopDirectoryOnly).FirstOrDefault(f=>new FileInfo(f).Length==(system=="PS1"?512*1024:4*1024*1024)):null;
+    private static string? FindPlayStationBios(string system,string directory)=>Directory.Exists(directory)?Directory.EnumerateFiles(directory,"*",SearchOption.TopDirectoryOnly).OrderBy(f=>f,StringComparer.OrdinalIgnoreCase).FirstOrDefault(f=>system=="PS2"?Ps2Bios.IsImage(f):new FileInfo(f).Length==512*1024):null;
 }

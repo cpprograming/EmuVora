@@ -104,8 +104,8 @@ public sealed partial class MainWindow
     }
     private bool CanBackUp()
     {
-        if(running.Count==0&&(esDeProcess==null||esDeProcess.HasExited))return true;
-        status.Text="Bitte zuerst laufende Spiele und ES-DE beenden, damit Spielstände vollständig gesichert werden.";return false;
+        if(running.Count==0)return true;
+        status.Text="Bitte zuerst laufende Spiele beenden, damit Spielstände vollständig gesichert werden.";return false;
     }
 }
 

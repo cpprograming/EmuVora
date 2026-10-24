@@ -143,7 +143,8 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [x] Neue Marke, App-/Setup-/Shortcut-Icon, Navigation, Cover-Platzhalter und Detailansicht in 0.14.71 veröffentlicht; 152 Funktions- und 6 Netzwerktests, Installation und Selbstupdate einschließlich SHA-256 geprüft. [Vorschau](design/README.md).
 - [ ] Downloads und Fehlerzustände weiter vereinheitlichen.
   - Gemeinsamer Statusbereich mit Fortschritt, Abbruch und Fehlerdetails für Standarddialoge veröffentlicht (ab 0.14.109); Timeouts und veraltete Download-Meldungen gesondert behandeln. [Anleitung](OPERATIONS_AND_ERRORS.md).
-- [x] Direkte Theme-Unterstützung und separate ES-DE-Darstellung in Einstellungen und Anleitung unterscheiden.
+- [x] Native Themes Aurora/Studio und automatische ES-DE-Anpassung implementieren; separaten ES-DE-Start und Download aus der Oberfläche entfernen (Entwicklungsstand). [Umfang und Grenzen](NATIVE_THEMES.md).
+- [x] Einheitliche Konsolenzeilen und sichtbare Versionsgruppen statt doppelter Titelkarten implementieren (Entwicklungsstand).
 
 ## 0.14 – Spielebibliothek
 
