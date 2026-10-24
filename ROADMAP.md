@@ -2,7 +2,15 @@
 
 Stand: 24. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.100](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.100).
+Aktueller geprüfter Release: [0.14.103](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.103).
+
+## 0.14.103 – Bestätigte Duplikate (abgeschlossen)
+
+- [x] Verbleibenden Titel/Pfad, Cover-Schutz und eigenes Bildprofil vor Übernahme auswählen.
+- [x] Favoriten/Sammlungen vereinigen, Spielstarts addieren und bekannte Import-/Startzeiten übernehmen; ROMs und Spielstände erhalten.
+- [x] Datei-Inhalte erneut prüfen; konsistente Sicherung, Originalmetadatenarchiv und Wiederaufnahme nach Unterbrechung ergänzen.
+- [x] Unveränderte Duplikatpfade bei Scans unterdrücken; geänderte Dateien, JSON-Import, vollständige Sicherung und ROM-Umzug berücksichtigen.
+- [x] 266 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
 
 ## 0.14.100 – Datei-Inhalte und PS1-Playlists (abgeschlossen)
 
@@ -10,7 +18,7 @@ Aktueller geprüfter Release: [0.14.100](https://github.com/cpprograming/EmuVora
 - [x] PS1-M3U aus nummerierten CHD/CUE-Discs nach Vorschau erstellen und als zusätzliche Karte importieren; vorhandene Discs und Metadaten behalten.
 - [x] Geänderte Dateien, unvollständige Disc-Nummern, ungeeignete CUE-Verweise und bestehende Ziele abweisen; Spielstandsnamenswechsel erklären.
 - [x] 246 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; neuen Dialog visuell geprüft.
-- [x] Bestätigte Duplikate mit Auswahl, Metadatenübernahme, Sicherung und Wiederaufnahme zusammenführen (Entwicklungsstand).
+- [x] Bestätigte Duplikate mit Auswahl, Metadatenübernahme, Sicherung und Wiederaufnahme zusammenführen (ab 0.14.103).
 - [ ] Weitere Playlist-Systeme ergänzen.
 
 ## 0.14.98 – Bibliotheksprüfung (Prüfungsübersicht abgeschlossen)
@@ -19,7 +27,7 @@ Aktueller geprüfter Release: [0.14.100](https://github.com/cpprograming/EmuVora
 - [x] Prüfung abbrechbar im Hintergrund ausführen; ROM-Dateien und Bibliotheksmetadaten unverändert lassen.
 - [x] 228 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Dialog zusätzlich mit einer privaten Bibliothekskopie geprüft.
 - [x] Inhaltsprüfung per SHA-256 und bestätigte PS1-Playlist-Erstellung für CHD/CUE implementieren (ab 0.14.100).
-- [x] Zusammenführen mit Metadatenübernahme und Sicherung ergänzen (Entwicklungsstand).
+- [x] Zusammenführen mit Metadatenübernahme und Sicherung ergänzen (ab 0.14.103).
 - [ ] Weitere Playlist-Systeme ergänzen.
 
 ## 0.14.94 – Verschobene ROM-Ordner (abgeschlossen)
@@ -125,8 +133,8 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [x] Prüfsummen-Erkennung mit bestätigter Titelvorschau für 16 Cartridge-Systeme integriert; Schutz eigener Bearbeitungen und lokaler ROM-Dateien. [Anleitung](ROM_RECOGNITION.md).
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
-- [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
-  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 SHA-256-Vergleich und PS1-Playlists mit Vorschau. Bestätigte Duplikate im Entwicklungsstand zusammenführen; weitere Playlist-Systeme bleiben offen.
+- [x] Doppelte Einträge und PS1-Mehrdisc-Spiele mit Vorschau verwalten (ab 0.14.103).
+  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 SHA-256-Vergleich und PS1-Playlists mit Vorschau. Bestätigte Duplikate ab 0.14.103 zusammenführen; weitere Playlist-Systeme bleiben offen.
 - [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 
