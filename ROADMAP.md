@@ -134,7 +134,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [x] Doppelte Einträge und PS1-Mehrdisc-Spiele mit Vorschau verwalten (ab 0.14.103).
-  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 SHA-256-Vergleich und PS1-Playlists mit Vorschau. Bestätigte Duplikate ab 0.14.103 zusammenführen; weitere Playlist-Systeme bleiben offen.
+  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 SHA-256-Vergleich und PS1-Playlists mit Vorschau. Bestätigte Duplikate ab 0.14.103 zusammenführen. Im Entwicklungsstand Saturn-/Dreamcast-Playlists für CHD/CUE ergänzen; weitere Formate/Systeme bleiben offen.
 - [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 

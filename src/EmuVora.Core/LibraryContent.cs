@@ -11,6 +11,13 @@ public record DiscPlaylistPlan(LibraryAuditGroup Group, string Path, string Cont
 
 public static class LibraryContent
 {
+    public static string? PlaylistEmulator(string system) => system switch
+    {
+        "PS1" => "DuckStation oder RetroArch / Beetle PSX",
+        "Saturn" => "RetroArch / Beetle Saturn",
+        "Dreamcast" => "RetroArch / Flycast",
+        _ => null
+    };
     private static readonly HashSet<string> IndexFiles = new(StringComparer.OrdinalIgnoreCase) { ".cue", ".m3u", ".gdi", ".ccd", ".toc", ".mds" };
     internal static bool IsReferenceFile(string path) => IndexFiles.Contains(Path.GetExtension(path));
 
@@ -40,7 +47,7 @@ public static class LibraryContent
 
     public static DiscPlaylistPlan PreviewPlaylist(LibraryAuditGroup group, CancellationToken token = default)
     {
-        if (group.System != "PS1" || group.Games.Count < 2 || group.Games.Count > 99) throw new IOException("Playlist-Erstellung unterstützt zunächst PS1-Disc-Sätze mit 2 bis 99 Discs.");
+        if (PlaylistEmulator(group.System) == null || group.Games.Count < 2 || group.Games.Count > 99) throw new IOException("Playlist-Erstellung unterstützt PS1, Saturn und Dreamcast mit 2 bis 99 CHD/CUE-Discs.");
         var inspected = LibraryAudit.Inspect(group.Games, token).Where(g => g.Kind == "Mehrdisc-Kandidat").ToArray();
         if (inspected.Length != 1 || inspected[0].Games.Count != group.Games.Count || inspected[0].Title != group.Title) throw new IOException("Der Disc-Satz ist nicht eindeutig.");
         var ordered = inspected[0].Games;
@@ -57,7 +64,7 @@ public static class LibraryContent
         {
             token.ThrowIfCancellationRequested();
             var path = System.IO.Path.GetFullPath(game.Path); var name = System.IO.Path.GetFileName(path);
-            if (game.System != "PS1" || !System.IO.Path.GetDirectoryName(path)!.Equals(folder, StringComparison.OrdinalIgnoreCase) || name != name.Trim() || name.StartsWith('#') || name.Any(char.IsControl)) throw new IOException("Disc-Pfade sind für eine relative Playlist ungeeignet.");
+            if (game.System != group.System || !System.IO.Path.GetDirectoryName(path)!.Equals(folder, StringComparison.OrdinalIgnoreCase) || name != name.Trim() || name.StartsWith('#') || name.Any(char.IsControl)) throw new IOException("Disc-Pfade sind für eine relative Playlist ungeeignet.");
             var extension = System.IO.Path.GetExtension(path);
             if (!extension.Equals(".chd", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".cue", StringComparison.OrdinalIgnoreCase)) throw new IOException("Nur CHD- oder CUE-Discs werden unterstützt; BIN-Tracks nicht einzeln aufnehmen.");
             AddFile(path, snapshots);
@@ -117,7 +124,7 @@ public static class LibraryContent
             }
             token.ThrowIfCancellationRequested(); Backups.NoLinks(System.IO.Path.GetDirectoryName(plan.Path)!);
             File.Move(temporary, plan.Path, false); temporary = null;
-            return new(plan.Group.Title, "PS1", plan.Path);
+            return new(plan.Group.Title, plan.Group.System, plan.Path);
         }
         finally { foreach (var handle in handles) handle.Dispose(); if (temporary != null && File.Exists(temporary)) File.Delete(temporary); }
     }
