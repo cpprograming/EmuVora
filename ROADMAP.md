@@ -2,7 +2,15 @@
 
 Stand: 24. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.105](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.105).
+Aktueller geprüfter Release: [0.14.109](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.109).
+
+## 0.14.109 – Status und Fehlerhinweise (abgeschlossen)
+
+- [x] Gemeinsamen Fortschritts-/Abbruchbereich in Standarddialogen, allen Einstellungen-Tabs und Einrichtung anzeigen.
+- [x] Lesbare Fehlermeldungen mit technischen Details und gemeinsamem Ausblenden ergänzen; automatische Updateprüfungen ruhig halten.
+- [x] Eigenen Abbruch von Timeouts unterscheiden, verspätete Fortschrittsmeldungen verwerfen und verschachtelte Dialogzustände erhalten; sofortigen Abbruch korrekt abschließen.
+- [x] 288 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Fehleransicht visuell geprüft.
+- [ ] Übrige Spezialdialoge, Abstände und Validierung sowie Hardwaretests weiter bearbeiten.
 
 ## 0.14.105 – Saturn und Dreamcast (abgeschlossen)
 
@@ -134,7 +142,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [x] Leere Bibliothek und ergebnislose Filter mit eigenen Fluent-Infobereichen unterscheiden.
 - [x] Neue Marke, App-/Setup-/Shortcut-Icon, Navigation, Cover-Platzhalter und Detailansicht in 0.14.71 veröffentlicht; 152 Funktions- und 6 Netzwerktests, Installation und Selbstupdate einschließlich SHA-256 geprüft. [Vorschau](design/README.md).
 - [ ] Downloads und Fehlerzustände weiter vereinheitlichen.
-  - Gemeinsamer Statusbereich mit Fortschritt, Abbruch und Fehlerdetails für Standarddialoge implementiert (Entwicklungsstand); Timeouts und veraltete Download-Meldungen gesondert behandeln. [Anleitung](OPERATIONS_AND_ERRORS.md).
+  - Gemeinsamer Statusbereich mit Fortschritt, Abbruch und Fehlerdetails für Standarddialoge veröffentlicht (ab 0.14.109); Timeouts und veraltete Download-Meldungen gesondert behandeln. [Anleitung](OPERATIONS_AND_ERRORS.md).
 - [x] Direkte Theme-Unterstützung und separate ES-DE-Darstellung in Einstellungen und Anleitung unterscheiden.
 
 ## 0.14 – Spielebibliothek

@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.105](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.105)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.109](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.109)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -13,6 +13,10 @@ Unter **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** werden 
 - Alle Versionen und Änderungen findest du unter **[Releases](https://github.com/cpprograming/EmuVora/releases)**.
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
+
+## Fortschritt und Fehlerhinweise – neu in 0.14.109
+
+Standarddialoge, Einstellungen-Tabs und Einrichtungsassistent zeigen Fortschritt und Abbruch direkt im Dialog. Fehler erhalten einen lesbaren Hinweis mit ausklappbaren technischen Details. Timeouts werden von eigenem Abbruch unterschieden; verspätete Download-Meldungen überschreiben keinen neueren Vorgang. Automatische Updateprüfungen bleiben bei Fehlern im Hintergrund ruhig. [Ablauf und Grenzen](OPERATIONS_AND_ERRORS.md).
 
 ## Stabiler Start großer Bibliotheken – repariert in 0.14.78
 
