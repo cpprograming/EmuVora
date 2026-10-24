@@ -15,7 +15,8 @@ internal record OperationFailure(string Summary, string Details)
         HttpRequestException { StatusCode: System.Net.HttpStatusCode.Forbidden or System.Net.HttpStatusCode.Unauthorized } => "Die Download-Quelle verweigert den Zugriff. Versuche es später erneut; Details siehe unten.",
         HttpRequestException => "Die Download-Quelle konnte nicht erreicht werden. Prüfe deine Internetverbindung und versuche es später erneut.",
         UnauthorizedAccessException => "Zugriff verweigert. Prüfe die Berechtigungen und ob eine andere Anwendung die Datei verwendet.",
-        FileNotFoundException or DirectoryNotFoundException => "Datei oder Ordner nicht erreichbar. Prüfe Laufwerk und Pfad.",
+        FileNotFoundException => "Datei nicht erreichbar. " + error.Message,
+        DirectoryNotFoundException => "Ordner nicht erreichbar. Prüfe Laufwerk und Pfad.",
         InvalidDataException => "Die Daten konnten nicht geprüft werden. Bitte die Details beachten.",
         _ => error.Message
     }, error.GetType().Name + ": " + error.Message);

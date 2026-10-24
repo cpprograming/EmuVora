@@ -52,13 +52,14 @@ public sealed class ManagedGameLauncher
         {if(!settings.AutomaticSetup)throw new IOException("Den RetroArch-Core zuerst in EmuVora einrichten.");await Install("retroarch-cores");}
         if(settings.Packages.TryGetValue(definition.Id,out var managed)&&managed.ExecutablePath==executable)
         {
-            if(settings.AutomaticSetup)EmulatorSetup.Configure(definition.Id,executable,request.DataDirectory,settings.XboxDefaults,settings.Fullscreen,firstController:firstController);
+            if(settings.AutomaticSetup)EmulatorSetup.Configure(definition.Id,executable,request.DataDirectory,settings.XboxDefaults,settings.Fullscreen,firstController:firstController,preferGerman:settings.PreferGerman);
+            if(settings.PreferGerman)EmulatorLanguage.Apply(definition.Id,executable);
             DisplayProfiles.Apply(definition.Id,executable,game.System,monitor??DisplayDetection.Current(),settings,gamePath:game.Path);
             var hint=EmulatorSetup.FirmwareHint(game.System,request.DataDirectory,EmulatorSetup.ConfiguredFirmwareDirectory(definition.Id,executable,request.DataDirectory));if(hint!=null)throw new IOException(hint);
         }
         progress?.Report(new("Spiel wird gestartet …"));
         token.ThrowIfCancellationRequested();
-        using var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen);
+        using var process=new ExternalEmulatorAdapter(definition).Launch(game,executable,settings.CorePaths.GetValueOrDefault(game.System),settings.Fullscreen,settings.PreferGerman);
         store.MarkPlayed(game);started();await process.WaitForExitAsync(token);
         if(process.ExitCode!=0)throw new IOException($"{definition.Name} wurde mit Fehlercode {process.ExitCode} beendet. BIOS, ROM und Emulator-Protokoll prüfen.");
     }

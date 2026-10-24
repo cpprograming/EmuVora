@@ -4,6 +4,8 @@ Stand: 24. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 
 ## Aktueller Stand
 
+- [x] Deutsche Vorgabe für verwaltete Emulatoren und unterstützte Spielsysteme sowie sichtbare BIOS-/Startfehlerdialoge implementieren (Entwicklungsstand). [Anleitung](LANGUAGE_AND_ERRORS.md).
+
 - [x] Native Oberfläche und Themes in 0.14.112 veröffentlicht ([PR #34](https://github.com/cpprograming/EmuVora/pull/34)): gleichmäßige Konsolenzeilen und Titelkarten, auswählbare Versionen statt doppelter Karten, native Aurora-/Studio-Stile und automatische ES-DE-Anpassung mit Bericht. Separater ES-DE-Start entfernt. PS2-BIOS-Auswahl strukturell geprüft; betroffener Spielstart bestätigt. 296 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
 
 - [x] ROM-Ordnerzuordnung in 0.14.94 veröffentlicht ([PR #27](https://github.com/cpprograming/EmuVora/pull/27)): fehlende Dateien am gleichen relativen Zielpfad vorschlagen, vor Übernahme prüfen, Konflikte und geänderte Ziele abweisen. Titel, Favoriten, Verlauf, Importdatum, Cover/Sperren, Bildprofile und Sammlungen erhalten. Metadaten vorher sichern und unterbrochene Übernahmen konsistent wieder aufnehmen. 20 neue Prüffälle; 223 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
