@@ -135,7 +135,8 @@ public sealed partial class MainWindow : Window
         var library=new Grid{RowDefinitions=new("*,Auto")};library.Children.Add(gamesList);
         var pageButtons=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};pageButtons.Children.Add(previousPage);pageButtons.Children.Add(nextPage);libraryPager.Children.Add(pageLabel);libraryPager.Children.Add(pageButtons);Grid.SetRow(libraryPager,1);library.Children.Add(libraryPager);
         previousPage.Click+=(_,_)=>ChangeLibraryPage(-1);nextPage.Click+=(_,_)=>ChangeLibraryPage(1);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
-        AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);AddRow(main,footer,4);
+        AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);var notices=new StackPanel{Spacing=8};notices.Children.Add(CreateOperationNotice(false));notices.Children.Add(footer);AddRow(main,notices,4);
+        status.PropertyChanged+=(_,e)=>{if(e.Property==TextBlock.TextProperty)NotifyFeedback();};progress.PropertyChanged+=(_,e)=>{if(e.Property==ProgressBar.ValueProperty||e.Property==ProgressBar.IsIndeterminateProperty)NotifyFeedback();};
         var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
         var details=new StackPanel {Spacing=16,Margin=new(22,30)};details.Children.Add(new TextBlock{Text="IM FOKUS",FontSize=10,LetterSpacing=2,Opacity=0.6});details.Children.Add(new Border{CornerRadius=new(16),Padding=new Thickness(14),Background=new SolidColorBrush(Color.Parse("#10203030")),Child=detailCover});details.Children.Add(detailTitle);details.Children.Add(detailInfo);
         details.Children.Add(displayStatus);details.Children.Add(play);details.Children.Add(favorite);
@@ -147,7 +148,7 @@ public sealed partial class MainWindow : Window
         onlineCover.Click+=async(_,_)=>await FetchCoverAsync();ToolTip.SetTip(onlineCover,"Sucht den Spieltitel bei libretro-thumbnails. Titel und Konsole werden dafür an GitHub gesendet.");
         gamesList.SelectionChanged+=(_,_)=>UpdateSelected();gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
         gamesList.KeyDown+=async(_,e)=>{if(e.Key==Key.Enter){e.Handled=true;await PlayAsync();}};
-        search.TextChanged+=(_,_)=>Refresh();systems.SelectionChanged+=(_,_)=>Refresh();sort.SelectionChanged+=(_,_)=>Refresh();cancel.Click+=(_,_)=>operation?.Cancel();
+        search.TextChanged+=(_,_)=>Refresh();systems.SelectionChanged+=(_,_)=>Refresh();sort.SelectionChanged+=(_,_)=>Refresh();cancel.Click+=(_,_)=>RequestOperationCancel();
         KeyDown+=(_,e)=>{if(e.Key==Key.F&&e.KeyModifiers.HasFlag(KeyModifiers.Control)){search.Focus();e.Handled=true;}};
         UpdateSystems();ApplyTheme();ApplyLibraryAppearance();Refresh();
         PropertyChanged+=(_,e)=>{if(e.Property==ClientSizeProperty)ApplyLayout();};
@@ -164,7 +165,7 @@ public sealed partial class MainWindow : Window
     private Button AsyncButton(string text,Func<Task> action)
     {var button=new Button {Content=text,HorizontalAlignment=HorizontalAlignment.Stretch};button.Click+=async(_,_)=>{try{await action();}catch(Exception ex){ShowError(ex);}};return button;}
     private void Guard(Action action){try{action();}catch(Exception ex){ShowError(ex);}}
-    private void ShowError(Exception ex){status.Text="Fehler: "+ex.Message;Log(ex);}
+    private void ShowError(Exception ex){operationFailure=OperationFailure.From(ex);status.Text="Fehler: "+operationFailure.Summary;NotifyFeedback();Log(ex);}
     private void Log(Exception ex){try{File.AppendAllText(Path.Combine(dataDir,"errors.log"),$"{DateTimeOffset.Now:O} {ex}\n");}catch{ }}
     private Game? Selected=>gamesList.SelectedItem as Game;
     private void ApplyTheme()
@@ -289,11 +290,11 @@ public sealed partial class MainWindow : Window
     private async Task<bool> BusyAsync(Func<CancellationToken,Task> action)
     {
         if(operation!=null){status.Text="Bitte den aktuellen Vorgang abschließen oder abbrechen.";return false;}
-        operation=new();foreach(var button in operationButtons)button.IsEnabled=false;cancel.IsVisible=progress.IsVisible=true;progress.IsIndeterminate=true;UpdateSelected();
-        try{await action(operation.Token);return true;}catch(OperationCanceledException){status.Text="Vorgang abgebrochen.";return false;}catch(Exception ex){ShowError(ex);return false;}
-        finally{operation.Dispose();operation=null;foreach(var button in operationButtons)button.IsEnabled=true;cancel.IsVisible=progress.IsVisible=false;UpdateSelected();}
+        operationFailure=null;operation=new();foreach(var button in operationButtons)button.IsEnabled=false;cancel.IsVisible=progress.IsVisible=true;progress.IsIndeterminate=true;progress.Value=0;status.Text="Vorgang läuft …";UpdateSelected();NotifyFeedback();
+        try{await action(operation.Token);return true;}catch(OperationCanceledException) when(operation.IsCancellationRequested){status.Text="Vorgang abgebrochen.";return false;}catch(Exception ex){ShowError(ex);return false;}
+        finally{operation.Dispose();operation=null;foreach(var button in operationButtons)button.IsEnabled=true;cancel.IsVisible=progress.IsVisible=false;UpdateSelected();NotifyFeedback();}
     }
-    private IProgress<DownloadProgress> DownloadProgress()=>new Progress<DownloadProgress>(p=>{status.Text=p.Message;progress.IsIndeterminate=p.Fraction==null;if(p.Fraction is{} value)progress.Value=value*100;});
+    private IProgress<DownloadProgress> DownloadProgress(){var source=operation;return new Progress<DownloadProgress>(p=>{if(!CanReport(source))return;status.Text=p.Message;progress.IsIndeterminate=p.Fraction==null;if(p.Fraction is{} value)progress.Value=double.IsFinite(value)?Math.Clamp(value*100,0,100):0;});}
     private async Task ImportAsync()
     {
         var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="ROM-Ordner wählen",AllowMultiple=true});if(folders.Count==0)return;
@@ -319,9 +320,10 @@ public sealed partial class MainWindow : Window
     }
     private Window Dialog(string title,Control content)
     {
-        var dialog=new Window {Title=title,Width=640,Height=640,MinWidth=520,MinHeight=220,WindowStartupLocation=WindowStartupLocation.CenterOwner,Content=new ScrollViewer {Content=content},RequestedThemeVariant=RequestedThemeVariant,Background=Background,Foreground=Foreground};WindowAppearance.Apply(dialog);ControllerUi.Attach(dialog);
+        var body=content is TabControl?content:new ScrollViewer{Content=content};var host=new Grid{RowDefinitions=new("*,Auto")};host.Children.Add(body);var notice=CreateOperationNotice(true);notice.Margin=new(24,0,24,16);Grid.SetRow(notice,1);host.Children.Add(notice);
+        var dialog=new Window {Title=title,Width=640,Height=640,MinWidth=520,MinHeight=220,WindowStartupLocation=WindowStartupLocation.CenterOwner,Content=host,RequestedThemeVariant=RequestedThemeVariant,Background=Background,Foreground=Foreground,FontSize=FontSize};WindowAppearance.Apply(dialog);ControllerUi.Attach(dialog);ControllerUi.SetBack(dialog,()=>{if(operation!=null)RequestOperationCancel();else dialog.Close();});
         dialog.Opened+=(_,_)=>{var screen=Screens.ScreenFromWindow(this);if(screen!=null){dialog.Width=Math.Min(dialog.Width,Math.Max(dialog.MinWidth,screen.WorkingArea.Width/screen.Scaling-32));dialog.Height=Math.Min(dialog.Height,Math.Max(dialog.MinHeight,screen.WorkingArea.Height/screen.Scaling-48));}};
-        dialog.Opened+=(_,_)=>dialogOpen=true;dialog.Closed+=(_,_)=>dialogOpen=false;return dialog;
+        dialog.Opened+=(_,_)=>{openedDialogs++;dialogOpen=true;};dialog.Closed+=(_,_)=>{openedDialogs=Math.Max(0,openedDialogs-1);dialogOpen=openedDialogs>0;};return dialog;
     }
     private async Task<bool> ConfirmAsync(string message)
     {
@@ -435,7 +437,7 @@ public sealed partial class MainWindow : Window
     }
     public async Task HandleLibraryControllerAsync(ushort pressed)
     {
-        if(operation!=null&&(pressed&0x2000)!=0){operation.Cancel();return;}
+        if(operation!=null&&(pressed&0x2000)!=0){RequestOperationCancel();return;}
         if(running.Count>0||pressed==0)return;
         if((pressed&0x10)!=0){if(operation==null)await ShowSettingsAsync();return;}
         if((pressed&0x20)!=0){controllerUiMode=!controllerUiMode;if(controllerUiMode)ControllerUi.Handle(this,2);else gamesList.Focus();return;}
@@ -480,7 +482,7 @@ public sealed partial class MainWindow : Window
         if(executable!=null&&settings.Packages.TryGetValue(id,out var managed)&&managed.ExecutablePath==executable)EmulatorSetup.Configure(id,executable,dataDir,settings.XboxDefaults,settings.Fullscreen,firstController:Gamepad.FirstXInputIndex);
         settingsStore.Save(settings);
     }
-    private async Task CheckUpdatesAsync()
+    private async Task CheckUpdatesAsync(bool reportFailure=false)
     {
         try
         {
@@ -503,7 +505,7 @@ public sealed partial class MainWindow : Window
                 status.Text="Verfügbare Updates installiert. Vorige Emulator-Versionen bleiben erhalten.";
             });
         }
-        catch(Exception ex){Log(ex);}
+        catch(Exception ex){if(reportFailure)ShowError(ex);else Log(ex);}
     }
     private async Task OpenEsDeAsync()
     {
@@ -594,10 +596,6 @@ public sealed partial class MainWindow : Window
             if(!settings.Packages.TryGetValue(id,out var installed)||settings.EmulatorPaths.GetValueOrDefault(id)!=installed.ExecutablePath){status.Text="Automatische Profile sind für verwaltete Downloads verfügbar.";return;}
             if(await ConfirmAsync("Xbox-Standardprofil erneut anwenden? Die bisherigen Konfigurationsdateien werden als .bak gesichert."))Guard(()=>{EmulatorSetup.Configure(id,installed.ExecutablePath,dataDir,true,settings.Fullscreen,true,Gamepad.FirstXInputIndex);status.Text="Xbox-Profil angewendet.";});
         }));
-        var downloadStatus=new TextBlock {TextWrapping=TextWrapping.Wrap};
-        void FollowStatus(object? sender,AvaloniaPropertyChangedEventArgs e){if(e.Property==TextBlock.TextProperty)downloadStatus.Text=status.Text;}
-        status.PropertyChanged+=FollowStatus;panel.Children.Add(downloadStatus);
-        panel.Children.Add(ActionButton("Laufenden Download abbrechen",()=>operation?.Cancel()));
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="RetroArch-Core je Konsole",FontWeight=FontWeight.Bold});
         var coreSystem=new ComboBox {ItemsSource=EmulatorCatalog.Get("retroarch").Systems,SelectedIndex=0};var corePath=new TextBox();panel.Children.Add(coreSystem);panel.Children.Add(corePath);
         void LoadCore()=>corePath.Text=settings.CorePaths.GetValueOrDefault((string)coreSystem.SelectedItem!)??"";
@@ -611,14 +609,14 @@ public sealed partial class MainWindow : Window
         }));
         panel.Children.Add(new TextBlock {Text="Downloads stammen aus offiziellen Projektquellen und werden mit SHA-256 geprüft. Alte Installationen bleiben erhalten. Bei fehlenden VCRUNTIME/MSVCP-DLLs die Microsoft Visual C++ Runtime installieren. BIOS-Dateien werden nicht heruntergeladen. Heimcomputer, DS-Touchscreen und spezielle Controller können zusätzliche Eingaben benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
-        panel.Children.Add(AsyncButton("Jetzt auf Updates prüfen",()=>CheckUpdatesAsync()));
+        panel.Children.Add(AsyncButton("Jetzt auf Updates prüfen",()=>CheckUpdatesAsync(true)));
         panel.Children.Add(new Separator());panel.Children.Add(new TextBlock {Text="Gespeicherte ROM-Ordner",FontWeight=FontWeight.Bold});
         var folders=new ListBox {ItemsSource=settings.RomFolders.ToArray(),MaxHeight=150};panel.Children.Add(folders);
         panel.Children.Add(ActionButton("Ordner aus dem Neu-Scan entfernen",()=>{if(folders.SelectedItem is string folder){settings.RomFolders.Remove(folder);settingsStore.Save(settings);folders.ItemsSource=settings.RomFolders.ToArray();status.Text="Ordner aus dem Neu-Scan entfernt. Spiele und Dateien bleiben erhalten.";}}));
         var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}},new TabItem{Header="App-Updates",Content=new ScrollViewer{Content=AppUpdateOptions()}},new TabItem{Header="Sicherung",Content=new ScrollViewer{Content=BackupOptions()}}},SelectedIndex=initialTab??(initialEmulator==null?0:3)};
-        var dialog=Dialog("EmuVora · Einstellungen",tabs);dialog.Width=760;dialog.Height=760;dialog.Content=tabs;dialog.Closed+=(_,_)=>status.PropertyChanged-=FollowStatus;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();status.Text="Vorgang wird abgebrochen. Danach kann das Fenster geschlossen werden.";}};await dialog.ShowDialog(this);
+        var dialog=Dialog("EmuVora · Einstellungen",tabs);dialog.Width=760;dialog.Height=760;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;RequestOperationCancel();}};await dialog.ShowDialog(this);
     }
-    private async Task CheckAppUpdatesAsync()
+    private async Task CheckAppUpdatesAsync(bool reportFailure=false)
     {
         try
         {
@@ -628,7 +626,7 @@ public sealed partial class MainWindow : Window
             appRelease=release;
             appUpdateStatus.Text=release==null?"EmuVora ist aktuell · v"+AppVersion.ToString(3):"EmuVora v"+release.Version+" verfügbar · Einstellungen → App-Updates";
         }
-        catch(Exception ex){if(!isClosed)appUpdateStatus.Text="EmuVora-Updateprüfung fehlgeschlagen: "+ex.Message;}
+        catch(Exception ex){if(!isClosed){appUpdateStatus.Text="EmuVora-Updateprüfung fehlgeschlagen: "+OperationFailure.From(ex).Summary;if(reportFailure)ShowError(ex);else Log(ex);}}
     }
     private StackPanel AppUpdateOptions()
     {
@@ -637,18 +635,18 @@ public sealed partial class MainWindow : Window
         var automatic=new CheckBox{Content="Beim Start nach neuen EmuVora-Versionen suchen",IsChecked=settings.CheckAppUpdatesOnStartup};
         automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckAppUpdatesOnStartup=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
         var message=new TextBlock{Text=appUpdateStatus.Text,TextWrapping=TextWrapping.Wrap};panel.Children.Add(message);
-        panel.Children.Add(AsyncButton("Jetzt auf App-Updates prüfen",async()=>{await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;}));
+        panel.Children.Add(AsyncButton("Jetzt auf App-Updates prüfen",async()=>{await CheckAppUpdatesAsync(true);message.Text=appUpdateStatus.Text;}));
         panel.Children.Add(AsyncButton("Update herunterladen",async()=>
         {
             if(operation!=null)return;
-            await CheckAppUpdatesAsync();message.Text=appUpdateStatus.Text;if(appRelease==null)return;
+            await CheckAppUpdatesAsync(true);message.Text=appUpdateStatus.Text;if(appRelease==null)return;
             var release=appRelease;
             bool complete=false;message.Text="EmuVora-Update wird heruntergeladen …";
-            try{await BusyAsync(async token=>{status.Text=message.Text;appUpdateFile=await new AppUpdates(updateHttp).DownloadAsync(release,Path.Combine(dataDir,"updates"),new Progress<double>(value=>{if(!complete)message.Text="EmuVora-Update wird heruntergeladen · "+value.ToString("0")+" %";progress.IsIndeterminate=false;progress.Value=value;}),token);status.Text="Update geprüft und bereit. Unter App-Updates neu starten.";});}
+            try{await BusyAsync(async token=>{status.Text=message.Text;appUpdateFile=await new AppUpdates(updateHttp).DownloadAsync(release,Path.Combine(dataDir,"updates"),OperationPercentage(value=>{if(complete)return;message.Text="EmuVora-Update wird heruntergeladen · "+value.ToString("0")+" %";status.Text=message.Text;progress.IsIndeterminate=false;progress.Value=value;}),token);status.Text="Update geprüft und bereit. Unter App-Updates neu starten.";});}
             finally{complete=true;}
             message.Text=appUpdateFile==null?status.Text:"Download geprüft · v"+release.Version+" · bereit zum Installieren";
         }));
-        panel.Children.Add(ActionButton("Download abbrechen",()=>operation?.Cancel()));
+        panel.Children.Add(ActionButton("Download abbrechen",RequestOperationCancel));
         panel.Children.Add(AsyncButton("Aktualisieren und neu starten",async()=>
         {
             if(operation!=null||running.Count>0||esDeProcess!=null){message.Text="Downloads, Spiele und ES-DE zuerst beenden.";return;}

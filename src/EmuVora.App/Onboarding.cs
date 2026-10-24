@@ -16,8 +16,8 @@ public sealed partial class MainWindow
         var dialog=Dialog("EmuVora · Erste Einrichtung",panel);dialog.Width=760;dialog.Height=690;
         var previous=new Button{Content="Zurück"};var next=new Button{Content="Weiter"};
         previous.Click+=(_,_)=>{if(operation==null&&step>0){step--;Render();}};next.Click+=(_,_)=>{if(operation!=null)return;if(step<4){step++;Render();}else{settings.OnboardingCompleted=true;settingsStore.Save(settings);dialog.Close();status.Text="Einrichtung gespeichert. Spiel auswählen und A drücken.";}};
-        ControllerUi.SetBack(dialog,()=>{if(operation!=null){operation.Cancel();return;}if(step>0){step--;Render();}else dialog.Close();});
-        navigation.Children.Add(previous);navigation.Children.Add(next);navigation.Children.Add(ActionButton("Später einrichten",()=>{if(operation!=null){operation.Cancel();return;}settings.OnboardingCompleted=true;settingsStore.Save(settings);dialog.Close();}));
+        ControllerUi.SetBack(dialog,()=>{if(operation!=null){RequestOperationCancel();return;}if(step>0){step--;Render();}else dialog.Close();});
+        navigation.Children.Add(previous);navigation.Children.Add(next);navigation.Children.Add(ActionButton("Später einrichten",()=>{if(operation!=null){RequestOperationCancel();return;}settings.OnboardingCompleted=true;settingsStore.Save(settings);dialog.Close();}));
         void Text(string value)=>content.Children.Add(new TextBlock{Text=value,TextWrapping=TextWrapping.Wrap});
         void Render()
         {
@@ -46,7 +46,7 @@ public sealed partial class MainWindow
                 {
                     var definitions=SetupPlan.RequiredEmulators(allGames.Select(g=>g.System),settings);
                     await BusyAsync(async token=>{foreach(var definition in definitions){var executable=settings.EmulatorPaths.GetValueOrDefault(definition.Id);if(executable==null||!File.Exists(executable))await InstallManagedAsync(definition.Id,token);}if(definitions.Any(e=>e.Id=="retroarch"))await InstallManagedAsync("retroarch-cores",token);status.Text="Benötigte Emulatoren und Cores eingerichtet.";});Render();feedback.Text=status.Text;
-                }));content.Children.Add(ActionButton("Download abbrechen",()=>operation?.Cancel()));
+                }));content.Children.Add(ActionButton("Download abbrechen",RequestOperationCancel));
                 content.Children.Add(AsyncButton("Eigene BIOS-Dateien importieren",async()=>{var files=await new ControllerPicker(dialog).OpenFilePathsAsync("Eigene BIOS-/Firmware-Dateien");if(files.Length==0)return;await ImportFirmwareFilesAsync(files);Render();feedback.Text=status.Text;}));
                 foreach(var system in allGames.Select(g=>g.System).Distinct().Order())Text(system+": "+(SetupPlan.FirmwareHint(system,dataDir,settings)??"Keine fehlende Pflicht-Firmware erkannt."));Text("BIOS-Dateien werden nicht heruntergeladen. Falls du sie noch nicht hast, kannst du die Einrichtung später fortsetzen. Fehlende Emulatoren werden mit aktivierter automatischer Einrichtung beim ersten Spielstart nachgeladen.");
             }
@@ -57,8 +57,8 @@ public sealed partial class MainWindow
                 foreach(var system in allGames.Select(g=>g.System).Distinct().Order()){var definition=EmulatorCatalog.Known.FirstOrDefault(e=>e.Systems.Contains(system));var installed=definition!=null&&File.Exists(settings.EmulatorPaths.GetValueOrDefault(definition.Id));Text(system+": "+(installed?"Emulator vorhanden":"Emulator beim ersten Start einrichten")+(SetupPlan.FirmwareHint(system,dataDir,settings) is{} hint?" · "+hint:""));}
             }
         }
-        var timer=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(250)};timer.Tick+=(_,_)=>{var connected=Gamepad.Read();pad.Text=connected.Length==0?"Controller: noch nicht verbunden":"Controller: "+connected.Length+" verbunden · "+string.Join(", ",connected.Select(Gamepad.Label));if(operation!=null)feedback.Text=status.Text;};
-        dialog.Opened+=(_,_)=>timer.Start();dialog.Closed+=(_,_)=>timer.Stop();dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;operation.Cancel();feedback.Text="Vorgang wird abgebrochen …";}};Render();await dialog.ShowDialog(this);
+        var timer=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(250)};timer.Tick+=(_,_)=>{var connected=Gamepad.Read();pad.Text=connected.Length==0?"Controller: noch nicht verbunden":"Controller: "+connected.Length+" verbunden · "+string.Join(", ",connected.Select(Gamepad.Label));};
+        dialog.Opened+=(_,_)=>timer.Start();dialog.Closed+=(_,_)=>timer.Stop();dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;RequestOperationCancel();feedback.Text="Vorgang wird abgebrochen …";}};Render();await dialog.ShowDialog(this);
     }
 }
 

@@ -63,7 +63,7 @@ public sealed partial class MainWindow
             });
             if(!completed)message.Text=status.Text;
         }));
-        panel.Children.Add(ActionButton("Sicherungsvorgang abbrechen",()=>operation?.Cancel()));
+        panel.Children.Add(ActionButton("Sicherungsvorgang abbrechen",RequestOperationCancel));
         panel.Children.Add(ActionButton("Wiederhergestellten Ordner öffnen",()=>{if(restored!=null)OpenPath(restored);else message.Text="Bitte zuerst eine Datensicherung wiederherstellen.";}));
         panel.Children.Add(AsyncButton("Mit wiederhergestellter Bibliothek neu starten",async()=>
         {

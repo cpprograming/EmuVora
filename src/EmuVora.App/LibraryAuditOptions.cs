@@ -41,7 +41,7 @@ public sealed partial class MainWindow
                     if (matches.SelectedItem is not ContentMatch match) { mergeStatus.Text = "Bitte eine Gruppe mit gleichen Datei-Inhalten auswählen."; return; }
                     if (await ReviewDuplicateMergeAsync(match, review, mergeStatus)) matches.ItemsSource = matches.Items.Cast<ContentMatch>().Where(m => m != match).ToArray();
                 }));
-                result.Children.Add(ActionButton("Zusammenführung abbrechen", () => operation?.Cancel()));
+                result.Children.Add(ActionButton("Zusammenführung abbrechen", RequestOperationCancel));
                 result.Children.Add(ActionButton("Schließen", () => review.Close())); await review.ShowDialog(dialog);
             }));
             content.Children.Add(AsyncButton("Mehrdisc-Playlist vorbereiten", async () =>
@@ -49,7 +49,7 @@ public sealed partial class MainWindow
                 if (list.SelectedItem is not LibraryAuditGroup selected || selected.Kind != "Mehrdisc-Kandidat") { message.Text = "Bitte einen Mehrdisc-Kandidaten auswählen."; return; }
                 await PrepareDiscPlaylistAsync(selected, dialog, message);
             }));
-            content.Children.Add(ActionButton("Prüfung abbrechen", () => operation?.Cancel()));
+            content.Children.Add(ActionButton("Prüfung abbrechen", RequestOperationCancel));
             content.Children.Add(ActionButton("Schließen", () => dialog.Close()));
             await dialog.ShowDialog(owner);
         }));
