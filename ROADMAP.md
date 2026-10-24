@@ -2,7 +2,15 @@
 
 Stand: 24. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.103](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.103).
+Aktueller geprüfter Release: [0.14.105](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.105).
+
+## 0.14.105 – Saturn und Dreamcast (abgeschlossen)
+
+- [x] CHD/CUE-Playlists für Saturn/Beetle Saturn und Dreamcast/Flycast nach bestätigter Vorschau erstellen.
+- [x] Konsolenzuordnung in Playlist-Karte und erneutem Scan erhalten; vorhandene Disc-Metadaten bewahren.
+- [x] Nummerierung, CUE-Tracks, Abbruch und Vorschau für alle drei Systeme prüfen; GDI/CDI und unbestätigte Systeme auslassen.
+- [x] 277 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden.
+- [ ] Weitere Disc-Formate und Playlist-Systeme ergänzen; echte Spiel-/Disc-Wechsel separat testen.
 
 ## 0.14.103 – Bestätigte Duplikate (abgeschlossen)
 
@@ -19,7 +27,8 @@ Aktueller geprüfter Release: [0.14.103](https://github.com/cpprograming/EmuVora
 - [x] Geänderte Dateien, unvollständige Disc-Nummern, ungeeignete CUE-Verweise und bestehende Ziele abweisen; Spielstandsnamenswechsel erklären.
 - [x] 246 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; neuen Dialog visuell geprüft.
 - [x] Bestätigte Duplikate mit Auswahl, Metadatenübernahme, Sicherung und Wiederaufnahme zusammenführen (ab 0.14.103).
-- [ ] Weitere Playlist-Systeme ergänzen.
+- [x] Saturn-/Dreamcast-Playlists für CHD/CUE ergänzen (ab 0.14.105).
+- [ ] Weitere Formate und Playlist-Systeme ergänzen.
 
 ## 0.14.98 – Bibliotheksprüfung (Prüfungsübersicht abgeschlossen)
 
@@ -28,7 +37,8 @@ Aktueller geprüfter Release: [0.14.103](https://github.com/cpprograming/EmuVora
 - [x] 228 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Dialog zusätzlich mit einer privaten Bibliothekskopie geprüft.
 - [x] Inhaltsprüfung per SHA-256 und bestätigte PS1-Playlist-Erstellung für CHD/CUE implementieren (ab 0.14.100).
 - [x] Zusammenführen mit Metadatenübernahme und Sicherung ergänzen (ab 0.14.103).
-- [ ] Weitere Playlist-Systeme ergänzen.
+- [x] Saturn-/Dreamcast-Playlists für CHD/CUE ergänzen (ab 0.14.105).
+- [ ] Weitere Formate und Playlist-Systeme ergänzen.
 
 ## 0.14.94 – Verschobene ROM-Ordner (abgeschlossen)
 
@@ -134,7 +144,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [x] Doppelte Einträge und PS1-Mehrdisc-Spiele mit Vorschau verwalten (ab 0.14.103).
-  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 SHA-256-Vergleich und PS1-Playlists mit Vorschau. Bestätigte Duplikate ab 0.14.103 zusammenführen. Im Entwicklungsstand Saturn-/Dreamcast-Playlists für CHD/CUE ergänzen; weitere Formate/Systeme bleiben offen.
+  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 SHA-256-Vergleich und PS1-Playlists mit Vorschau. Bestätigte Duplikate ab 0.14.103 zusammenführen. Ab 0.14.105 Saturn-/Dreamcast-Playlists für CHD/CUE erstellen; weitere Formate/Systeme bleiben offen.
 - [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 
