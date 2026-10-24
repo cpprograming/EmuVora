@@ -16,7 +16,7 @@ public static class EmulatorLanguage
         {
             case "retroarch":
                 Set("retroarch.cfg",new(){{"",new(){{"user_language","4"}}}});
-                Set("retroarch-core-options.cfg",new(){{"",new(){{"flycast_language","\"German\""},{"desmume_firmware_language","\"German\""}}}});break;
+                Set("retroarch-core-options.cfg",new(){{"",new(){{"reicast_language","\"German\""},{"desmume_firmware_language","\"German\""}}}});break;
             case "duckstation":Set("settings.ini",new(){{"Main",new(){{"Language","de"}}}});break;
             case "pcsx2":Set("inis/PCSX2.ini",new(){{"UI",new(){{"Language","de-DE"}}}});break;
             case "dolphin":Set("User/Config/Dolphin.ini",new(){{"Interface",new(){{"LanguageCode","de"}}},{"Core",new(){{"SelectedLanguage","1"}}}});break;

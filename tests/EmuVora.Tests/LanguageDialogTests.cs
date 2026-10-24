@@ -18,7 +18,7 @@ public class LanguageDialogTests
         using var dir=new TestDirectory();var exe=dir.File("emulator/program.exe");var file=dir.File("emulator/"+relative,"; original\n[Unrelated]\nCustom = keep\n");
         EmulatorLanguage.Apply(id,exe);var first=File.ReadAllText(file);Assert.Contains(expected,first);Assert.Contains("Custom = keep",first);Assert.Equal("; original\n[Unrelated]\nCustom = keep\n",File.ReadAllText(file+".before-german.bak"));
         EmulatorLanguage.Apply(id,exe);Assert.Equal(first,File.ReadAllText(file));
-        if(id=="retroarch"){var cores=File.ReadAllText(Path.Combine(dir.Path,"emulator/retroarch-core-options.cfg"));Assert.Contains("flycast_language = \"German\"",cores);Assert.Contains("desmume_firmware_language = \"German\"",cores);}
+        if(id=="retroarch"){var cores=File.ReadAllText(Path.Combine(dir.Path,"emulator/retroarch-core-options.cfg"));Assert.Contains("reicast_language = \"German\"",cores);Assert.Contains("desmume_firmware_language = \"German\"",cores);}
         if(id=="dolphin")Assert.Contains("SelectedLanguage = 1",first);
         if(id=="ppsspp")Assert.Contains("GameLanguage = 4",first);
         if(id=="pcsx2")Assert.DoesNotContain("BIOS =",first);
