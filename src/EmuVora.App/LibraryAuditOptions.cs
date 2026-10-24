@@ -19,7 +19,7 @@ public sealed partial class MainWindow
             if (!await BusyAsync(async token => groups = await Task.Run(() => LibraryAudit.Inspect(snapshot, token), token)) || groups == null || isClosed || !owner.IsVisible) return;
             var content = new StackPanel { Spacing = 14, Margin = new(24) };
             content.Children.Add(new TextBlock { Text = $"{groups.Count} Gruppen zur Prüfung. Es wurde nichts verändert.", TextWrapping = TextWrapping.Wrap });
-            content.Children.Add(new TextBlock { Text = "Eine Gruppe auswählen und deren Dateien per SHA-256 vergleichen oder einen PS1-Disc-Satz als neue Playlist vorbereiten. Verweisdateien (z. B. CUE/M3U) werden beim Inhaltsvergleich ausgelassen. Die Prüfung gilt für die Datei-Bytes, nicht für unterschiedliche Container desselben Spiels.", TextWrapping = TextWrapping.Wrap });
+            content.Children.Add(new TextBlock { Text = "Eine Gruppe auswählen und deren Dateien per SHA-256 vergleichen oder einen Disc-Satz für PS1, Saturn oder Dreamcast als neue Playlist vorbereiten. Verweisdateien (z. B. CUE/M3U) werden beim Inhaltsvergleich ausgelassen. Die Prüfung gilt für die Datei-Bytes, nicht für unterschiedliche Container desselben Spiels.", TextWrapping = TextWrapping.Wrap });
             var list = new ListBox { Height = 240, ItemsSource = groups, ItemTemplate = new FuncDataTemplate<LibraryAuditGroup>((group, _) => new TextBlock { Text = group == null ? "" : $"{group.Kind} · {group.System}\n{group.Title}\n" + string.Join("\n", group.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) };
             content.Children.Add(list);
             var dialog = Dialog("Duplikate und Mehrdisc-Spiele", content);
@@ -44,7 +44,7 @@ public sealed partial class MainWindow
                 result.Children.Add(ActionButton("Zusammenführung abbrechen", () => operation?.Cancel()));
                 result.Children.Add(ActionButton("Schließen", () => review.Close())); await review.ShowDialog(dialog);
             }));
-            content.Children.Add(AsyncButton("PS1-Playlist vorbereiten", async () =>
+            content.Children.Add(AsyncButton("Mehrdisc-Playlist vorbereiten", async () =>
             {
                 if (list.SelectedItem is not LibraryAuditGroup selected || selected.Kind != "Mehrdisc-Kandidat") { message.Text = "Bitte einen Mehrdisc-Kandidaten auswählen."; return; }
                 await PrepareDiscPlaylistAsync(selected, dialog, message);
@@ -63,8 +63,8 @@ public sealed partial class MainWindow
         if (!await BusyAsync(async token => plan = await Task.Run(() => LibraryContent.PreviewPlaylist(group, token), token)) || plan == null || isClosed || !owner.IsVisible) return;
         var content = new StackPanel { Spacing = 14, Margin = new(24) };
         content.Children.Add(new TextBlock { Text = "Neue Playlist:\n" + plan.Path + "\n\nDisc-Reihenfolge:\n" + plan.Content, TextWrapping = TextWrapping.Wrap });
-        content.Children.Add(new TextBlock { Text = "Unterstützt zunächst PS1 mit CHD/CUE und DuckStation oder RetroArch/Beetle PSX. Discs müssen vollständig nummeriert sein. Bitte Reihenfolge selbst prüfen. Emulatorprofile werden nicht verändert.\n\nWichtig: Der neue Playlist-Name kann einen anderen Spielstands-/Memory-Card-Namen verwenden. Vorhandene Spielstände ggf. im Emulator zuordnen. EmuVora verschiebt oder benennt keine Spielstände um.\n\nEs entsteht eine zusätzliche Bibliothekskarte ohne bisherigen Verlauf. Die einzelnen Discs und ihre Favoriten, Cover und Verläufe bleiben erhalten. Bestehende Playlists werden nicht überschrieben.", TextWrapping = TextWrapping.Wrap });
-        var review = Dialog("PS1-Playlist erstellen", content);
+        content.Children.Add(new TextBlock { Text = $"{group.System} · CHD/CUE · {LibraryContent.PlaylistEmulator(group.System)}. Discs müssen vollständig nummeriert sein. Bitte Reihenfolge selbst prüfen. Eigene Core- und Emulatorprofile werden nicht verändert. GDI/CDI und rohe BIN-Tracks werden hier nicht gebündelt.\n\nWichtig: Der neue Playlist-Name kann einen anderen Spielstands-/Memory-Card-Namen verwenden. Vorhandene Spielstände ggf. im Emulator zuordnen. EmuVora verschiebt oder benennt keine Spielstände um.\n\nEs entsteht eine zusätzliche Bibliothekskarte ohne bisherigen Verlauf. Die einzelnen Discs und ihre Favoriten, Cover und Verläufe bleiben erhalten. Bestehende Playlists werden nicht überschrieben.", TextWrapping = TextWrapping.Wrap });
+        var review = Dialog(group.System + "-Playlist erstellen", content);
         content.Children.Add(ActionButton("Playlist erstellen und hinzufügen", () => review.Close(true)));
         content.Children.Add(ActionButton("Abbrechen", () => review.Close(false)));
         if (!await review.ShowDialog<bool>(owner) || isClosed || operation != null || !CanBackUp()) return;

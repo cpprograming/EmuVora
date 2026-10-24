@@ -76,4 +76,16 @@ public class LibraryContentTests
         using var dir = new TestDirectory(); var a = GameFile(dir, "a.chd", "a", "Game (Disc 1 of 3)"); var b = GameFile(dir, "b.chd", "b", "Game (Disc 2 of 3)");
         Assert.Throws<IOException>(() => LibraryContent.PreviewPlaylist(Discs(a, b)));
     }
+    [Theory] [InlineData("Saturn", ".chd")] [InlineData("Saturn", ".cue")] [InlineData("Dreamcast", ".chd")] [InlineData("Dreamcast", ".cue")]
+    public void AdditionalSystemsKeepTheirPlatformAndValidateCueTracks(string system, string extension)
+    {
+        using var dir = new TestDirectory(); var a = GameFile(dir, system + "/Game (Disc 1)" + extension, extension == ".cue" ? "FILE one.bin BINARY" : "disc one", "Game (Disc 1)", system); var b = GameFile(dir, system + "/Game (Disc 2)" + extension, extension == ".cue" ? "FILE two.bin BINARY" : "disc two", "Game (Disc 2)", system); var group = Discs(a, b);
+        if (extension == ".cue") { Assert.ThrowsAny<IOException>(() => LibraryContent.PreviewPlaylist(group)); dir.File(system + "/one.bin", "track one"); dir.File(system + "/two.bin", "track two"); }
+        var plan = LibraryContent.PreviewPlaylist(group); var game = LibraryContent.CreatePlaylist(plan); Assert.Equal(system, game.System); Assert.Equal(system, Assert.Single(RomScanner.Scan(Path.Combine(dir.Path, system))).System); Assert.True(File.Exists(a.Path)); Assert.True(File.Exists(b.Path)); Assert.Contains("Disc 1", File.ReadAllLines(game.Path)[0]);
+    }
+    [Theory] [InlineData("Dreamcast", ".gdi")] [InlineData("Dreamcast", ".cdi")] [InlineData("Saturn", ".bin")] [InlineData("PC-FX", ".chd")] [InlineData("PC Engine CD", ".cue")]
+    public void OtherFormatsAndUnverifiedSystemsRemainRejected(string system, string extension)
+    {
+        using var dir = new TestDirectory(); var a = GameFile(dir, "a" + extension, "one", "Game (Disc 1)", system); var b = GameFile(dir, "b" + extension, "two", "Game (Disc 2)", system); Assert.Throws<IOException>(() => LibraryContent.PreviewPlaylist(Discs(a, b)));
+    }
 }

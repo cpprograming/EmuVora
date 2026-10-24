@@ -25,22 +25,23 @@ public class LibraryContentUiTests
         new SettingsStore(Path.Combine(dir.Path, "settings.json")).Save(new() { OnboardingCompleted = true, AutoDownloadCovers = false, CheckAppUpdatesOnStartup = false, CheckUpdatesOnStartup = false });
         var window = new MainWindow(dir.Path); window.Show(); Render(window); return window;
     }
-    [AvaloniaFact] public async Task PlaylistRequiresReviewAndPreservesIndividualMetadata()
+    [AvaloniaTheory] [InlineData("PS1")] [InlineData("Saturn")] [InlineData("Dreamcast")]
+    public async Task PlaylistRequiresReviewAndPreservesIndividualMetadata(string system)
     {
         using var dir = new TestDirectory();
-        var games = new[] { new Game("Game (Disc 1)", "PS1", Path.GetFullPath(dir.File("PS1/Game (Disc 1).chd", "one"))), new Game("Game (Disc 2)", "PS1", Path.GetFullPath(dir.File("PS1/Game (Disc 2).chd", "two"))) };
+        var games = new[] { new Game("Game (Disc 1)", system, Path.GetFullPath(dir.File(system + "/Game (Disc 1).chd", "one"))), new Game("Game (Disc 2)", system, Path.GetFullPath(dir.File(system + "/Game (Disc 2).chd", "two"))) };
         var store = new LibraryStore(Path.Combine(dir.Path, "library.db")); store.Restore(games.Select(g => g with { Favorite = true, PlayCount = 7, LastPlayed = DateTimeOffset.UtcNow })); var before = store.GetAll().ToArray();
         var group = Assert.Single(LibraryAudit.Inspect(before)); var message = new TextBlock(); var window = WindowFor(dir);
         Task Prepare() => (Task)typeof(MainWindow).GetMethod("PrepareDiscPlaylistAsync", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, [group, window, message])!;
         try
         {
-            var task = Prepare(); var dialog = await NextDialog(window); var target = Path.Combine(dir.Path, "PS1/Game.m3u"); Assert.False(File.Exists(target));
+            var task = Prepare(); var dialog = await NextDialog(window); var target = Path.Combine(dir.Path, system + "/Game.m3u"); Assert.False(File.Exists(target)); Assert.Equal(system + "-Playlist erstellen", dialog.Title);
             Assert.Contains(dialog.GetVisualDescendants().OfType<TextBlock>(), t => t.Text?.Contains("Spielstands-/Memory-Card-Namen") == true);
             Click(dialog, "Abbrechen"); await task; Assert.False(File.Exists(target)); Assert.Equal(before, store.GetAll());
             task = Prepare(); dialog = await NextDialog(window);
-            using (var frame = dialog.CaptureRenderedFrame()) { Assert.NotNull(frame); var output = Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS"); if (output != null) { Directory.CreateDirectory(output); frame.Save(Path.Combine(output, "PS1-playlist-review.png")); } }
+            using (var frame = dialog.CaptureRenderedFrame()) { Assert.NotNull(frame); var output = Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS"); if (output != null) { Directory.CreateDirectory(output); frame.Save(Path.Combine(output, system + "-playlist-review.png")); } }
             Click(dialog, "Playlist erstellen und hinzufügen"); await task;
-            Assert.True(File.Exists(target)); var after = store.GetAll(); Assert.Equal(3, after.Count); Assert.All(before, game => Assert.Contains(game, after)); Assert.All(games, game => Assert.True(File.Exists(game.Path)));
+            Assert.True(File.Exists(target)); var after = store.GetAll(); Assert.Equal(3, after.Count); Assert.All(after, game => Assert.Equal(system, game.System)); Assert.All(before, game => Assert.Contains(game, after)); Assert.All(games, game => Assert.True(File.Exists(game.Path)));
         }
         finally { window.Close(); }
     }
