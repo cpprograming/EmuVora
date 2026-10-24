@@ -1,15 +1,23 @@
 # EmuVora – Roadmap
 
-Stand: 23. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 24. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.98](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.98).
+Aktueller geprüfter Release: [0.14.100](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.100).
+
+## 0.14.100 – Datei-Inhalte und PS1-Playlists (abgeschlossen)
+
+- [x] Ausgewählte Dateien per SHA-256 vergleichen; leere/fehlende/gesperrte Dateien melden und reine Verweisdateien auslassen.
+- [x] PS1-M3U aus nummerierten CHD/CUE-Discs nach Vorschau erstellen und als zusätzliche Karte importieren; vorhandene Discs und Metadaten behalten.
+- [x] Geänderte Dateien, unvollständige Disc-Nummern, ungeeignete CUE-Verweise und bestehende Ziele abweisen; Spielstandsnamenswechsel erklären.
+- [x] 246 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; neuen Dialog visuell geprüft.
+- [ ] Metadatenbewahrendes Zusammenführen und weitere Playlist-Systeme bleiben Folgearbeiten.
 
 ## 0.14.98 – Bibliotheksprüfung (Prüfungsübersicht abgeschlossen)
 
 - [x] Gleiche Titel als ungeprüfte Kandidaten und explizit nummerierte Discs im selben Ordner anzeigen; Editionen und Regionen getrennt halten.
 - [x] Prüfung abbrechbar im Hintergrund ausführen; ROM-Dateien und Bibliotheksmetadaten unverändert lassen.
 - [x] 228 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Dialog zusätzlich mit einer privaten Bibliothekskopie geprüft.
-- [x] Inhaltsprüfung per SHA-256 und bestätigte PS1-Playlist-Erstellung für CHD/CUE implementieren (Entwicklungsstand).
+- [x] Inhaltsprüfung per SHA-256 und bestätigte PS1-Playlist-Erstellung für CHD/CUE implementieren (ab 0.14.100).
 - [ ] Zusammenführen mit Erhalt aller Metadaten und weitere Playlist-Systeme ergänzen.
 
 ## 0.14.94 – Verschobene ROM-Ordner (abgeschlossen)
@@ -116,7 +124,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
-  - Prüfungsübersicht ab 0.14.98; im Entwicklungsstand ergänzt um SHA-256-Vergleich und PS1-Playlists mit Vorschau. Automatisches Zusammenführen und weitere Playlist-Systeme bleiben offen.
+  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 ergänzt um SHA-256-Vergleich und PS1-Playlists mit Vorschau. Automatisches Zusammenführen und weitere Playlist-Systeme bleiben offen.
 - [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 

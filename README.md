@@ -2,11 +2,11 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.98](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.98)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.100](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.100)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
-Unter **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** werden gleiche Titel pro System und nummerierte Disc-Sätze im selben Ordner angezeigt. Neu im Entwicklungsstand: ausgewählte Dateien per SHA-256 vergleichen und PS1-Playlists aus CHD/CUE nach bestätigter Vorschau erstellen. Dateiverweise werden beim Inhaltsvergleich ausgelassen. Einzelne Discs, Favoriten und Verläufe bleiben erhalten; es wird nichts automatisch gelöscht oder zusammengeführt. Vorhandene Spielstände können im Emulator eine Zuordnung zum neuen Playlist-Namen benötigen. [Anleitung und Grenzen](LIBRARY_AND_DISPLAY.md).
+Unter **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** werden gleiche Titel pro System und nummerierte Disc-Sätze im selben Ordner angezeigt. Neu ab 0.14.100: ausgewählte Dateien per SHA-256 vergleichen und PS1-Playlists aus CHD/CUE nach bestätigter Vorschau erstellen. Dateiverweise werden beim Inhaltsvergleich ausgelassen. Einzelne Discs, Favoriten und Verläufe bleiben erhalten; es wird nichts automatisch gelöscht oder zusammengeführt. Vorhandene Spielstände können im Emulator eine Zuordnung zum neuen Playlist-Namen benötigen. [Anleitung und Grenzen](LIBRARY_AND_DISPLAY.md).
 
 - **[Windows-Setup herunterladen](https://github.com/cpprograming/EmuVora/releases/latest/download/EmuVora-Setup.exe)** – Installationslaufwerk und Ordner wählen; eigene Desktop- und Startmenü-Verknüpfungen sind optional.
 - **[Portable Windows-Version herunterladen](https://github.com/cpprograming/EmuVora/releases/latest/download/EmuVora-win-x64.zip)** – ZIP vollständig entpacken und `EmuVora.App.exe` starten.
