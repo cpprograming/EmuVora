@@ -33,9 +33,16 @@ public sealed partial class MainWindow
                 message.Text = $"{check.CheckedFiles} Dateien geprüft; {check.Matches.Count} Gruppen mit gleichen Datei-Bytes.";
                 var result = new StackPanel { Spacing = 14, Margin = new(24) };
                 result.Children.Add(new TextBlock { Text = $"{check.CheckedFiles} Dateien vollständig geprüft · {check.Matches.Count} Gruppen mit gleichen Datei-Bytes.\nErgebnis gilt zum Prüfzeitpunkt. Nichts wurde gelöscht oder zusammengeführt.", TextWrapping = TextWrapping.Wrap });
-                result.Children.Add(new ListBox { Height = 230, ItemsSource = check.Matches, ItemTemplate = new FuncDataTemplate<ContentMatch>((match, _) => new TextBlock { Text = match == null ? "" : $"SHA-256: {match.Sha256}\n{match.Length:N0} Bytes\n" + string.Join("\n", match.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) });
+                var matches = new ListBox { Height = 230, ItemsSource = check.Matches, ItemTemplate = new FuncDataTemplate<ContentMatch>((match, _) => new TextBlock { Text = match == null ? "" : $"SHA-256: {match.Sha256}\n{match.Length:N0} Bytes\n" + string.Join("\n", match.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) }; result.Children.Add(matches);
                 if (check.Notes.Count > 0) result.Children.Add(new TextBlock { Text = string.Join("\n", check.Notes), TextWrapping = TextWrapping.Wrap });
-                var review = Dialog("Datei-Inhalte vergleichen", result); result.Children.Add(ActionButton("Schließen", () => review.Close())); await review.ShowDialog(dialog);
+                var review = Dialog("Datei-Inhalte vergleichen", result); var mergeStatus = new TextBlock { TextWrapping = TextWrapping.Wrap }; result.Children.Add(mergeStatus);
+                result.Children.Add(AsyncButton("Ausgewählte Duplikate zusammenführen", async () =>
+                {
+                    if (matches.SelectedItem is not ContentMatch match) { mergeStatus.Text = "Bitte eine Gruppe mit gleichen Datei-Inhalten auswählen."; return; }
+                    if (await ReviewDuplicateMergeAsync(match, review, mergeStatus)) matches.ItemsSource = matches.Items.Cast<ContentMatch>().Where(m => m != match).ToArray();
+                }));
+                result.Children.Add(ActionButton("Zusammenführung abbrechen", () => operation?.Cancel()));
+                result.Children.Add(ActionButton("Schließen", () => review.Close())); await review.ShowDialog(dialog);
             }));
             content.Children.Add(AsyncButton("PS1-Playlist vorbereiten", async () =>
             {

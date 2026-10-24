@@ -10,7 +10,8 @@ Aktueller geprüfter Release: [0.14.100](https://github.com/cpprograming/EmuVora
 - [x] PS1-M3U aus nummerierten CHD/CUE-Discs nach Vorschau erstellen und als zusätzliche Karte importieren; vorhandene Discs und Metadaten behalten.
 - [x] Geänderte Dateien, unvollständige Disc-Nummern, ungeeignete CUE-Verweise und bestehende Ziele abweisen; Spielstandsnamenswechsel erklären.
 - [x] 246 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; neuen Dialog visuell geprüft.
-- [ ] Metadatenbewahrendes Zusammenführen und weitere Playlist-Systeme bleiben Folgearbeiten.
+- [x] Bestätigte Duplikate mit Auswahl, Metadatenübernahme, Sicherung und Wiederaufnahme zusammenführen (Entwicklungsstand).
+- [ ] Weitere Playlist-Systeme ergänzen.
 
 ## 0.14.98 – Bibliotheksprüfung (Prüfungsübersicht abgeschlossen)
 
@@ -18,7 +19,8 @@ Aktueller geprüfter Release: [0.14.100](https://github.com/cpprograming/EmuVora
 - [x] Prüfung abbrechbar im Hintergrund ausführen; ROM-Dateien und Bibliotheksmetadaten unverändert lassen.
 - [x] 228 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Dialog zusätzlich mit einer privaten Bibliothekskopie geprüft.
 - [x] Inhaltsprüfung per SHA-256 und bestätigte PS1-Playlist-Erstellung für CHD/CUE implementieren (ab 0.14.100).
-- [ ] Zusammenführen mit Erhalt aller Metadaten und weitere Playlist-Systeme ergänzen.
+- [x] Zusammenführen mit Metadatenübernahme und Sicherung ergänzen (Entwicklungsstand).
+- [ ] Weitere Playlist-Systeme ergänzen.
 
 ## 0.14.94 – Verschobene ROM-Ordner (abgeschlossen)
 
@@ -124,7 +126,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 - [x] Eigene Sammlungen und Ansicht/Sortierung für neue Importe ergänzen (ab 0.14.92).
 - [ ] Doppelte Einträge und Mehrdisc-Spiele übersichtlicher verwalten.
-  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 ergänzt um SHA-256-Vergleich und PS1-Playlists mit Vorschau. Automatisches Zusammenführen und weitere Playlist-Systeme bleiben offen.
+  - Prüfungsübersicht ab 0.14.98; ab 0.14.100 SHA-256-Vergleich und PS1-Playlists mit Vorschau. Bestätigte Duplikate im Entwicklungsstand zusammenführen; weitere Playlist-Systeme bleiben offen.
 - [x] Umgezogene ROM-Ordner mit Vorschau neu zuordnen, ohne Favoriten und Verlauf zu verlieren (ab 0.14.94).
 - [x] Falsche Cover-Treffer mit Vorschau korrigieren, fehlende Bilder gesammelt anzeigen und eigene Cover schützen (ab 0.14.90).
 

@@ -121,6 +121,7 @@ public static class RomRelocation
                     token.ThrowIfCancellationRequested();using var command=db.CreateCommand();command.Transaction=tx;command.CommandText="UPDATE games SET path=$new WHERE path=$old COLLATE NOCASE";command.Parameters.AddWithValue("$old",change.OldPath);command.Parameters.AddWithValue("$new",change.NewPath);
                     if(command.ExecuteNonQuery()!=1)throw new IOException("Bibliothek wurde zwischenzeitlich geändert.");
                 }
+                DuplicateMerge.RelocateAliases(db,tx,oldRoot,newRoot,pathsByOld);
                 token.ThrowIfCancellationRequested();AtomicFile.WriteText(settingsFile,newJson);tx.Commit();
             }
             File.Delete(journalFile);return new(changes.Length,backup);

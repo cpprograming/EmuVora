@@ -20,6 +20,7 @@ public sealed class ManagedGameLauncher
         DataLocation.CheckAvailable(request.DataDirectory);
         // Serialize launches across ES-DE processes. Never execute commands from the stub.
         RomRelocation.Recover(request.DataDirectory);
+        DuplicateMerge.Recover(request.DataDirectory);
         using var launchLock=new FileStream(Path.Combine(request.DataDirectory,".game-launch.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None,1,FileOptions.DeleteOnClose);
         var store=new LibraryStore(Path.Combine(request.DataDirectory,"library.db"));var game=FindGame(request,store);
         if(!File.Exists(game.Path))throw new IOException("Die ROM-Datei ist nicht erreichbar: "+game.Path);

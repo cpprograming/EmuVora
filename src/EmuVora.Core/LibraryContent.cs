@@ -12,6 +12,7 @@ public record DiscPlaylistPlan(LibraryAuditGroup Group, string Path, string Cont
 public static class LibraryContent
 {
     private static readonly HashSet<string> IndexFiles = new(StringComparer.OrdinalIgnoreCase) { ".cue", ".m3u", ".gdi", ".ccd", ".toc", ".mds" };
+    internal static bool IsReferenceFile(string path) => IndexFiles.Contains(Path.GetExtension(path));
 
     public static async Task<ContentCheck> CompareAsync(IEnumerable<Game> games, CancellationToken token = default)
     {
