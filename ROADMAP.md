@@ -2,7 +2,15 @@
 
 Stand: 25. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.116](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.116).
+Aktueller geprüfter Release: [0.14.118](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.118).
+
+## 0.14.118 – Diagnose mit Vorschau (abgeschlossen)
+
+- [x] Bibliothekszahlen, Dateierreichbarkeit, Emulatoren, Cores und allgemeinen Firmwarestatus lesend prüfen; Monitor-/Bild-/Sprachvorgaben zusammenfassen.
+- [x] Nur festgelegte Angaben exportieren: keine privaten Spielnamen/Pfade, Gerätekennungen, BIOS-/ROM-Inhalte oder Protokolltexte.
+- [x] Schreibgeschützte Vorschau mit freiwilligem lokalem Export ohne automatische Übertragung ergänzen; Abbruch und vorhandene Originaldateien respektieren.
+- [x] 310 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; Vorschau visuell und Bericht mit 5.805 Einträgen lesend geprüft. [Anleitung](DIAGNOSTICS.md).
+- [ ] Hardwareabnahme, Monitorwechsel und praktische Controller-/Sprachtests weiterführen; die Diagnose ersetzt diese nicht.
 
 ## 0.14.116 – Deutsch und Startdialoge (abgeschlossen)
 
@@ -180,7 +188,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 ## 0.15 – Bild und Leistung
 
-- [x] Diagnosebericht mit Vorschau, allgemeinen Prüfergebnissen und freiwilligem lokalem Export ohne private Namen/Pfade oder automatische Übertragung ergänzen (Entwicklungsstand). [Anleitung](DIAGNOSTICS.md).
+- [x] Diagnosebericht mit Vorschau, allgemeinen Prüfergebnissen und freiwilligem lokalem Export ohne private Namen/Pfade oder automatische Übertragung ergänzen (ab 0.14.118). [Anleitung](DIAGNOSTICS.md).
 
 - [ ] 1080p, 1440p, 4K und mehrere Monitore praktisch testen.
 - [ ] Windows-Anzeigeskalierung und Bildschirmwechsel prüfen.
