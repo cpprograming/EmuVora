@@ -607,6 +607,7 @@ public sealed partial class MainWindow : Window
     {
         var panel=new StackPanel{Spacing=14,Margin=new(24)};
         panel.Children.Add(new TextBlock{Text="EmuVora · v"+AppVersion.ToString(3),FontSize=25,FontWeight=FontWeight.Bold});
+        panel.Children.Add(AsyncButton("Diagnosebericht anzeigen …",ShowDiagnosticsAsync));
         var automatic=new CheckBox{Content="Beim Start nach neuen EmuVora-Versionen suchen",IsChecked=settings.CheckAppUpdatesOnStartup};
         automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.CheckAppUpdatesOnStartup=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
         var message=new TextBlock{Text=appUpdateStatus.Text,TextWrapping=TextWrapping.Wrap};panel.Children.Add(message);

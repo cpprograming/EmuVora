@@ -1,0 +1,9 @@
+# Diagnosebericht
+
+Unter **Einstellungen → App-Updates → Diagnosebericht anzeigen …** entsteht zuerst eine schreibgeschützte Vorschau. Noch keine Datei wird gespeichert. **Bericht lokal speichern …** fragt nach einem Zielordner und erstellt dort eine neue Textdatei. Schließen oder Abbrechen speichert nichts. Es gibt keinen automatischen Upload.
+
+Enthalten sind ausschließlich festgelegte Angaben: EmuVora-/Laufzeitversion, Betriebssystemfamilie, Erstellzeit, Anzahl der Bibliothekseinträge und Titelgruppen, nicht erreichbare Spiele, vorhandene/fehlende Cover, Erreichbarkeit der fünf Emulatorprogramme, fehlende RetroArch-Cores, allgemeiner Firmwarestatus pro bekanntem System, aktuelle Monitorauflösung ohne Kennung sowie gewählte Bild-, Deutsch-, Einrichtungs-, Xbox- und TV-Vorgaben. Unbekannte Systemnamen werden durch einen allgemeinen Hinweis ersetzt. Bei einem aktuell gemeldeten Fehler steht nur dessen Vorhandensein im Bericht.
+
+Nicht enthalten sind Spielnamen, Datei-/Ordnerpfade, Benutzernamen, Gerätekennungen, Einstellungen als Rohdaten, ROM-/BIOS-Inhalte, Prüfsummen privater Dateien oder Protokoll-/Fehlertexte. Die technischen Fehlerdetails bleiben im lokalen Fehlerdialog. Ein Bericht kann daher gezielt um Angaben ergänzt werden, die du selbst teilen möchtest; die App versendet ihn nicht.
+
+Die Prüfung liest den aktuellen Bibliotheks-/Einstellungsstand und prüft lokale Dateierreichbarkeit und vorhandene Firmwarehinweise. Sie verändert keine Bibliothek, Einstellungen, ROMs, BIOS-Dateien oder Spielstände. Die Arbeit läuft abbrechbar im Hintergrund. Erreichbar bedeutet nicht ausführbar oder kompatibel: Firmware-/Controller-/Sprach-/Bildtests mit echten Spielen und Geräten bleiben erforderlich. Der Bericht erkennt nicht jede beschädigte Datei und bescheinigt keine BIOS-Echtheit.

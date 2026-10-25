@@ -52,7 +52,7 @@ jobs:
         run: dotnet publish src/EmuVora.App/EmuVora.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:Version=${{ env.APP_VERSION }} -o publish
       - name: Include installation script and documentation
         shell: pwsh
-        run: Copy-Item README.md, CHECKLIST.md, ROADMAP.md, DATA_LOCATIONS.md, BIOS_IMPORT.md, CONTROLLERS.md, TV_MODE.md, ROM_RECOGNITION.md, REPOSITORY_PLAN.md, GUIDED_SETUP.md, APP_UPDATES.md, BACKUPS.md, STORAGE_AND_THEMES.md, NATIVE_THEMES.md, LANGUAGE_AND_ERRORS.md, OPERATIONS_AND_ERRORS.md, ALEKFULL_ESDE.md, LIBRARY_AND_DISPLAY.md, SPONSORS.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
+        run: Copy-Item README.md, CHECKLIST.md, ROADMAP.md, DATA_LOCATIONS.md, BIOS_IMPORT.md, CONTROLLERS.md, TV_MODE.md, ROM_RECOGNITION.md, REPOSITORY_PLAN.md, GUIDED_SETUP.md, APP_UPDATES.md, BACKUPS.md, STORAGE_AND_THEMES.md, NATIVE_THEMES.md, LANGUAGE_AND_ERRORS.md, DIAGNOSTICS.md, OPERATIONS_AND_ERRORS.md, ALEKFULL_ESDE.md, LIBRARY_AND_DISPLAY.md, SPONSORS.md, LICENSE, THIRD_PARTY_NOTICES.md, Install-EmuVora.ps1, Install-EmuVora.cmd -Destination publish/
       - name: Verify selectable installation and update paths
         shell: pwsh
         run: ./scripts/test-installation.ps1
