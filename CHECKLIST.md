@@ -80,6 +80,8 @@ Abnahme: Die üblichen Abläufe funktionieren mit einem Xbox-Controller ohne fes
 
 ## 3. Einheitliche Oberfläche und TV-Modus
 
+- [x] Systemübersicht mit Suche/Filtern, lesender Zustandsprüfung, konkreter Downloadvorschau und Rückwegen zwischen Einrichtung und Bibliothek implementieren (Entwicklungsstand). [Anleitung](SYSTEM_CENTER.md).
+
 - [x] FluentAvaloniaUI 2.5.1 als gemeinsame Bedienelement-Basis mit Release 0.13.66 veröffentlicht ([PR #16](https://github.com/cpprograming/EmuVora/pull/16)); alle vier Farbschemata rendern automatisch geprüft. [TV-Anleitung](TV_MODE.md).
 
 - [ ] Abstände, Schriften, Farben, Schaltflächen und Dialoge durchgehend vereinheitlichen.

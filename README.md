@@ -6,6 +6,8 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 ## Download und Installation
 
+**Systemübersicht:** Einrichtungszustände, BIOS-/Core-Hinweise, fehlende Spiele/Cover und direkte Bibliotheksfilter an einem Ort. Fehlende Komponenten lassen sich für eine Konsole oder für die importierten Systeme nach konkreter Downloadvorschau einrichten; eigene funktionierende Pfade bleiben erhalten. [Abläufe und Grenzen](SYSTEM_CENTER.md).
+
 **Diagnose mit Vorschau:** Unter Einstellungen → App-Updates lässt sich ein Bericht zu Bibliothek, Emulatoren, Cores, Firmware und Bildvorgaben anzeigen und freiwillig lokal speichern. Er enthält keine Spielnamen, privaten Pfade oder Protokollinhalte und wird nicht hochgeladen. [Umfang und Grenzen](DIAGNOSTICS.md).
 
 **Deutsch und Startdialoge:** Die deutschen Sprachprofile für verwaltete Emulatoren und unterstützte Spielsysteme sind standardmäßig aktiv. Fehlendes BIOS erhält einen eigenen Importdialog; andere Fehler ein Fehlerfenster oder den Fehlerbereich des bereits geöffneten Dialogs. [Anleitung, Sprachumfang und Grenzen](LANGUAGE_AND_ERRORS.md).
