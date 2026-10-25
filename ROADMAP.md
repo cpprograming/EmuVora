@@ -161,6 +161,8 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 
 ## 0.13 – Einheitliche Oberfläche (Fluent/TV veröffentlicht, weitere Zustände offen)
 
+- [x] Zentrale Systemübersicht mit Suche, Einrichtungs-/Firmware-/Bibliotheksstatus, bestätigter Sammel-Einrichtung, direkten Bibliotheksaktionen und fest angeordneter Aktionsleiste implementieren (Entwicklungsstand). [Anleitung](SYSTEM_CENTER.md).
+
 - [x] Release 0.13.66 veröffentlicht, heruntergeladen und per Updater einschließlich SHA-256 geprüft; 138 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
 
 Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). FluentAvaloniaUI 2.5.1 als Bedienelement-Basis integriert; die vier Farbschemata und Controller-Raster sind automatisch geprüft. [TV-Modus](TV_MODE.md).

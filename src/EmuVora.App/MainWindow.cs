@@ -113,6 +113,7 @@ public sealed partial class MainWindow : Window
         var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());import.Classes.Add("primary-action");import.Classes.Add("accent");sidebar.Children.Add(import);operationButtons.Add(import);
         var rescan=AsyncButton("Ordner neu scannen",()=>RescanAsync());operationButtons.Add(rescan);
         var covers=AsyncButton("Fehlende Cover laden",()=>FetchAllCoversAsync());sidebar.Children.Add(covers);operationButtons.Add(covers);
+        var center=AsyncButton("Systemübersicht",ShowSystemCenterAsync);sidebar.Children.Add(center);operationButtons.Add(center);
         var preferences=AsyncButton("Einstellungen",()=>ShowSettingsAsync());StyleNavigation(preferences);sidebar.Children.Add(preferences);
         var tools=new StackPanel{Spacing=6};foreach(var name in new[]{"Konsole zuordnen","Fehlende Dateien"}){var item=ActionButton(name,()=>{view=name;Refresh();});viewButtons[name]=item;tools.Children.Add(item);}
         tools.Children.Add(rescan);tools.Children.Add(AsyncButton("Einrichtungsassistent",()=>ShowOnboardingAsync()));
@@ -323,8 +324,12 @@ public sealed partial class MainWindow : Window
         var dialog=Dialog("Spieldetails",panel);panel.Children.Add(ActionButton("Speichern",()=>{if(string.IsNullOrWhiteSpace(title.Text)||console.SelectedItem is not string system){status.Text="Titel und Konsole wählen.";return;}store.Update(game with {Title=title.Text.Trim(),System=system});if(aspect.SelectedIndex==0)settings.GameAspectRatios.Remove(game.Path);else settings.GameAspectRatios[game.Path]=aspect.SelectedIndex==1?"4:3":"16:9";settingsStore.Save(settings);Reload(game.Path);dialog.Close();}));await dialog.ShowDialog(this);
     }
     private Window Dialog(string title,Control content)
+        =>CreateDialog(title,content,true);
+    private Window FixedDialog(string title,Control content)
+        =>CreateDialog(title,content,false);
+    private Window CreateDialog(string title,Control content,bool scrollBody)
     {
-        var body=content is TabControl?content:new ScrollViewer{Content=content};var host=new Grid{RowDefinitions=new("*,Auto")};host.Children.Add(body);var notice=CreateOperationNotice(true);notice.Margin=new(24,0,24,16);Grid.SetRow(notice,1);host.Children.Add(notice);
+        var body=!scrollBody||content is TabControl?content:new ScrollViewer{Content=content};var host=new Grid{RowDefinitions=new("*,Auto")};host.Children.Add(body);var notice=CreateOperationNotice(true);notice.Margin=new(24,0,24,16);Grid.SetRow(notice,1);host.Children.Add(notice);
         var dialog=new Window {Title=title,Width=640,Height=640,MinWidth=520,MinHeight=220,WindowStartupLocation=WindowStartupLocation.CenterOwner,Content=host,RequestedThemeVariant=RequestedThemeVariant,Background=Background,Foreground=Foreground,FontSize=FontSize};WindowAppearance.Apply(dialog);ControllerUi.Attach(dialog);ControllerUi.SetBack(dialog,()=>{if(operation!=null)RequestOperationCancel();else dialog.Close();});
         dialog.Opened+=(_,_)=>{var screen=Screens.ScreenFromWindow(this);if(screen!=null){dialog.Width=Math.Min(dialog.Width,Math.Max(dialog.MinWidth,screen.WorkingArea.Width/screen.Scaling-32));dialog.Height=Math.Min(dialog.Height,Math.Max(dialog.MinHeight,screen.WorkingArea.Height/screen.Scaling-48));}};
         dialog.Opened+=(_,_)=>{openedDialogs++;dialogOpen=true;};dialog.Closed+=(_,_)=>{openedDialogs=Math.Max(0,openedDialogs-1);dialogOpen=openedDialogs>0;};return dialog;
@@ -589,7 +594,7 @@ public sealed partial class MainWindow : Window
         var folders=new ListBox {ItemsSource=settings.RomFolders.ToArray(),MaxHeight=150};panel.Children.Add(folders);
         panel.Children.Add(ActionButton("Ordner aus dem Neu-Scan entfernen",()=>{if(folders.SelectedItem is string folder){settings.RomFolders.Remove(folder);settingsStore.Save(settings);folders.ItemsSource=settings.RomFolders.ToArray();status.Text="Ordner aus dem Neu-Scan entfernt. Spiele und Dateien bleiben erhalten.";}}));
         var tabs=new TabControl{ItemsSource=new[]{new TabItem{Header="Bibliothek",Content=new ScrollViewer{Content=LibraryOptions()}},new TabItem{Header="Bild & Monitor",Content=new ScrollViewer{Content=DisplayOptions()}},new TabItem{Header="Darstellung",Content=new ScrollViewer{Content=themePanel}},new TabItem{Header="Emulatoren",Content=new ScrollViewer{Content=panel}},new TabItem{Header="App-Updates",Content=new ScrollViewer{Content=AppUpdateOptions()}},new TabItem{Header="Sicherung",Content=new ScrollViewer{Content=BackupOptions()}}},SelectedIndex=initialTab??(initialEmulator==null?0:3)};
-        var dialog=Dialog("EmuVora · Einstellungen",tabs);dialog.Width=760;dialog.Height=760;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;RequestOperationCancel();}};await dialog.ShowDialog(this);
+        var dialog=Dialog("EmuVora · Einstellungen",tabs);dialog.Width=760;dialog.Height=760;dialog.Closing+=(_,e)=>{if(operation!=null){e.Cancel=true;RequestOperationCancel();}};await dialog.ShowDialog(OwnedWindows.LastOrDefault(w=>w.IsActive)??this);
     }
     private async Task CheckAppUpdatesAsync(bool reportFailure=false)
     {
@@ -648,6 +653,7 @@ public sealed partial class MainWindow : Window
     private StackPanel LibraryOptions()
     {
         var panel=new StackPanel{Spacing=14,Margin=new(24)};panel.Children.Add(new TextBlock{Text="Deine Bibliothek",FontSize=25,FontWeight=FontWeight.Bold});panel.Children.Add(AsyncButton("Einrichtungsassistent öffnen",()=>ShowOnboardingAsync()));panel.Children.Add(DataDirectoryOptions());panel.Children.Add(RomRelocationOptions());panel.Children.Add(LibraryAuditOptions());panel.Children.Add(RecognitionOptions());
+        panel.Children.Add(AsyncButton("Systemübersicht öffnen",ShowSystemCenterAsync));
         var automatic=new CheckBox{Content="Fehlende Cover beim Start und nach einem Import automatisch laden",IsChecked=settings.AutoDownloadCovers};automatic.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.AutoDownloadCovers=automatic.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(automatic);
         var versions=new CheckBox{Content="Gleichnamige Spiele pro Konsole als Versionen bündeln (keine Dateien löschen)",IsChecked=settings.GroupGameVersions};versions.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.GroupGameVersions=versions.IsChecked==true;settingsStore.Save(settings);UpdateSystems();Refresh();});panel.Children.Add(versions);
         panel.Children.Add(new TextBlock{Text="Quelle: libretro-thumbnails auf GitHub, ohne Konto. Vorhandene Cover bleiben erhalten. Titelvarianten werden erkannt; ähnliche Spielnamen und Fortsetzungen werden nicht geraten. Nicht jeder Titel ist verfügbar.",TextWrapping=TextWrapping.Wrap});
