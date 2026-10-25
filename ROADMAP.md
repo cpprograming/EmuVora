@@ -2,7 +2,16 @@
 
 Stand: 25. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.118](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.118).
+Aktueller geprüfter Release: [0.14.120](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.120).
+
+## 0.14.120 – Systemzentrale (abgeschlossen)
+
+- [x] Status für alle 47 unterstützten und unzugeordnete importierte Systeme mit Suche, Filtern und Titel-/Datei-/Coverzahlen lesend anzeigen.
+- [x] Fehlende Emulatoren und Cores einzeln oder für die importierten Systeme nach konkreter Vorschau einrichten; gemeinsame Pakete bündeln und vor Ausführung erneut prüfen.
+- [x] Funktionierende eigene Pfade erhalten; BIOS-Import und Emulator-Einstellungen mit Rückkehr zur Übersicht verbinden.
+- [x] Direkte Bibliotheksfilter für Spiele und fehlende Cover ergänzen; feste Aktionsleiste, schmale Fenster und TV-Layout berücksichtigen.
+- [x] Konkurrierende Aktionen während der Arbeit sperren; Controller-Abbruch erhält die Übersicht. 318 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. [Anleitung](SYSTEM_CENTER.md).
+- [ ] Echte Controller-/Monitor-/Spieltests wie gewünscht später durchführen; weitere Spezialdialoge angleichen.
 
 ## 0.14.118 – Diagnose mit Vorschau (abgeschlossen)
 
@@ -161,7 +170,7 @@ In 0.11.61: Optionale BIOS-/Firmware-Sicherung ergänzt: persönliche importiert
 
 ## 0.13 – Einheitliche Oberfläche (Fluent/TV veröffentlicht, weitere Zustände offen)
 
-- [x] Zentrale Systemübersicht mit Suche, Einrichtungs-/Firmware-/Bibliotheksstatus, bestätigter Sammel-Einrichtung, direkten Bibliotheksaktionen und fest angeordneter Aktionsleiste implementieren (Entwicklungsstand). [Anleitung](SYSTEM_CENTER.md).
+- [x] Zentrale Systemübersicht mit Suche, Einrichtungs-/Firmware-/Bibliotheksstatus, bestätigter Sammel-Einrichtung, direkten Bibliotheksaktionen und fest angeordneter Aktionsleiste implementieren (ab 0.14.120). [Anleitung](SYSTEM_CENTER.md).
 
 - [x] Release 0.13.66 veröffentlicht, heruntergeladen und per Updater einschließlich SHA-256 geprüft; 138 Funktionstests, 5 Netzwerktests und Installer-Prüfungen bestanden.
 
