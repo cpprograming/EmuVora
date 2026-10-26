@@ -24,8 +24,9 @@ Der bestehende Import übernimmt Bilder, Logos und Farben und wählt Varianten a
 
 - [x] Gemeinsames Darstellungsmodell für Suche, Filter, Sortierung, Auswahl, Versionen und begrenzte Seiten ergänzen. Vorhandene Start-/Bearbeitungsaktionen werden gemeinsam verwendet.
 - [x] Cover-Raster und kompakte Liste mit vorhandener Detailspalte, gespeichertem Layouttyp und sitzungsbezogenen Scrollpositionen anbieten.
-- [ ] Horizontales Cover-Karussell auf derselben Grundlage ergänzen.
-- [ ] Eigenständige Konsolenauswahl mit großen Logos und optionalem Hintergrund anbieten; schnelle Seitenleisten-Navigation beibehalten.
+- [x] Horizontales Cover-Karussell auf derselben Grundlage ergänzen, Auswahl hervorheben und möglichst zentrieren; Größe der Fensterhöhe anpassen.
+- [x] Durchsuchbare Auswahl importierter Konsolen mit großen Logos und Titel-/Dateizahlen anbieten; schnelle Seitenleisten-Navigation beibehalten.
+- [ ] Konsolenauswahl um eigene Hintergrundoptionen und weitere native Layoutvarianten erweitern.
 - [ ] Seitenleistenbreite, Coverformat, Abstände, Detailposition und Informationsdichte über definierte Layout-Optionen steuern.
 - [ ] Responsive Regeln für schmale Fenster, Desktop und TV festlegen; Auswahl, Suchtext und Scrollposition beim Ansichtswechsel erhalten.
 - [ ] Gemeinsame Farb-, Abstands-, Schrift- und Fokusvorgaben für alle nativen Themes verwenden.

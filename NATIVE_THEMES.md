@@ -12,7 +12,15 @@ Beide Ansichten verwenden dieselbe Datenaufbereitung für Suche, Konsolenfilter,
 
 Controller-Auf/Ab bewegt sich in der Liste jeweils um einen Titel; Seitenwechsel und Spielen mit A, Coververwaltung mit X sowie Favoriten mit Y bleiben erhalten. Über den Bedienmodus (Back/View) ist auch die Layout-Auswahl erreichbar. Maus-Doppelklick und Enter starten weiterhin das ausgewählte Spiel. Es werden höchstens 48 Titel pro Seite bereitgestellt; die Liste erzeugt ihre sichtbaren Zeilen bedarfsweise. Bibliotheksdaten und ROM-Dateien werden durch einen Layoutwechsel nicht verändert.
 
-Dies ist die gemeinsame Grundlage für weitere native Ansichten. Karussell, eigenständige Konsolenauswahl und die Übernahme fremder Theme-Layouts folgen separat. Der bestehende Theme-Import verändert weiterhin nur die unten beschriebenen Eigenschaften.
+## Cover-Karussell und Konsolenauswahl
+
+**Cover-Karussell** ist die dritte Auswahl unter der Suche. Die Cover stehen in einer horizontalen Reihe, die ausgewählte Karte ist hervorgehoben und wird möglichst mittig angezeigt. An den Enden einer Seite begrenzt der verfügbare Inhalt die Zentrierung. Links/Rechts am Controller oder an der Tastatur bewegt sich durch die Reihe; auch Auf/Ab bewegt jeweils einen Titel. Seitenwechsel am Rand behalten die Reihenfolge bei. Titel, Versionen, Favoriten, Filter und Spielaktionen verwenden dieselbe Bibliotheksgrundlage wie Raster und Liste. Auf einer neuen Karussellseite ohne bisherige Auswahl wird der erste Titel markiert.
+
+Die Karussell-Covergröße folgt der verfügbaren Fensterhöhe und wird beim Verkleinern neu berechnet. Sehr niedrige Fenster können zusätzlich vertikales Scrollen benötigen. Es bleiben höchstens 48 Titel pro Seite; sichtbare Karten werden bedarfsweise erzeugt. Der Layouttyp wird gespeichert, die bisherigen sitzungsbezogenen Scrollregeln gelten auch für das Karussell.
+
+Über **Konsolen auswählen** in der linken Navigation eine durchsuchbare Übersicht der bereits importierten Systeme mit großen Logos, Titel- und Dateizahlen öffnen. Eine Konsole wählen und **Spiele dieser Konsole anzeigen** bestätigen. Die Darstellung und Sortierung bleiben erhalten; Suchtext und Sammlungsfilter werden für diese Konsolenansicht zurückgesetzt, die Anzeige beginnt auf ihrer ersten Seite. Abbrechen erhält die bisherige Auswahl. Systeme ohne bekannte Logos erhalten ein Symbol; eine leere Bibliothek oder erfolglose Suche kann nicht als Konsole übernommen werden.
+
+Die Übernahme fremder Theme-Layouts folgt separat. Der bestehende Theme-Import verändert weiterhin nur die unten beschriebenen Eigenschaften.
 
 ## EmulationStation-/ES-DE-Theme anpassen
 

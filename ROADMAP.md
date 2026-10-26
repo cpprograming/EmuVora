@@ -4,6 +4,14 @@ Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.130](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.130).
 
+## Nächste Etappe – Karussell und Konsolenauswahl
+
+- [x] Horizontal virtualisiertes Cover-Karussell mit hervorgehobener, möglichst zentrierter Auswahl und höhenabhängigen Covergrößen ergänzen.
+- [x] Gemeinsame Filter, Versionen, Spielaktionen und Seitenwechsel erhalten; Tastatur, Controller-Eingaben und Fensterverkleinerung prüfen.
+- [x] Durchsuchbare Auswahl importierter Konsolen mit großen Logos, Titel-/Dateizahlen und fester Bestätigungsleiste ergänzen; Abbruch und Leerzustände berücksichtigen.
+- [ ] Vollständige Release-/Installationsprüfung abschließen.
+- [ ] Anschließend Auswahl von Theme-Varianten, Importvorschau und fremde Layoutübernahme ausbauen. [Bedienung](NATIVE_THEMES.md#cover-karussell-und-konsolenauswahl).
+
 ## 0.14.130 – native Bibliothekslayouts (Raster/Liste abgeschlossen)
 
 - [x] Gemeinsame Datenaufbereitung für Suche, Filter, Sortierung, Versionen, Auswahl und begrenzte Seiten von der Darstellung trennen.

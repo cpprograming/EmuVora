@@ -108,7 +108,7 @@ public sealed partial class MainWindow : Window
         }
         sidebar.Children.Add(new TextBlock{Text="SAMMLUNGEN",FontSize=11,Opacity=0.65,Margin=new(0,12,0,4)});sidebar.Children.Add(collectionChoice);sidebar.Children.Add(AsyncButton("Sammlungen verwalten",()=>ManageCollectionsAsync()));
         collectionChoice.SelectionChanged+=(_,_)=>{if(!updatingCollections&&collectionChoice.SelectedItem is string){view="Sammlung";Refresh();}};UpdateCollections();
-        sidebar.Children.Add(new TextBlock{Text="KONSOLEN",FontSize=11,Opacity=0.65,Margin=new(0,16,0,4)});sidebar.Children.Add(consoleNavigation);
+        sidebar.Children.Add(new TextBlock{Text="KONSOLEN",FontSize=11,Opacity=0.65,Margin=new(0,16,0,4)});sidebar.Children.Add(AsyncButton("Konsolen auswählen",ShowConsolePickerAsync));sidebar.Children.Add(consoleNavigation);
         sidebar.Children.Add(new Separator {Margin=new(0,12)});
         var import=AsyncButton("+ ROM-Ordner importieren",()=>ImportAsync());import.Classes.Add("primary-action");import.Classes.Add("accent");sidebar.Children.Add(import);operationButtons.Add(import);
         var rescan=AsyncButton("Ordner neu scannen",()=>RescanAsync());operationButtons.Add(rescan);
@@ -127,7 +127,7 @@ public sealed partial class MainWindow : Window
         var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=4};Grid.SetColumnSpan(search,3);filters.Children.Add(search);
         var toolbar=new WrapPanel();Grid.SetRow(toolbar,1);Grid.SetColumnSpan(toolbar,3);filters.Children.Add(toolbar);
         detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});
-        libraryLayoutChoice.SelectedIndex=IsListLayout?1:0;Avalonia.Automation.AutomationProperties.SetName(libraryLayoutChoice,"Bibliothekslayout");ToolTip.SetTip(libraryLayoutChoice,"Cover-Raster oder kompakte Liste · Auswahl und Filter bleiben erhalten");libraryLayoutChoice.SelectionChanged+=(_,_)=>Guard(ChangeLibraryLayout);
+        libraryLayoutChoice.SelectedIndex=IsCarouselLayout?2:IsListLayout?1:0;Avalonia.Automation.AutomationProperties.SetName(libraryLayoutChoice,"Bibliothekslayout");ToolTip.SetTip(libraryLayoutChoice,"Raster, Liste oder Karussell · Auswahl und Filter bleiben erhalten");libraryLayoutChoice.SelectionChanged+=(_,_)=>Guard(ChangeLibraryLayout);
         foreach(var control in new Control[]{systems,sort,libraryLayoutChoice,detailsToggle}){control.Margin=new(0,0,8,8);toolbar.Children.Add(control);}AddRow(main,filters,1);
         gamesList.Classes.Add("game-library");
         filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);var gameActions=new Grid{ColumnDefinitions=new("*,*"),ColumnSpacing=10};Grid.SetRow(gameActions,2);Grid.SetColumnSpan(gameActions,3);gameActions.Children.Add(manageCover);Grid.SetColumn(collectionGame,1);gameActions.Children.Add(collectionGame);filters.Children.Add(gameActions);
@@ -139,7 +139,9 @@ public sealed partial class MainWindow : Window
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("list-layout").Descendant().OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.HorizontalAlignmentProperty,HorizontalAlignment.Stretch),new Setter(ListBoxItem.HorizontalContentAlignmentProperty,HorizontalAlignment.Stretch)}});
         gamesList.AutoScrollToSelectedItem=false;ConfigureLibraryLayout();
-        ScrollViewer.SetHorizontalScrollBarVisibility(gamesList,Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
+        gamesList.SizeChanged+=(_,_)=>ResizeCarousel();
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("carousel-layout").Descendant().OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.VerticalAlignmentProperty,VerticalAlignment.Center),new Setter(ListBoxItem.OpacityProperty,.72)}});
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("carousel-layout").Descendant().OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.OpacityProperty,1d)}});
         var library=new Grid{RowDefinitions=new("*,Auto")};library.Children.Add(gamesList);
         var pageButtons=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};pageButtons.Children.Add(previousPage);pageButtons.Children.Add(nextPage);libraryPager.Children.Add(pageLabel);libraryPager.Children.Add(pageButtons);Grid.SetRow(libraryPager,1);library.Children.Add(libraryPager);
         previousPage.Click+=(_,_)=>ChangeLibraryPage(-1);nextPage.Click+=(_,_)=>ChangeLibraryPage(1);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
@@ -154,7 +156,7 @@ public sealed partial class MainWindow : Window
         cover.Click+=async(_,_)=>await ChooseCoverAsync();edit.Click+=async(_,_)=>await EditAsync();remove.Click+=async(_,_)=>await RemoveAsync();reveal.Click+=(_,_)=>Guard(()=>{if(Selected is{} game)OpenPath(Path.GetDirectoryName(game.Path)!);});
         protectCover.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){if(!settings.ProtectedCovers.Remove(game.Path))settings.ProtectedCovers.Add(game.Path);settingsStore.Save(settings);UpdateSelected();}});
         onlineCover.Click+=async(_,_)=>await FetchCoverAsync();ToolTip.SetTip(onlineCover,"Sucht den Spieltitel bei libretro-thumbnails. Titel und Konsole werden dafür an GitHub gesendet.");
-        gamesList.SelectionChanged+=(_,_)=>{UpdateSelected();if(!changingLibraryLayout&&Selected!=null)gamesList.ScrollIntoView(Selected);};gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
+        gamesList.SelectionChanged+=(_,_)=>{UpdateSelected();if(!changingLibraryLayout&&Selected!=null)ScrollToLibrarySelection();};gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
         gamesList.KeyDown+=async(_,e)=>{if(e.Key==Key.Enter){e.Handled=true;await PlayAsync();}};
         search.TextChanged+=(_,_)=>Refresh();systems.SelectionChanged+=(_,_)=>Refresh();sort.SelectionChanged+=(_,_)=>Refresh();cancel.Click+=(_,_)=>RequestOperationCancel();
         KeyDown+=(_,e)=>{if(e.Key==Key.F&&e.KeyModifiers.HasFlag(KeyModifiers.Control)){search.Focus();e.Handled=true;}};
@@ -240,7 +242,7 @@ public sealed partial class MainWindow : Window
         foreach(var imageControl in gamesList.GetVisualDescendants().OfType<Image>())imageControl.Source=null;
         gamesList.ItemsSource=null;detailCover.Content=null;
         foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();
-        gamesList.ItemsSource=page;gamesList.SelectedItem=page.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));
+        gamesList.ItemsSource=page;gamesList.SelectedItem=page.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase))??(IsCarouselLayout?page.FirstOrDefault():null);
         libraryPager.IsVisible=result.Length>LibraryPageSize;previousPage.IsEnabled=libraryPage>0;nextPage.IsEnabled=(libraryPage+1)*LibraryPageSize<result.Length;
         pageLabel.Text=$"Seite {libraryPage+1} / {Math.Max(1,(result.Length+LibraryPageSize-1)/LibraryPageSize)} · {libraryPage*LibraryPageSize+1}–{libraryPage*LibraryPageSize+page.Count} von {result.Length}";
         emptyState.IsVisible=empty.IsVisible=result.Length==0;emptyAction.Content=allGames.Count==0?"Ersten ROM-Ordner importieren":"Filter zurücksetzen";empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Deine Klassiker bekommen hier ein Zuhause. Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
@@ -462,7 +464,7 @@ public sealed partial class MainWindow : Window
         if((pressed&1)!=0)index-=columns;if((pressed&2)!=0)index+=columns;if((pressed&4)!=0)index--;if((pressed&8)!=0)index++;
         if(index>=count&&(libraryPage+1)*LibraryPageSize<libraryResultCount)ChangeLibraryPage(1);
         else if(index<0&&libraryPage>0)ChangeLibraryPage(-1);
-        else gamesList.SelectedIndex=Math.Clamp(index,0,count-1);gamesList.ScrollIntoView(gamesList.SelectedItem!);
+        else gamesList.SelectedIndex=Math.Clamp(index,0,count-1);ScrollToLibrarySelection();
         if(operation==null&&(pressed&0x1000)!=0)await PlayAsync();
         if(operation==null&&(pressed&0x4000)!=0)await ManageCoverAsync();
         if(operation==null&&(pressed&0x8000)!=0&&Selected is{} game)Guard(()=>{store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);});

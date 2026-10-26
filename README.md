@@ -8,6 +8,8 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Native Layouts:** Unter der Suche zwischen Cover-Raster und kompakter Liste wechseln. Filter, Sortierung, Versionen, Seite und Auswahl bleiben gemeinsam; die Liste zeigt kleine Cover und den Spielverlauf. [Bedienung und Grenzen](NATIVE_THEMES.md#bibliothekslayout-wählen).
 
+**Karussell und Konsolen:** Als dritte Ansicht steht eine horizontale Cover-Reihe mit hervorgehobener Auswahl bereit. Über **Konsolen auswählen** eine durchsuchbare Übersicht mit großen Logos öffnen und direkt zur Bibliothek einer Konsole wechseln. [Bedienung und Grenzen](NATIVE_THEMES.md#cover-karussell-und-konsolenauswahl).
+
 **Aktueller geprüfter Stand: [0.14.130](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.130)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
