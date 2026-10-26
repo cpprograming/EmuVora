@@ -34,6 +34,8 @@ Der bestehende Import übernimmt Bilder, Logos und Farben und wählt Varianten a
 
 Raster-/Listenstand: 352 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; private Bibliothekskopie mit 5.805 Einträgen geprüft. Karussell und Theme-Layouts bleiben nächste Ausbaustufen.
 
+Karussell-/Konsolenstand ab 0.14.132: 362 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; private Bibliothekskopie mit 5.805 Einträgen geprüft. Theme-Varianten und XML-Layoutübernahme bleiben nächste Ausbaustufen.
+
 ## 3. ES-DE-Theme-Import mit Layouts
 
 - [ ] Referenz-Theme Alekfull NX anhand seiner tatsächlichen XML-Varianten inventarisieren und eine Unterstützungsmatrix erstellen.
