@@ -4,6 +4,14 @@ Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.128](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.128).
 
+## Nächste Etappe – native Bibliothekslayouts
+
+- [x] Gemeinsame Datenaufbereitung für Suche, Filter, Sortierung, Versionen, Auswahl und begrenzte Seiten von der Darstellung trennen.
+- [x] Umschaltbare kompakte Liste mit Covern/Verlauf neben dem Raster und umbruchsicherer Werkzeugleiste ergänzen; Layout speichern.
+- [x] Auswahl, Seite und passende Scrollposition beim Layoutwechsel erhalten; Listen-Controller-Navigation und Virtualisierung ergänzen.
+- [ ] Vollständige Release-/Installationsprüfung abschließen.
+- [ ] Anschließend Karussell, Konsolenauswahl und erweiterte Theme-Layouts ergänzen. [Umfang](NATIVE_THEMES.md#bibliothekslayout-wählen).
+
 ## 0.14.128 – eigenes Frontend ohne ES-DE-Anwendung (Codeumstellung abgeschlossen)
 
 - [x] ES-DE-Start-/Export-/Downloadcode und zugehörige Paketfreigaben entfernen; Cover-Kennungen und Konsolenlogos entkoppeln.
