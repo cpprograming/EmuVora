@@ -20,7 +20,7 @@ Der bestehende Import übernimmt Bilder, Logos und Farben und wählt Varianten a
 
 344 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Persönliche Restordner werden nicht automatisch gelöscht; deren Vorschau/Bereinigung bleibt separat offen.
 
-## 2. Gemeinsame Layout-Grundlage – vor erweitertem Theme-Import
+## 2. Gemeinsame Layout-Grundlage – Raster/Liste ab 0.14.130
 
 - [x] Gemeinsames Darstellungsmodell für Suche, Filter, Sortierung, Auswahl, Versionen und begrenzte Seiten ergänzen. Vorhandene Start-/Bearbeitungsaktionen werden gemeinsam verwendet.
 - [x] Cover-Raster und kompakte Liste mit vorhandener Detailspalte, gespeichertem Layouttyp und sitzungsbezogenen Scrollpositionen anbieten.
@@ -30,6 +30,8 @@ Der bestehende Import übernimmt Bilder, Logos und Farben und wählt Varianten a
 - [ ] Responsive Regeln für schmale Fenster, Desktop und TV festlegen; Auswahl, Suchtext und Scrollposition beim Ansichtswechsel erhalten.
 - [ ] Gemeinsame Farb-, Abstands-, Schrift- und Fokusvorgaben für alle nativen Themes verwenden.
 - [ ] Große Bibliotheken weiterhin begrenzt/virtualisiert darstellen; Cover- und Videospeicher begrenzen.
+
+Raster-/Listenstand: 352 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; private Bibliothekskopie mit 5.805 Einträgen geprüft. Karussell und Theme-Layouts bleiben nächste Ausbaustufen.
 
 ## 3. ES-DE-Theme-Import mit Layouts
 
