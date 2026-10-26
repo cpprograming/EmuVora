@@ -1,6 +1,6 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 25. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 26. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
 
@@ -114,7 +114,7 @@ Abnahme: Eine größere Bibliothek bleibt übersichtlich; eigene Korrekturen üb
 - [ ] Echte Tests auf 1080p-, 1440p- und 4K-Monitoren sowie mit mehreren Monitoren durchführen.
 - [ ] Windows-Anzeigeskalierung und Bildschirmwechsel prüfen.
 - [ ] Seitenverhältnis und ganzzahlige Skalierung mit repräsentativen 2D- und 3D-Systemen vergleichen.
-- [ ] Systeme mit Maus-/Tastaturbedarf oder besonderen Controllern eindeutig kennzeichnen.
+- [x] Systemgrundhinweise für Maus/Touch, Tastatur und besondere Steuerung vor dem Spielen sowie in einer gefilterten Übersicht anzeigen (Entwicklungsstand). Keine pauschale Spiel-/Hardware-Kompatibilitätszusage. [Anleitung](INPUT_GUIDE.md).
 - [x] Verständlichen Diagnosebericht mit Vorschau und ausdrücklichem lokalem Speichern ergänzen; private Namen/Pfade und Protokolltexte auslassen, kein Upload (ab 0.14.118). [Anleitung](DIAGNOSTICS.md).
 - [ ] Updatefehler, Offlinebetrieb und Rückkehr zur vorherigen Emulatorversion praktisch testen.
 

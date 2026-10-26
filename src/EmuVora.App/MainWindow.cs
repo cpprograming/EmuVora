@@ -129,6 +129,7 @@ public sealed partial class MainWindow : Window
         filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);var gameActions=new Grid{ColumnDefinitions=new("*,*"),ColumnSpacing=10};Grid.SetRow(gameActions,2);Grid.SetColumnSpan(gameActions,3);gameActions.Children.Add(manageCover);Grid.SetColumn(collectionGame,1);gameActions.Children.Add(collectionGame);filters.Children.Add(gameActions);
         collectionGame.Click+=async(_,_)=>{try{await ChooseCollectionsAsync();}catch(Exception ex){ShowError(ex);}};
         chooseVersion.Click+=async(_,_)=>{try{if(Selected is{} game&&await ChooseVersionAsync(game) is{} chosen)Refresh(chosen.Path);}catch(Exception ex){ShowError(ex);}};filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(chooseVersion,3);Grid.SetColumnSpan(chooseVersion,3);filters.Children.Add(chooseVersion);
+        inputGuideButton.Click+=async(_,_)=>{try{await ShowInputGuideAsync();}catch(Exception ex){ShowError(ex);}};filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(inputGuideButton,4);Grid.SetColumnSpan(inputGuideButton,3);filters.Children.Add(inputGuideButton);
         manageCover.Click+=async(_,_)=>{try{await ManageCoverAsync();}catch(Exception ex){ShowError(ex);}};
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
@@ -283,6 +284,7 @@ public sealed partial class MainWindow : Window
     {
         var game=Selected;foreach(var button in new[]{favorite,edit,cover,onlineCover,protectCover,manageCover,collectionGame,remove,reveal})button.IsEnabled=game!=null&&operation==null;
         chooseVersion.IsVisible=game!=null&&Versions(game).Count>1;chooseVersion.IsEnabled=operation==null;chooseVersion.Content=game==null?"Version auswählen":$"Version auswählen · {Versions(game).Count}";
+        var input=game==null?null:InputGuide.ForSystem(game.System);inputGuideButton.IsVisible=input?.AdditionalInput==true;inputGuideButton.IsEnabled=operation==null;inputGuideButton.Content=input==null?"Bedienhinweise":"Bedienung: "+input.Category+" …";
         protectCover.Content=game!=null&&settings.ProtectedCovers.Contains(game.Path)?"Cover-Schutz aufheben":"Cover schützen";
         play.IsEnabled=game!=null&&operation==null&&!running.ContainsKey(game.Path);
         detailTitle.Text=game?.Title??"Spiel auswählen";detailCover.Content=game==null?null:Artwork(game,220);
@@ -687,6 +689,7 @@ public sealed partial class MainWindow : Window
         }));
         panel.Children.Add(new TextBlock {Text="Xbox 360 / One / Series: USB, Bluetooth oder Xbox-Adapter, sobald Windows den Controller als XInput erkennt. Neue Profile belegen Buttons, Sticks, Trigger und unterstütztes Rumble. Eigene Belegungen bleiben bei späteren Starts erhalten. RetroArch / PS1 / PS2: View + Menu beendet das Spiel; View + RB öffnet das Menü. Dolphin: View + Menu beendet; PPSSPP: LT öffnet das Menü. Wii nutzt ein Wiimote/Nunchuk-Grundprofil; Bewegungsspiele können Anpassungen benötigen.",TextWrapping=TextWrapping.Wrap,FontSize=12});
         panel.Children.Add(new TextBlock{Text="Weitere Gamepads: SDL und die mitgelieferte Controller-Datenbank belegen die EmuVora-Oberfläche automatisch. A/B/X/Y bezeichnen die Positionen wie beim Xbox-Layout. Spielprofile für andere Controller müssen im jeweiligen Emulator eingerichtet werden; Xbox-Standardprofile bleiben erhalten.",TextWrapping=TextWrapping.Wrap,FontSize=12});
+        panel.Children.Add(AsyncButton("Bedienhinweise für Systeme",ShowInputGuideAsync));
         panel.Children.Add(AsyncButton("Controller prüfen",ShowControllerDiagnosticsAsync));
         panel.Children.Add(AsyncButton("Eigene BIOS-/Firmware-Dateien importieren",async()=>{var files=await new ControllerPicker(this).OpenFilePathsAsync("Eigene BIOS-/Firmware-Dateien");if(files.Length==0)return;await ImportFirmwareFilesAsync(files);}));
         panel.Children.Add(AsyncButton("Firmware-Ordner importieren (z. B. MSX)",async()=>

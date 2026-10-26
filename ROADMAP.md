@@ -1,6 +1,6 @@
 # EmuVora – Roadmap
 
-Stand: 25. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
 Aktueller geprüfter Release: [0.14.120](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.120).
 
@@ -204,7 +204,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [ ] 1080p, 1440p, 4K und mehrere Monitore praktisch testen.
 - [ ] Windows-Anzeigeskalierung und Bildschirmwechsel prüfen.
 - [ ] Seitenverhältnis und scharfe Skalierung mit repräsentativen 2D- und 3D-Systemen vergleichen.
-- [ ] Systeme mit besonderen Eingabegeräten eindeutig kennzeichnen.
+- [x] Systemgrundhinweise für besondere Eingaben in Bibliothek, Systemübersicht und durchsuchbarem Leitfaden ergänzen (Entwicklungsstand). Spielabhängige Anforderungen und Hardwareabnahme bleiben separat. [Anleitung](INPUT_GUIDE.md).
 
 ## 1.0 – Stabile Privatversion
 
