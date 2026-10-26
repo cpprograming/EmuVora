@@ -51,6 +51,7 @@ public static class RomRelocation
         Backups.NoLinks(path);if(!File.Exists(path))throw new IOException("Zieldatei fehlt.");
         using(var readable=File.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite)){ }
         var extension=Path.GetExtension(path);
+        if(extension.Equals(".gdi",StringComparison.OrdinalIgnoreCase)){foreach(var track in GdiManifest.Read(path)){if(!Backups.Inside(track.Path,root))throw new IOException("GDI-Track liegt außerhalb des neuen ROM-Ordners.");}return;}
         if(!extension.Equals(".m3u",StringComparison.OrdinalIgnoreCase)&&!extension.Equals(".cue",StringComparison.OrdinalIgnoreCase))return;
         if(new FileInfo(path).Length>1024*1024)throw new IOException("Disc-Liste ist zu groß (höchstens 1 MiB).");
         var count=0;
@@ -67,7 +68,7 @@ public static class RomRelocation
             if(!Backups.Inside(dependency,root))throw new IOException("Disc-Verweis liegt außerhalb des neuen ROM-Ordners.");
             Backups.NoLinks(dependency);if(!File.Exists(dependency))throw new IOException("Disc-Datei fehlt: "+entry);count++;
             // A referenced CUE must retain its relative FILE dependencies as well.
-            if(extension.Equals(".m3u",StringComparison.OrdinalIgnoreCase)&&Path.GetExtension(dependency).Equals(".cue",StringComparison.OrdinalIgnoreCase))CheckTarget(dependency,root);
+            if(extension.Equals(".m3u",StringComparison.OrdinalIgnoreCase)&&(Path.GetExtension(dependency).Equals(".cue",StringComparison.OrdinalIgnoreCase)||Path.GetExtension(dependency).Equals(".gdi",StringComparison.OrdinalIgnoreCase)))CheckTarget(dependency,root);
         }
         if(count==0)throw new IOException("Disc-Liste enthält keine passenden Dateien.");
     }

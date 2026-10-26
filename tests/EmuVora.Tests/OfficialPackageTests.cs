@@ -30,6 +30,8 @@ public class OfficialPackageTests
                 {
                     Marshal.GetDelegateForFunctionPointer<GetSystemInfo>(NativeLibrary.GetExport(library,"retro_get_system_info"))(out var info);
                     var extensions=(Marshal.PtrToStringUTF8(info.Extensions)??"").Split('|');
+                    if(core=="genesis_plus_gx"||core=="flycast")Assert.Contains("m3u",extensions);
+                    if(core=="flycast")Assert.Contains("gdi",extensions);
                     foreach(var system in SystemCatalog.RetroSystems.Where(s=>s.Core==core))Assert.True(extensions.Contains(system.Extensions.Split(' ')[0],StringComparer.OrdinalIgnoreCase),$"{system.Name}: core {core} accepts {string.Join('|',extensions)}");
                 }
                 finally{NativeLibrary.Free(library);}

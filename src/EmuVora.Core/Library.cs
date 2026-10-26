@@ -74,6 +74,11 @@ public static class RomScanner
                     if(system=="Unknown disc")system=DetectDiscSystem(file,root);
                     else if(DetectFolderSystem(file,root) is{} folderMatch&&SystemCatalog.Find(folderMatch) is{} folderDefinition&&folderDefinition.Extensions.Split(' ').Contains(extension.TrimStart('.'),StringComparer.OrdinalIgnoreCase))system=folderMatch;
                     games.Add(new(System.IO.Path.GetFileNameWithoutExtension(file),system,System.IO.Path.GetFullPath(file)));
+                    if(extension.Equals(".gdi",StringComparison.OrdinalIgnoreCase))
+                    {
+                        try{foreach(var track in GdiManifest.Read(file,cancellationToken))referenced.Add(track.Path);}
+                        catch(Exception ex) when(ex is IOException or UnauthorizedAccessException or ArgumentException){warnings.Add($"{file}: {ex.Message}");}
+                    }
                     if(extension.Equals(".m3u",StringComparison.OrdinalIgnoreCase)||extension.Equals(".cue",StringComparison.OrdinalIgnoreCase))
                     {
                         try

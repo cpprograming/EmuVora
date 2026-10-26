@@ -6,6 +6,8 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 ## Download und Installation
 
+**Mehrdisc erweitert:** Dreamcast-GDI mit geprüften Track-Verweisen und eindeutig nummerierten benachbarten Disc-Ordnern sowie Mega-CD-Playlists für Genesis Plus GX. Vorschau und erneute Prüfung vor dem Schreiben erhalten Originaldateien und Disc-Metadaten. [Abläufe und Grenzen](LIBRARY_AND_DISPLAY.md).
+
 **Bedienhinweise:** DS-Touchscreen, Wii-Bewegung und Tastatur-/Mausbedarf sind vor dem Spielen erkennbar. Ein durchsuchbarer Leitfaden erklärt die Grundbedienung aller 47 Systeme; Hinweise stehen auch in der Systemübersicht und bei der Auswahl betroffener Spiele. [Umfang und Grenzen](INPUT_GUIDE.md).
 
 **Systemübersicht:** Einrichtungszustände, BIOS-/Core-Hinweise, fehlende Spiele/Cover und direkte Bibliotheksfilter an einem Ort. Fehlende Komponenten lassen sich für eine Konsole oder für die importierten Systeme nach konkreter Downloadvorschau einrichten; eigene funktionierende Pfade bleiben erhalten. [Abläufe und Grenzen](SYSTEM_CENTER.md).
