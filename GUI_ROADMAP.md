@@ -8,7 +8,7 @@ EmuVora ist das einzige Frontend. ES-DE wird weder gestartet noch installiert un
 
 Der bestehende Import übernimmt Bilder, Logos und Farben und wählt Varianten automatisch. Er rendert derzeit keine vollständigen fremden Layouts, Karussells, Videos, eigenen Schriften oder Animationen. Die folgenden Aufgaben erweitern diesen Umfang schrittweise; vollständige Kompatibilität mit jedem Theme wird nicht versprochen.
 
-## 1. ES-DE als Anwendung vollständig entfernen – zuerst
+## 1. ES-DE als Anwendung vollständig entfernen – Codeumstellung in 0.14.128
 
 - [x] Alten ES-DE-Startpfad, Startfenster, Download-/Installationscode und spezielle Paketfreigaben entfernen.
 - [x] Allgemein benötigte Spielkennungen und Konsolen-IDs aus `EsDeFrontend` in unabhängige Hilfsfunktionen überführen. Vorhandene Cover-Dateinamen und Zuordnungen müssen unverändert funktionieren.
@@ -17,6 +17,8 @@ Der bestehende Import übernimmt Bilder, Logos und Farben und wählt Varianten a
 - [x] Veraltete ES-DE-Texte aus Coververwaltung, Sicherung, Duplikaten, ROM-Zuordnung und Dokumentation entfernen. Hinweise zum Theme-Import bleiben erhalten.
 - [ ] Bestehende ES-DE-Ordner nur erkennen und als entbehrlich kennzeichnen. Persönliche Dateien nicht ungefragt löschen; eine spätere Bereinigung braucht eine konkrete Dateivorschau.
 - [x] Regression: alte Bibliothek, Cover, Sicherung, ROM-Zuordnung und direkte Emulatorstarts funktionieren ohne installierte ES-DE-Anwendung.
+
+344 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Persönliche Restordner werden nicht automatisch gelöscht; deren Vorschau/Bereinigung bleibt separat offen.
 
 ## 2. Gemeinsame Layout-Grundlage – vor erweitertem Theme-Import
 
