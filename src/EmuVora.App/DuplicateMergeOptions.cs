@@ -22,7 +22,8 @@ public sealed partial class MainWindow
         panel.Children.Add(new TextBlock { Text = "Eigenes Bildprofil übernehmen von" }); panel.Children.Add(aspects);
         var summary = new TextBlock { TextWrapping = TextWrapping.Wrap }; panel.Children.Add(summary);
         panel.Children.Add(new TextBlock { Text = "Nur Bibliothekseinträge werden zusammengeführt. Alle ROMs, Cover-Dateien und Spielstände bleiben erhalten. Favoriten und Sammlungen werden vereinigt, Spielstarts addiert und der jüngste Startzeitpunkt übernommen. Bereits früher kopierte Zähler können dadurch doppelt zählen. Der früheste bekannte Importzeitpunkt bleibt erhalten.\n\nVorher werden Bibliothek und Einstellungen gesichert. Ursprüngliche Einträge bleiben außerdem im Zusammenführungsarchiv der Datenbank. Andere Titel/Cover/Profile sind in der Sicherung erhalten. Spielstände der anderen ROM-Pfade werden nicht automatisch dem verbleibenden Pfad zugeordnet. Bei ES-DE danach die Bibliothek neu abgleichen.", TextWrapping = TextWrapping.Wrap });
-        var review = Dialog("Duplikate zusammenführen", panel); DuplicateMergePlan? plan = initial;
+        var actions = new StackPanel { Spacing = 8 };
+        var review = LibraryDialog("Duplikate zusammenführen", panel, actions); DuplicateMergePlan? plan = initial;
         var accept = ActionButton("Geprüfte Einträge zusammenführen", () => review.Close(plan));
         void Update()
         {
@@ -34,7 +35,7 @@ public sealed partial class MainWindow
             catch (Exception ex) { plan = null; summary.Text = ex.Message; accept.IsEnabled = false; }
         }
         keeper.SelectionChanged += (_, _) => Update(); covers.SelectionChanged += (_, _) => Update(); aspects.SelectionChanged += (_, _) => Update(); Update();
-        panel.Children.Add(accept); panel.Children.Add(ActionButton("Abbrechen", () => review.Close()));
+        actions.Children.Add(accept); actions.Children.Add(ActionButton("Abbrechen", () => review.Close()));
         var selected = await review.ShowDialog<DuplicateMergePlan?>(owner);
         if (selected == null || isClosed || operation != null || !CanBackUp()) return false;
         DuplicateMergeResult? result = null; message.Text = "Datei-Inhalte werden erneut geprüft; danach Sicherung und Zusammenführung. Abbrechen ist während der Prüfung möglich.";

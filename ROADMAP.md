@@ -4,6 +4,13 @@ Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.124](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.124).
 
+## Nächste Etappe – Bibliotheksdialoge
+
+- [x] Feste Aktionsleisten für Duplikatübersicht, Inhaltsvergleich, Zusammenführung, Playlist-Vorschau und ROM-Pfadzuordnung ergänzen.
+- [x] Lange Vorschauen unabhängig von Entscheidungen scrollbar machen; Schließen während einer Prüfung fordert zuerst Abbruch an.
+- [x] Schmale, helle/dunkle und TV-Ansichten sowie Abbruch ohne Datenänderung automatisiert prüfen.
+- [ ] Vollständige Release-/Installationsprüfung abschließen; echte Controllerabnahme bleibt separat offen.
+
 ## 0.14.124 – GDI und Mega-CD (abgeschlossen)
 
 - [x] Dreamcast-GDI mit begrenzter Manifest-/Trackprüfung, relativen Pfaden und eindeutig nummerierten benachbarten Disc-Ordnern nach Vorschau bündeln.

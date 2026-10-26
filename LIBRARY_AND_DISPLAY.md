@@ -22,6 +22,12 @@ GDI-Discs dürfen im selben Ordner oder in benachbarten, eindeutig nummerierten 
 
 Die Vorschau erfasst Manifest und alle referenzierten Tracks. Vor Schreiben werden Vorschau und Dateien erneut geprüft und während der Erstellung gegen Schreibzugriffe gesperrt. Beim Scan werden Tracks gültiger GDI-Dateien nicht als zusätzliche Spiele aufgenommen; bereits vorhandene Bibliothekseinträge bleiben erhalten. Auch eine ROM-Ordner-Neuzuordnung prüft GDI-Tracks sowie GDI-Verweise einer M3U. Fehlende Tracks stoppen die Zuordnung. Originaldateien und Spielstände werden nicht konvertiert, umbenannt oder gelöscht; echte Disc-Wechsel im Spiel bleiben separat zu testen.
 
+## Bibliotheksdialoge bedienen
+
+Duplikatübersicht, SHA-256-Ergebnisse, Zusammenführung, Playlist-Vorschau und ROM-Pfadzuordnung verwenden eine gemeinsame Anordnung: lange Dateilisten, Hinweise und Vorschauen scrollen in der Mitte; Bestätigen und Abbrechen bleiben unten sichtbar. Das gilt auch für schmale Fenster und den TV-Modus. Vor dem Bestätigen die vollständige Vorschau durchsehen; eine feste Schaltfläche bedeutet keine automatische Freigabe.
+
+Während einer laufenden Prüfung fordert **Schließen**, die Fensterschaltfläche oder Controller **B** zunächst den Abbruch an und erhält die Übersicht. Nach Ende der Prüfung kann das Fenster geschlossen werden. Bereits begonnene gesicherte Datenübernahmen werden konsistent beendet; Abbrechen ist kein Rückgängigmachen einer abgeschlossenen Übernahme. Die Vorschau selbst verändert keine ROMs oder Bibliotheksdaten.
+
 ## Bestätigte Duplikate zusammenführen
 
 Nach dem SHA-256-Vergleich eine Ergebnisgruppe auswählen und **Ausgewählte Duplikate zusammenführen** öffnen. Unterstützt werden 2 bis 100 Einzeldateien desselben Systems; reine Verweisdateien bleiben ausgenommen. Den verbleibenden Titel/ROM-Pfad sowie die Quellen für Cover (einschließlich Schutz) und eigenes Bildprofil auswählen. Vor der Übernahme werden die Inhalte erneut vollständig gelesen. Abbrechen während der Inhaltsprüfung verändert keine Einträge. Laufende Spiele und verwaltete ES-DE-Spielstarts blockieren die Übernahme.

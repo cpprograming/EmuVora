@@ -22,10 +22,12 @@ public sealed partial class MainWindow
             content.Children.Add(new TextBlock { Text = "Eine Gruppe auswählen und deren Dateien per SHA-256 vergleichen oder einen Disc-Satz für PS1, Saturn, Dreamcast oder Mega-CD als neue Playlist vorbereiten. Verweisdateien (z. B. CUE/M3U) werden beim Inhaltsvergleich ausgelassen. Die Prüfung gilt für die Datei-Bytes, nicht für unterschiedliche Container desselben Spiels.", TextWrapping = TextWrapping.Wrap });
             var list = new ListBox { Height = 240, ItemsSource = groups, ItemTemplate = new FuncDataTemplate<LibraryAuditGroup>((group, _) => new TextBlock { Text = group == null ? "" : $"{group.Kind} · {group.System}\n{group.Title}\n" + string.Join("\n", group.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) };
             content.Children.Add(list);
-            var dialog = Dialog("Duplikate und Mehrdisc-Spiele", content);
-            var message = new TextBlock { TextWrapping = TextWrapping.Wrap }; content.Children.Add(message);
-            content.Children.Add(AsyncButton("Ausgewählte Dateien per SHA-256 vergleichen", async () =>
+            var actions = new StackPanel { Spacing = 8 };
+            var dialog = LibraryDialog("Duplikate und Mehrdisc-Spiele", content, actions);
+            var message = new TextBlock { TextWrapping = TextWrapping.Wrap }; actions.Children.Add(message);
+            actions.Children.Add(AsyncButton("Ausgewählte Dateien per SHA-256 vergleichen", async () =>
             {
+                if (operation != null) return;
                 if (list.SelectedItem is not LibraryAuditGroup selected) { message.Text = "Bitte zuerst eine Gruppe auswählen."; return; }
                 message.Text = "SHA-256-Prüfung läuft. Große Disc-Dateien können länger dauern; Prüfung abbrechen bleibt verfügbar.";
                 ContentCheck? check = null;
@@ -35,22 +37,23 @@ public sealed partial class MainWindow
                 result.Children.Add(new TextBlock { Text = $"{check.CheckedFiles} Dateien vollständig geprüft · {check.Matches.Count} Gruppen mit gleichen Datei-Bytes.\nErgebnis gilt zum Prüfzeitpunkt. Nichts wurde gelöscht oder zusammengeführt.", TextWrapping = TextWrapping.Wrap });
                 var matches = new ListBox { Height = 230, ItemsSource = check.Matches, ItemTemplate = new FuncDataTemplate<ContentMatch>((match, _) => new TextBlock { Text = match == null ? "" : $"SHA-256: {match.Sha256}\n{match.Length:N0} Bytes\n" + string.Join("\n", match.Games.Select(g => g.Path)), TextWrapping = TextWrapping.Wrap, Margin = new(8) }) }; result.Children.Add(matches);
                 if (check.Notes.Count > 0) result.Children.Add(new TextBlock { Text = string.Join("\n", check.Notes), TextWrapping = TextWrapping.Wrap });
-                var review = Dialog("Datei-Inhalte vergleichen", result); var mergeStatus = new TextBlock { TextWrapping = TextWrapping.Wrap }; result.Children.Add(mergeStatus);
-                result.Children.Add(AsyncButton("Ausgewählte Duplikate zusammenführen", async () =>
+                var resultActions = new StackPanel { Spacing = 8 };
+                var review = LibraryDialog("Datei-Inhalte vergleichen", result, resultActions); var mergeStatus = new TextBlock { TextWrapping = TextWrapping.Wrap }; resultActions.Children.Add(mergeStatus);
+                resultActions.Children.Add(AsyncButton("Ausgewählte Duplikate zusammenführen", async () =>
                 {
                     if (matches.SelectedItem is not ContentMatch match) { mergeStatus.Text = "Bitte eine Gruppe mit gleichen Datei-Inhalten auswählen."; return; }
                     if (await ReviewDuplicateMergeAsync(match, review, mergeStatus)) matches.ItemsSource = matches.Items.Cast<ContentMatch>().Where(m => m != match).ToArray();
                 }));
-                result.Children.Add(ActionButton("Zusammenführung abbrechen", RequestOperationCancel));
-                result.Children.Add(ActionButton("Schließen", () => review.Close())); await review.ShowDialog(dialog);
+                resultActions.Children.Add(ActionButton("Zusammenführung abbrechen", RequestOperationCancel));
+                resultActions.Children.Add(ActionButton("Schließen", () => { if (operation != null) RequestOperationCancel(); else review.Close(); })); await review.ShowDialog(dialog);
             }));
-            content.Children.Add(AsyncButton("Mehrdisc-Playlist vorbereiten", async () =>
+            actions.Children.Add(AsyncButton("Mehrdisc-Playlist vorbereiten", async () =>
             {
                 if (list.SelectedItem is not LibraryAuditGroup selected || selected.Kind != "Mehrdisc-Kandidat") { message.Text = "Bitte einen Mehrdisc-Kandidaten auswählen."; return; }
                 await PrepareDiscPlaylistAsync(selected, dialog, message);
             }));
-            content.Children.Add(ActionButton("Prüfung abbrechen", RequestOperationCancel));
-            content.Children.Add(ActionButton("Schließen", () => dialog.Close()));
+            actions.Children.Add(ActionButton("Prüfung abbrechen", RequestOperationCancel));
+            actions.Children.Add(ActionButton("Schließen", () => { if (operation != null) RequestOperationCancel(); else dialog.Close(); }));
             await dialog.ShowDialog(owner);
         }));
         return new Expander { Header = "Duplikate und Mehrdisc-Spiele", Content = panel };
@@ -64,9 +67,10 @@ public sealed partial class MainWindow
         var content = new StackPanel { Spacing = 14, Margin = new(24) };
         content.Children.Add(new TextBlock { Text = "Neue Playlist:\n" + plan.Path + "\n\nDisc-Reihenfolge:\n" + plan.Content, TextWrapping = TextWrapping.Wrap });
         content.Children.Add(new TextBlock { Text = $"{group.System} · {LibraryContent.PlaylistFormats(group.System)} · {LibraryContent.PlaylistEmulator(group.System)}. Discs müssen vollständig nummeriert sein. Bitte Reihenfolge selbst prüfen. Eigene Core- und Emulatorprofile werden nicht verändert. Dreamcast-GDI wird einschließlich seiner Tracks geprüft. CDI und einzelne rohe Tracks werden nicht gebündelt.\n\nWichtig: Der neue Playlist-Name kann einen anderen Spielstands-/Memory-Card-Namen verwenden. Vorhandene Spielstände ggf. im Emulator zuordnen. EmuVora verschiebt oder benennt keine Spielstände um.\n\nEs entsteht eine zusätzliche Bibliothekskarte ohne bisherigen Verlauf. Die einzelnen Discs und ihre Favoriten, Cover und Verläufe bleiben erhalten. Bestehende Playlists werden nicht überschrieben.", TextWrapping = TextWrapping.Wrap });
-        var review = Dialog(group.System + "-Playlist erstellen", content);
-        content.Children.Add(ActionButton("Playlist erstellen und hinzufügen", () => review.Close(true)));
-        content.Children.Add(ActionButton("Abbrechen", () => review.Close(false)));
+        var actions = new StackPanel { Spacing = 8 };
+        var review = LibraryDialog(group.System + "-Playlist erstellen", content, actions);
+        actions.Children.Add(ActionButton("Playlist erstellen und hinzufügen", () => review.Close(true)));
+        actions.Children.Add(ActionButton("Abbrechen", () => review.Close(false)));
         if (!await review.ShowDialog<bool>(owner) || isClosed || operation != null || !CanBackUp()) return;
         await BusyAsync(async token =>
         {
