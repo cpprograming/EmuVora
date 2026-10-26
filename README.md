@@ -4,7 +4,7 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Zusammenführung, Mehrdisc-Playlists und ROM-Pfadzuordnung zeigen ihre Entscheidungen auch bei langen Vorschauen unten an. [Bedienung](LIBRARY_AND_DISPLAY.md#bibliotheksdialoge-bedienen).
 
-**Aktueller geprüfter Stand: [0.14.124](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.124)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.126](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.126)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 

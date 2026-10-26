@@ -2,14 +2,15 @@
 
 Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.124](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.124).
+Aktueller geprüfter Release: [0.14.126](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.126).
 
-## Nächste Etappe – Bibliotheksdialoge
+## 0.14.126 – Bibliotheksdialoge (abgeschlossen)
 
 - [x] Feste Aktionsleisten für Duplikatübersicht, Inhaltsvergleich, Zusammenführung, Playlist-Vorschau und ROM-Pfadzuordnung ergänzen.
 - [x] Lange Vorschauen unabhängig von Entscheidungen scrollbar machen; Schließen während einer Prüfung fordert zuerst Abbruch an.
 - [x] Schmale, helle/dunkle und TV-Ansichten sowie Abbruch ohne Datenänderung automatisiert prüfen.
-- [ ] Vollständige Release-/Installationsprüfung abschließen; echte Controllerabnahme bleibt separat offen.
+- [x] 344 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft und installiert. [Bedienung](LIBRARY_AND_DISPLAY.md#bibliotheksdialoge-bedienen).
+- [ ] Echte Controllerabnahme und weitere Spezialdialoge bleiben separat offen.
 
 ## 0.14.124 – GDI und Mega-CD (abgeschlossen)
 
