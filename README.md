@@ -2,7 +2,7 @@
 
 EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen Spiele. Sie verwaltet **47 Systeme** und startet RetroArch, DuckStation, PCSX2, Dolphin oder PPSSPP als eigenständige Anwendungen.
 
-**Aktueller geprüfter Stand: [0.14.122](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.122)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.124](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.124)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
@@ -23,6 +23,12 @@ Unter **Einstellungen → Bibliothek → Duplikate und Mehrdisc-Spiele** werden 
 - Alle Versionen und Änderungen findest du unter **[Releases](https://github.com/cpprograming/EmuVora/releases)**.
 
 Die Pakete sind für Windows 10/11 x64 und enthalten die benötigte .NET-Laufzeit. Für die normale Nutzung ist kein .NET SDK nötig. Emulatoren und ihre zusätzlichen Laufzeitabhängigkeiten werden gesondert eingerichtet.
+
+## GDI und Mega-CD als Mehrdisc-Playlist – neu in 0.14.124
+
+Dreamcast-GDI-Sätze erhalten eine geprüfte relative Playlist, auch in eindeutig nummerierten benachbarten Disc-Ordnern. Manifest und Tracks werden vor dem Schreiben erneut geprüft; der Scanner erkennt Track-Abhängigkeiten und die ROM-Neuzuordnung berücksichtigt GDI-Verweise. Mega-CD erhält CHD/CUE-Playlists für Genesis Plus GX. Einzel-Discs, Metadaten und Spielstände bleiben erhalten. [Abläufe und Grenzen](LIBRARY_AND_DISPLAY.md).
+
+341 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Die offiziellen Flycast-/Genesis-Plus-GX-Cores melden die benötigten Formate. Echte Disc-Wechsel mit Spielen bleiben separat zu testen.
 
 ## Bedienung vor dem Spielen erkennen – neu in 0.14.122
 

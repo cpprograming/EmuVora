@@ -2,7 +2,15 @@
 
 Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.122](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.122).
+Aktueller geprüfter Release: [0.14.124](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.124).
+
+## 0.14.124 – GDI und Mega-CD (abgeschlossen)
+
+- [x] Dreamcast-GDI mit begrenzter Manifest-/Trackprüfung, relativen Pfaden und eindeutig nummerierten benachbarten Disc-Ordnern nach Vorschau bündeln.
+- [x] GDI-Track-Abhängigkeiten im Scanner und bei der ROM-Neuzuordnung inklusive M3U-Verweisen berücksichtigen.
+- [x] Mega-CD-Playlists für CHD/CUE und Genesis Plus GX ergänzen; Originaldateien und Einzel-Disc-Metadaten erhalten.
+- [x] 341 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; echte Core-Erweiterungen und neue Vorschauen geprüft. [Anleitung](LIBRARY_AND_DISPLAY.md).
+- [ ] Weitere Formate/Systeme und echte Disc-Wechsel separat prüfen.
 
 ## 0.14.122 – Bedienhinweise (abgeschlossen)
 
@@ -195,7 +203,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 ## 0.14 – Spielebibliothek
 
-- [x] Dreamcast-GDI mit Trackprüfung und nummerierten benachbarten Disc-Ordnern sowie Mega-CD/Genesis-Plus-GX-Playlists für CHD/CUE ergänzen (Entwicklungsstand). Scanner und ROM-Neuzuordnung berücksichtigen GDI-Abhängigkeiten. [Anleitung](LIBRARY_AND_DISPLAY.md).
+- [x] Dreamcast-GDI mit Trackprüfung und nummerierten benachbarten Disc-Ordnern sowie Mega-CD/Genesis-Plus-GX-Playlists für CHD/CUE ergänzen (ab 0.14.124). Scanner und ROM-Neuzuordnung berücksichtigen GDI-Abhängigkeiten. [Anleitung](LIBRARY_AND_DISPLAY.md).
 
 - [x] Release 0.14.68 mit 149 Funktions- und 6 Netzwerktests veröffentlicht; Setup-Download und Selbstupdate einschließlich SHA-256 geprüft.
 
