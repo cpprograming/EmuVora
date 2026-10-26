@@ -167,7 +167,7 @@ public sealed class CoverCatalog(HttpClient http,string cacheDirectory,string re
         if(image.Length<24||!image.AsSpan(0,8).SequenceEqual(new byte[]{137,80,78,71,13,10,26,10}))throw new IOException("Die Coverquelle liefert kein PNG-Bild.");
         var width=BinaryPrimitives.ReadUInt32BigEndian(image.AsSpan(16,4));var height=BinaryPrimitives.ReadUInt32BigEndian(image.AsSpan(20,4));
         if(width==0||height==0||width>8192||height>8192||width* (long)height>32_000_000)throw new IOException("Ungültige Covergröße.");
-        Directory.CreateDirectory(folder);var file=Path.Combine(folder,EsDeFrontend.GameId(game)+".png");var temporary=file+".new";
+        Directory.CreateDirectory(folder);var file=Path.Combine(folder,LibraryIdentity.GameId(game)+".png");var temporary=file+".new";
         try{await File.WriteAllBytesAsync(temporary,image,token);token.ThrowIfCancellationRequested();File.Move(temporary,file,true);}finally{if(File.Exists(temporary))File.Delete(temporary);}return file;
     }
     public async Task<CoverBatchResult> DownloadMissingAsync(IEnumerable<Game> games,Dictionary<string,string> covers,string folder,Action<Game,string> saved,IProgress<CoverBatchProgress>? progress=null,CancellationToken token=default)

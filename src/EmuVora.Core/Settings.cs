@@ -5,8 +5,6 @@ public sealed class AppSettings
     public bool OnboardingCompleted {get;set;}
     public string Theme {get;set;}="Midnight";
     public string? EmulationStationTheme {get;set;}
-    public string? EsDeExecutable {get;set;}
-    public bool StartInEsDe {get;set;}
     public Dictionary<string,string> EmulatorPaths {get;set;}=[];
     public Dictionary<string,string> CorePaths {get;set;}=[];
     public Dictionary<string,string> Covers {get;set;}=[];
@@ -52,6 +50,7 @@ public sealed class SettingsStore(string file)
             var json=File.ReadAllText(file);var settings=JsonSerializer.Deserialize<AppSettings>(json,JsonOptions)??new();
             settings.EmulatorPaths??=[];settings.CorePaths??=[];settings.Covers??=[];settings.PreferredEmulators??=[];settings.Packages??=[];settings.RomFolders??=[];
             settings.GameAspectRatios??=[];settings.ExternalSaveFolders??=[];
+            RemoveRetiredFrontend(settings);
             settings.ProtectedCovers=new(settings.ProtectedCovers??[],StringComparer.OrdinalIgnoreCase);
             settings.Collections=(settings.Collections??[]).Where(c=>!string.IsNullOrWhiteSpace(c.Key)).GroupBy(c=>c.Key,StringComparer.OrdinalIgnoreCase).ToDictionary(g=>g.First().Key,g=>new HashSet<string>(g.SelectMany(c=>c.Value??[]),StringComparer.OrdinalIgnoreCase),StringComparer.OrdinalIgnoreCase);
             // Older releases stored manually selected images under a random GUID filename.
@@ -69,6 +68,13 @@ public sealed class SettingsStore(string file)
         }
     }
     public void Save(AppSettings settings)=>AtomicFile.WriteText(file,JsonSerializer.Serialize(settings,JsonOptions));
+    internal static void RemoveRetiredFrontend(AppSettings settings)
+    {
+        foreach(var key in settings.EmulatorPaths.Keys.Where(IsRetiredFrontend).ToArray())settings.EmulatorPaths.Remove(key);
+        foreach(var key in settings.Packages.Keys.Where(IsRetiredFrontend).ToArray())settings.Packages.Remove(key);
+        foreach(var key in settings.PreferredEmulators.Where(p=>IsRetiredFrontend(p.Value)).Select(p=>p.Key).ToArray())settings.PreferredEmulators.Remove(key);
+    }
+    private static bool IsRetiredFrontend(string id)=>id.Equals("esde",StringComparison.OrdinalIgnoreCase)||id.Equals("alekfull-nx",StringComparison.OrdinalIgnoreCase);
 }
 public static class AtomicFile
 {

@@ -105,7 +105,7 @@ public class RomRelocationTests
         foreach(var game in games){dir.File("new/"+Path.GetFileName(game.Path),"fixture");settings.Covers[game.Path.ToUpperInvariant()]=cover;settings.Collections["Couch"].Add(game.Path.ToUpperInvariant());}
         new SettingsStore(Path.Combine(data,"settings.json")).Save(settings);var plan=RomRelocation.Preview(store.GetAll(),old,target);Assert.Equal(512,plan.Suggestions.Count);Assert.Equal(512,RomRelocation.Apply(data,plan).Changed);var loaded=new SettingsStore(Path.Combine(data,"settings.json")).Load();Assert.Equal(512,loaded.Collections["Couch"].Count);Assert.All(store.GetAll(),game=>{Assert.True(File.Exists(game.Path));Assert.Equal(cover,loaded.Covers[game.Path]);Assert.Contains(game.Path,loaded.Collections["Couch"]);});Assert.Equal("cover",File.ReadAllText(cover));
     }
-    [Fact] public void ActiveEsDeLaunchPreventsRelocationWithoutChangingData()
+    [Fact] public void ConcurrentLibraryOperationPreventsRelocationWithoutChangingData()
     {
         using var dir=new TestDirectory();var data=Data(dir);var old=Path.Combine(dir.Path,"old");var target=Path.Combine(dir.Path,"new");dir.File("new/Game.nes","rom");var store=new LibraryStore(Path.Combine(data,"library.db"));store.Upsert([new("Game","NES",Path.Combine(old,"Game.nes"))]);var game=Assert.Single(store.GetAll());var before=File.ReadAllText(Path.Combine(data,"settings.json"));var plan=RomRelocation.Preview([game],old,target);
         using(var launch=new FileStream(Path.Combine(data,".game-launch.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None,1,FileOptions.DeleteOnClose))Assert.Throws<IOException>(()=>RomRelocation.Apply(data,plan));

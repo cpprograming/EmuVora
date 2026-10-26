@@ -90,15 +90,6 @@ public class CoverManagementTests
         }
         finally{window.Close();}
     }
-    [Fact] public void EsDeDoesNotReplaceProtectedCoverButStillImportsFavorites()
-    {
-        using var dir=new TestDirectory();var game=new Game("Fixture","NES",dir.File("fixture.nes"));var own=Image(dir,"own.png");var settings=Settings();settings.Covers[game.Path]=own;settings.ProtectedCovers.Add(game.Path);
-        var store=new LibraryStore(Path.Combine(dir.Path,"library.db"));store.Upsert([game]);EsDeFrontend.Export(dir.Path,dir.File("app.exe"),[game],settings);
-        var native=Path.Combine(EsDeFrontend.AppData(dir.Path),"downloaded_media","emuvora-nes","covers",EsDeFrontend.GameId(game)+".png");File.WriteAllText(native,"changed");
-        var listFile=Path.Combine(EsDeFrontend.AppData(dir.Path),"gamelists","emuvora-nes","gamelist.xml");var list=System.Xml.Linq.XDocument.Load(listFile);list.Root!.Element("game")!.SetElementValue("favorite","true");list.Save(listFile);
-        EsDeFrontend.ImportChanges(dir.Path,store,settings);Assert.True(Assert.Single(store.GetAll()).Favorite);Assert.Equal(own,settings.Covers[game.Path]);Assert.True(File.Exists(own));
-        settings.ProtectedCovers.Clear();EsDeFrontend.ImportChanges(dir.Path,store,settings);Assert.Equal(native,settings.Covers[game.Path]);
-    }
     [AvaloniaFact] public async Task TvControllerOpensCoverActionsAndSearchCanBeCancelledWithoutEdits()
     {
         using var dir=new TestDirectory();var game=new Game("Fixture","SNES","fixture.sfc");var settings=Settings();settings.TvMode=true;

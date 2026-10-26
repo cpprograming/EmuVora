@@ -10,7 +10,7 @@ Das mintfarbene V mit Play-Aussparung ist das neue App-Zeichen. Die Wortmarke wi
 
 ## Oberfläche
 
-Ruhige Navigation mit einheitlichen Windows-Symbolen, dynamischer Überschrift, klarer Such- und Filterleiste und hervorgehobener Spielauswahl. Die Detailspalte setzt Cover, Titel und Spielen-Aktion in eine feste Reihenfolge. Nicht vorhandene Cover erhalten systemabhängige Platzhalter; vorhandene Cover werden proportional dargestellt. Weitere Werkzeuge liegen unter **Verwaltung**, einschließlich Einrichtungsassistent, erneutem Scan und ES-DE-Start.
+Ruhige Navigation mit einheitlichen Windows-Symbolen, dynamischer Überschrift, klarer Such- und Filterleiste und hervorgehobener Spielauswahl. Die Detailspalte setzt Cover, Titel und Spielen-Aktion in eine feste Reihenfolge. Nicht vorhandene Cover erhalten systemabhängige Platzhalter; vorhandene Cover werden proportional dargestellt. Weitere Werkzeuge liegen unter **Verwaltung**, einschließlich Einrichtungsassistent, erneutem Scan und Systemübersicht.
 
 Die vier Farbschemata und der TV-Modus bleiben verfügbar. Die Detailspalte wird unter 1120 Pixeln oder im TV-Modus ausgeblendet. Kleine Fenster behalten scrollbare Spiele- und Navigationsbereiche. Eine erfolglose Suche lässt sich direkt über **Filter zurücksetzen** aufheben. Der Kontrast des Spielen-Knopfs wird auch beim Darüberfahren mit der Maus automatisch geprüft (mindestens 4,5:1).
 

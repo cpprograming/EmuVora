@@ -90,13 +90,13 @@ public class InterfaceTests
         tabs.SelectedIndex=1;Dispatcher.UIThread.RunJobs();var mode=dialog.GetVisualDescendants().OfType<ComboBox>().First(c=>c.Items.Contains("Pixelgenau · ganze Skalierungsstufen"));mode.SelectedIndex=1;Assert.Equal("PixelPerfect",store.Load().DisplayMode);
         Dispatcher.UIThread.RunJobs();using var frame=dialog.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Display-options.png"));}dialog.Close();window.Close();
     }
-    [AvaloniaFact] public void NativeGameLaunchFailureShowsSetupAndReturnActions()
+    [AvaloniaFact] public void RetiredLaunchShowsExplanationWithoutCreatingLibraryOrDownloads()
     {
-        using var dir=new TestDirectory();var game=new Game("Unavailable","PS1",System.IO.Path.Combine(dir.Path,"missing.chd"));new LibraryStore(dir.File("library.db","")).Restore([game]);
-        var window=new GameLaunchWindow(new EsDeLaunchRequest(EsDeFrontend.GameId(game),dir.Path));window.Show();Dispatcher.UIThread.RunJobs();
-        Assert.Contains(window.GetVisualDescendants().OfType<Button>(),b=>b.Content as string=="EmuVora-Einrichtung öffnen"&&b.IsVisible);
-        Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text?.Contains("ROM-Datei ist nicht erreichbar")==true);
-        using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"ES-DE-launch-error.png"));}window.Close();
+        using var dir=new TestDirectory();var window=new RetiredLaunchWindow();window.Show();Dispatcher.UIThread.RunJobs();
+        Assert.Single(window.GetVisualDescendants().OfType<Button>(),b=>b.Content as string=="Schließen");
+        Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(),t=>t.Text?.Contains("entfernten ES-DE-Startmodus")==true);
+        Assert.Empty(Directory.GetFileSystemEntries(dir.Path));
+        using var frame=window.CaptureRenderedFrame();Assert.NotNull(frame);var screenshots=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(screenshots!=null){Directory.CreateDirectory(screenshots);frame.Save(System.IO.Path.Combine(screenshots,"Retired-launch-notice.png"));}ControllerUi.Handle(window,0x2000);Assert.False(window.IsVisible);
     }
     [AvaloniaFact] public void FirstStartShowsFolderChoiceAndRenders()
     {

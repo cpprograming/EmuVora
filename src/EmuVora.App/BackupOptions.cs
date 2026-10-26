@@ -14,7 +14,7 @@ public sealed partial class MainWindow
         var panel=new StackPanel{Spacing=14,Margin=new(24)};
         var message=new TextBlock{TextWrapping=TextWrapping.Wrap};string? restored=null;
         panel.Children.Add(new TextBlock{Text="Sicherung & Wiederherstellung",FontSize=25,FontWeight=FontWeight.Bold});
-        panel.Children.Add(new TextBlock{Text="Sichert Einstellungen, Bibliothek, Cover, erkannte Emulator-Spielstände und ausgewählte zusätzliche Spielstandsordner. Wähle nur Ordner mit Spielständen: Zusätzliche Ordner werden vollständig kopiert. Fehlende Ordner stoppen die Sicherung. Spiele und ES-DE vorher beenden.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(new TextBlock{Text="Sichert Einstellungen, Bibliothek, Cover, erkannte Emulator-Spielstände und ausgewählte zusätzliche Spielstandsordner. Wähle nur Ordner mit Spielständen: Zusätzliche Ordner werden vollständig kopiert. Fehlende Ordner stoppen die Sicherung. Laufende Spiele und Emulatoren vorher beenden.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(ExternalSaveOptions());
         var firmware=new CheckBox{Content="Importierte BIOS-/Firmware-Dateien mitsichern",IsChecked=settings.IncludeFirmwareInBackups};
         firmware.IsCheckedChanged+=(_,_)=>Guard(()=>{settings.IncludeFirmwareInBackups=firmware.IsChecked==true;settingsStore.Save(settings);});panel.Children.Add(firmware);

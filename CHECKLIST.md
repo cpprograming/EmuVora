@@ -4,6 +4,8 @@ Stand: 26. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 
 ## Aktueller Stand
 
+- [x] ES-DE-Anwendungsintegration entfernt: Start, Export/Abgleich, Downloads und Paketfreigaben entfallen. Cover-Kennungen/Konsolenlogos unabhängig; alte Einstellungen und Startverweise kontrolliert behandelt. Neue Sicherungen erhalten referenzierte alte Cover und aktive lokale Themes. Releaseprüfung läuft. Der Theme-Import bleibt erhalten; Layout-Engine folgt gemäß [GUI-Roadmap](GUI_ROADMAP.md).
+
 - [x] Bibliotheksdialoge in 0.14.126 veröffentlicht ([PR #41](https://github.com/cpprograming/EmuVora/pull/41)): feste Aktionsleisten in Duplikatübersicht, Inhaltsvergleich, Zusammenführung, Playlist-Vorschau und ROM-Pfadzuordnung; lange Vorschauen bleiben separat scrollbar. Schmale/helle/dunkle/TV-Ansichten und Abbruch ohne Datenänderung automatisiert geprüft. 344 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft und installiert. Bibliothek und Cover erhalten; echte Controllerabnahme bleibt offen. [Bedienung](LIBRARY_AND_DISPLAY.md#bibliotheksdialoge-bedienen).
 
 - [x] GDI und Mega-CD in 0.14.124 veröffentlicht ([PR #40](https://github.com/cpprograming/EmuVora/pull/40)): Dreamcast-GDI mit Trackprüfung, nummerierten benachbarten Disc-Ordnern, Scan-/Umzugsprüfung und Mega-CD-Playlists für CHD/CUE. Originaldateien und Disc-Metadaten erhalten; 341 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Echte Core-Erweiterungen und Vorschauen geprüft; Disc-Wechsel im Spiel bleibt offen. [Anleitung](LIBRARY_AND_DISPLAY.md).

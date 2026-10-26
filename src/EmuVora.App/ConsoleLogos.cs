@@ -17,7 +17,7 @@ public sealed class ConsoleLogos:IDisposable
         return system switch
         {
             "PC Engine CD"=>"pce-cd","Neo Geo CD"=>"neogeo","ColecoVision"=>"colecovision",
-            "DOS"=>"pc","Arcade (MAME)"=>"mame",_=>EsDeFrontend.ThemeId(system)
+            "DOS"=>"pc","Arcade (MAME)"=>"mame",_=>SystemArtworkIds.ThemeId(system)
         };
     }
     public Control CreateContent(string system,int count)

@@ -13,7 +13,7 @@ public sealed partial class MainWindow
         if(Selected is not{} game||operation!=null)return;
         var panel=new StackPanel{Spacing=14,Margin=new(24)};
         panel.Children.Add(new TextBlock{Text=game.Title,FontSize=22,TextWrapping=TextWrapping.Wrap});
-        panel.Children.Add(new TextBlock{Text=settings.ProtectedCovers.Contains(game.Path)?"Cover geschützt. Automatischer Abruf und ES-DE ersetzen dieses Bild nicht.":"Wähle ein eigenes Bild oder suche mit einem anderen Titel. Vor dem Austausch erscheint eine Vorschau.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(new TextBlock{Text=settings.ProtectedCovers.Contains(game.Path)?"Cover geschützt. Der automatische Abruf ersetzt dieses Bild nicht.":"Wähle ein eigenes Bild oder suche mit einem anderen Titel. Vor dem Austausch erscheint eine Vorschau.",TextWrapping=TextWrapping.Wrap});
         var dialog=Dialog("Cover bearbeiten",panel);
         panel.Children.Add(ActionButton("Eigenes Bild auswählen",()=>dialog.Close("local")));
         panel.Children.Add(ActionButton("Cover online suchen",()=>dialog.Close("online")));
@@ -45,7 +45,7 @@ public sealed partial class MainWindow
             old.Children.Add(new ContentControl{Height=230,Content=Artwork(game,180)});comparison.Children.Add(old);
             var proposed=new StackPanel{Spacing=8};proposed.Children.Add(new TextBlock{Text="Vorschlag"});
             var preview=new Image{Height=230,Source=bitmap,Stretch=Stretch.Uniform};proposed.Children.Add(preview);Grid.SetColumn(proposed,1);comparison.Children.Add(proposed);panel.Children.Add(comparison);
-            panel.Children.Add(new TextBlock{Text="Dieses Cover wird nach dem Übernehmen geschützt. Sammelsuche und ES-DE-Abgleich ersetzen es nicht. Den Schutz kannst du in den Spieldetails aufheben. Das bisherige Bild bleibt im Datenordner erhalten.",TextWrapping=TextWrapping.Wrap});
+            panel.Children.Add(new TextBlock{Text="Dieses Cover wird nach dem Übernehmen geschützt. Die Sammelsuche ersetzt es nicht. Den Schutz kannst du in den Spieldetails aufheben. Das bisherige Bild bleibt im Datenordner erhalten.",TextWrapping=TextWrapping.Wrap});
             var dialog=Dialog("Cover prüfen",panel);
             panel.Children.Add(ActionButton("Dieses Cover übernehmen",()=>dialog.Close(true)));
             panel.Children.Add(ActionButton("Abbrechen",()=>dialog.Close(false)));

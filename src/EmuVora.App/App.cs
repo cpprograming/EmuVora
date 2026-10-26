@@ -15,8 +15,7 @@ public class App : Application
             desktop.Exit+=(_,_)=>Gamepad.Shutdown();
             if(desktop.Args?.Contains("--esde-launch")==true)
             {
-                try{desktop.MainWindow=new GameLaunchWindow(EsDeLaunchRequest.Parse(desktop.Args));}
-                catch(Exception ex){desktop.MainWindow=new Window{Title="EmuVora – Spielverweis ungültig",Width=620,Height=280,Content=new TextBlock{Margin=new Thickness(24),TextWrapping=TextWrapping.Wrap,Text=ex.Message}};}
+                desktop.MainWindow=new RetiredLaunchWindow();
                 base.OnFrameworkInitializationCompleted();return;
             }
             var localLocator=Path.Combine(AppContext.BaseDirectory,"emuvora-location.json");

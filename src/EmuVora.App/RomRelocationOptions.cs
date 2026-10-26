@@ -52,6 +52,6 @@ public sealed partial class MainWindow
             }
         });}finally{owner.IsEnabled=enabled;}
         if(!completed){message.Text=status.Text;return;}
-        message.Text=status.Text=$"{result!.Changed} ROM-Pfade neu zugeordnet. Sicherung: {result.BackupDirectory}. ES-DE beim nächsten Öffnen neu abgleichen; eigene Emulator-Spielstandsordner bei Bedarf prüfen.";
+        message.Text=status.Text=$"{result!.Changed} ROM-Pfade neu zugeordnet. Sicherung: {result.BackupDirectory}. Eigene Emulator-Spielstandsordner bei Bedarf prüfen.";
     }
 }

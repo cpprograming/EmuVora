@@ -2,7 +2,7 @@
 
 Settings → App-Updates shows the installed version and checks the latest stable
 GitHub release. Startup checks can be disabled independently of emulator updates.
-Download the update, then select “Aktualisieren und neu starten”. Games and ES-DE
+Download the update, then select “Aktualisieren und neu starten”. Games and emulators
 must be closed first. A failed check never prevents playing offline.
 
 The updater accepts only the official repository's Windows setup asset with a
