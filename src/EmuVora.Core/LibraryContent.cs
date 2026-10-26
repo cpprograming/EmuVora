@@ -11,11 +11,13 @@ public record DiscPlaylistPlan(LibraryAuditGroup Group, string Path, string Cont
 
 public static class LibraryContent
 {
+    public static string PlaylistFormats(string system)=>system=="Dreamcast"?"CHD / CUE / GDI":"CHD / CUE";
     public static string? PlaylistEmulator(string system) => system switch
     {
         "PS1" => "DuckStation oder RetroArch / Beetle PSX",
         "Saturn" => "RetroArch / Beetle Saturn",
         "Dreamcast" => "RetroArch / Flycast",
+        "Mega-CD" => "RetroArch / Genesis Plus GX",
         _ => null
     };
     private static readonly HashSet<string> IndexFiles = new(StringComparer.OrdinalIgnoreCase) { ".cue", ".m3u", ".gdi", ".ccd", ".toc", ".mds" };
@@ -47,7 +49,7 @@ public static class LibraryContent
 
     public static DiscPlaylistPlan PreviewPlaylist(LibraryAuditGroup group, CancellationToken token = default)
     {
-        if (PlaylistEmulator(group.System) == null || group.Games.Count < 2 || group.Games.Count > 99) throw new IOException("Playlist-Erstellung unterstützt PS1, Saturn und Dreamcast mit 2 bis 99 CHD/CUE-Discs.");
+        if (PlaylistEmulator(group.System) == null || group.Games.Count < 2 || group.Games.Count > 99) throw new IOException("Playlist-Erstellung unterstützt PS1, Saturn, Dreamcast und Mega-CD mit 2 bis 99 CHD/CUE-Discs; Dreamcast zusätzlich GDI.");
         var inspected = LibraryAudit.Inspect(group.Games, token).Where(g => g.Kind == "Mehrdisc-Kandidat").ToArray();
         if (inspected.Length != 1 || inspected[0].Games.Count != group.Games.Count || inspected[0].Title != group.Title) throw new IOException("Der Disc-Satz ist nicht eindeutig.");
         var ordered = inspected[0].Games;
@@ -57,6 +59,11 @@ public static class LibraryContent
         var totals = ordered.Select(g => Regex.Match(g.Title, @"(?:disc|disk|cd)\s*\d+\s*(?:of|/)\s*(\d+)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Where(m => m.Success).Select(m => int.Parse(m.Groups[1].Value));
         if (totals.Any(total => total != ordered.Count)) throw new IOException("Die angegebene Gesamtzahl stimmt nicht mit dem Disc-Satz überein.");
         var folder = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(ordered[0].Path))!;
+        if(ordered.Any(g=>!System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(g.Path))!.Equals(folder,StringComparison.OrdinalIgnoreCase)))
+        {
+            if(group.System!="Dreamcast"||ordered.Any(g=>!g.Path.EndsWith(".gdi",StringComparison.OrdinalIgnoreCase)))throw new IOException("Nur GDI-Sätze in eindeutig nummerierten benachbarten Disc-Ordnern dürfen verschiedene Ordner verwenden.");
+            folder=System.IO.Path.GetDirectoryName(folder)!;if(ordered.Any(g=>!System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(g.Path))!)!.Equals(folder,StringComparison.OrdinalIgnoreCase)))throw new IOException("GDI-Disc-Ordner müssen denselben übergeordneten Ordner haben.");
+        }
         Backups.NoLinks(folder);
         var snapshots = new Dictionary<string, DiscFileSnapshot>(StringComparer.OrdinalIgnoreCase);
         var lines = new List<string>();
@@ -64,12 +71,15 @@ public static class LibraryContent
         {
             token.ThrowIfCancellationRequested();
             var path = System.IO.Path.GetFullPath(game.Path); var name = System.IO.Path.GetFileName(path);
-            if (game.System != group.System || !System.IO.Path.GetDirectoryName(path)!.Equals(folder, StringComparison.OrdinalIgnoreCase) || name != name.Trim() || name.StartsWith('#') || name.Any(char.IsControl)) throw new IOException("Disc-Pfade sind für eine relative Playlist ungeeignet.");
+            var relative=System.IO.Path.GetRelativePath(folder,path).Replace('\\','/');
+            if (game.System != group.System || !Backups.Inside(path,folder) || relative!=relative.Trim() || relative.StartsWith('#') || relative.Any(char.IsControl) || name != name.Trim()) throw new IOException("Disc-Pfade sind für eine relative Playlist ungeeignet.");
             var extension = System.IO.Path.GetExtension(path);
-            if (!extension.Equals(".chd", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".cue", StringComparison.OrdinalIgnoreCase)) throw new IOException("Nur CHD- oder CUE-Discs werden unterstützt; BIN-Tracks nicht einzeln aufnehmen.");
+            var gdi=extension.Equals(".gdi",StringComparison.OrdinalIgnoreCase)&&group.System=="Dreamcast";
+            if (!extension.Equals(".chd", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".cue", StringComparison.OrdinalIgnoreCase)&&!gdi) throw new IOException("CHD/CUE oder bei Dreamcast GDI wählen; rohe Tracks und CDI werden nicht gebündelt.");
             AddFile(path, snapshots);
             if (extension.Equals(".cue", StringComparison.OrdinalIgnoreCase)) CheckCue(path, folder, snapshots, token);
-            lines.Add(name);
+            if(gdi)foreach(var track in GdiManifest.Read(path,token))AddFile(track.Path,snapshots);
+            lines.Add(relative);
         }
         var title = string.Concat(group.Title.Select(c => System.IO.Path.GetInvalidFileNameChars().Contains(c) || char.IsControl(c) ? '_' : c)).Trim().TrimEnd('.');
         if (string.IsNullOrWhiteSpace(title)) throw new IOException("Der Playlist-Name ist leer.");

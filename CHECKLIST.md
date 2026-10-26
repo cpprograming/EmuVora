@@ -98,6 +98,8 @@ Abnahme: Einrichtung, Bibliothek und Einstellungen wirken zusammengehörig und b
 
 ## 4. Bibliothek und Cover verbessern
 
+- [x] Dreamcast-GDI-Playlists einschließlich Trackprüfung, getrennter nummerierter Disc-Ordner, Scan-/Umzugsprüfung und Mega-CD-Playlists implementieren (Entwicklungsstand). Originaldateien bleiben erhalten. [Anleitung](LIBRARY_AND_DISPLAY.md).
+
 - [x] Festgelegte libretro-/No-Intro-Kataloge mit SHA-256 prüfen und lokale ROMs per Größe/SHA-1 erkennen. Titelübernahme nach Vorschau; eigene Bearbeitungen, Pfade, Cover und Verlauf erhalten. [Umfang: 16 Systeme](ROM_RECOGNITION.md).
 
 - [x] Eigene Sammlungen und Ansichten für zuletzt hinzugefügt, zuletzt gespielt und Favoriten ergänzen (ab 0.14.92).

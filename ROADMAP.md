@@ -195,6 +195,8 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 
 ## 0.14 – Spielebibliothek
 
+- [x] Dreamcast-GDI mit Trackprüfung und nummerierten benachbarten Disc-Ordnern sowie Mega-CD/Genesis-Plus-GX-Playlists für CHD/CUE ergänzen (Entwicklungsstand). Scanner und ROM-Neuzuordnung berücksichtigen GDI-Abhängigkeiten. [Anleitung](LIBRARY_AND_DISPLAY.md).
+
 - [x] Release 0.14.68 mit 149 Funktions- und 6 Netzwerktests veröffentlicht; Setup-Download und Selbstupdate einschließlich SHA-256 geprüft.
 
 - [x] Prüfsummen-Erkennung mit bestätigter Titelvorschau für 16 Cartridge-Systeme integriert; Schutz eigener Bearbeitungen und lokaler ROM-Dateien. [Anleitung](ROM_RECOGNITION.md).

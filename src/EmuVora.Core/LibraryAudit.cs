@@ -24,6 +24,11 @@ public static class LibraryAudit
             if (!match.Success || game.Path.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase)) continue;
             var name = Disc.Replace(game.Title, "", 1).Trim();
             var folder = Path.GetDirectoryName(Path.GetFullPath(game.Path))!.ToUpperInvariant();
+            if(game.System=="Dreamcast"&&game.Path.EndsWith(".gdi",StringComparison.OrdinalIgnoreCase))
+            {
+                var directory=Path.GetDirectoryName(Path.GetFullPath(game.Path))!;var marker=Disc.Match(Path.GetFileName(directory));
+                if(marker.Success&&marker.Groups["number"].Value==match.Groups["number"].Value&&Disc.Replace(Path.GetFileName(directory),"",1).Trim().Equals(name,StringComparison.OrdinalIgnoreCase))folder=Path.GetDirectoryName(directory)!.ToUpperInvariant();
+            }
             var key = (system, name.ToUpperInvariant(), folder);
             if (!discs.TryGetValue(key, out var entries)) discs[key] = entries = [];
             entries.Add((game, int.Parse(match.Groups["number"].Value)));
