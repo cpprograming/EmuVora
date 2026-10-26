@@ -1,48 +1,48 @@
 {
   "SchemaVersion": 1,
+  "GeneratedAt": "2026-10-26T13:19:46.1326549Z",
   "Packages": [
     {
       "Url": "https://github.com/stenzek/duckstation/releases/download/latest/duckstation-windows-x64-release.zip",
-      "Id": "duckstation",
-      "Version": "latest-636005434",
+      "Version": "latest-673934896",
+      "Sha256": "b55d1cf45bdb6d0326a9083cf787ca7d6386dff6c837f6d3b8713f48af2a02b7",
       "Executable": "duckstation-qt-x64-ReleaseLTCG.exe",
-      "Sha256": "c7b126b98c19a87fa5f7068adc26d8f59d8e3266cd7ec5d257d039c8984fbbb8"
+      "Id": "duckstation"
     },
     {
       "Url": "https://github.com/PCSX2/pcsx2/releases/download/v2.8.2/pcsx2-v2.8.2-windows-x64-Qt.7z",
-      "Id": "pcsx2",
       "Version": "v2.8.2-544610696",
+      "Sha256": "7dfc829ca1994cc1045ac49f05e39b6cf968b72e6a374c40e05c2a2b4ac200b4",
       "Executable": "pcsx2-qt.exe",
-      "Sha256": "7dfc829ca1994cc1045ac49f05e39b6cf968b72e6a374c40e05c2a2b4ac200b4"
+      "Id": "pcsx2"
     },
     {
       "Url": "https://github.com/hrydgard/ppsspp/releases/download/v1.20.4/PPSSPP-v1.20.4-Windows-x64.zip",
-      "Id": "ppsspp",
       "Version": "v1.20.4-421816268",
+      "Sha256": "fbc9cd2f5131b159a92424e5c458c35ce43ba603cdded64dfc98e4bd4f17ff93",
       "Executable": "PPSSPPWindows64.exe",
-      "Sha256": "fbc9cd2f5131b159a92424e5c458c35ce43ba603cdded64dfc98e4bd4f17ff93"
+      "Id": "ppsspp"
     },
     {
       "Url": "https://dl.dolphin-emu.org/releases/2609a/dolphin-2609a-x64.7z",
-      "Id": "dolphin",
       "Version": "2609a",
+      "Sha256": "bbfd13bf9e6d2a4164a15c392b1f32a9b18150e5136746b388704608fbb60f76",
       "Executable": "Dolphin.exe",
-      "Sha256": "bbfd13bf9e6d2a4164a15c392b1f32a9b18150e5136746b388704608fbb60f76"
+      "Id": "dolphin"
     },
     {
       "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch.7z",
-      "Id": "retroarch",
       "Version": "1.22.2",
+      "Sha256": "b2139b1d0f9d4526dc6b5ce23cbb3efdc766096fa6f2c3df016818b486ac6372",
       "Executable": "retroarch.exe",
-      "Sha256": "b2139b1d0f9d4526dc6b5ce23cbb3efdc766096fa6f2c3df016818b486ac6372"
+      "Id": "retroarch"
     },
     {
       "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch_cores.7z",
-      "Id": "retroarch-cores",
       "Version": "1.22.2",
+      "Sha256": "86b871e11b9b4772ac644b40a38f2c8e9449da1f355eae7da08aa061148547b0",
       "Executable": "fceumm_libretro.dll",
-      "Sha256": "86b871e11b9b4772ac644b40a38f2c8e9449da1f355eae7da08aa061148547b0"
+      "Id": "retroarch-cores"
     }
-  ],
-  "GeneratedAt": "2026-10-19T13:39:07.3120471Z"
+  ]
 }
