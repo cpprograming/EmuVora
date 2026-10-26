@@ -22,8 +22,9 @@ Der bestehende Import übernimmt Bilder, Logos und Farben und wählt Varianten a
 
 ## 2. Gemeinsame Layout-Grundlage – vor erweitertem Theme-Import
 
-- [ ] Darstellung von Bibliotheksdaten und Aktionen trennen: ein gemeinsames Modell für Suche, Filter, Auswahl, Versionen und Startbefehle.
-- [ ] Native Ansichten ergänzen: Cover-Raster, kompakte Liste mit Detailbereich und horizontales Cover-Karussell.
+- [x] Gemeinsames Darstellungsmodell für Suche, Filter, Sortierung, Auswahl, Versionen und begrenzte Seiten ergänzen. Vorhandene Start-/Bearbeitungsaktionen werden gemeinsam verwendet.
+- [x] Cover-Raster und kompakte Liste mit vorhandener Detailspalte, gespeichertem Layouttyp und sitzungsbezogenen Scrollpositionen anbieten.
+- [ ] Horizontales Cover-Karussell auf derselben Grundlage ergänzen.
 - [ ] Eigenständige Konsolenauswahl mit großen Logos und optionalem Hintergrund anbieten; schnelle Seitenleisten-Navigation beibehalten.
 - [ ] Seitenleistenbreite, Coverformat, Abstände, Detailposition und Informationsdichte über definierte Layout-Optionen steuern.
 - [ ] Responsive Regeln für schmale Fenster, Desktop und TV festlegen; Auswahl, Suchtext und Scrollposition beim Ansichtswechsel erhalten.

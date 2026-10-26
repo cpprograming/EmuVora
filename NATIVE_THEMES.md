@@ -4,6 +4,16 @@ EmuVora verwendet seine eigene Oberfläche. Die ES-DE-Anwendung, ihr Start-/Expo
 
 Unter **Einstellungen → Darstellung** stehen die eigenen Basis-Themes **Midnight**, **Aurora**, **Studio**, **Classic Light**, **Retro Green** und **Neon Purple** bereit. Sie behalten Suche, Cover-Raster, Versionen, Sammlungen und Controller-Bedienung in einer gemeinsamen Oberfläche. Die Konsolenleiste reserviert für jede Zeile denselben Platz für Logo und Anzahl; Auswahlrahmen verändern die Breite nicht. Titelzeilen der Cover-Karten haben eine einheitliche Höhe.
 
+## Bibliothekslayout wählen
+
+In der Werkzeugleiste unter der Suche zwischen **Cover-Raster** und **Kompakte Liste** wechseln. Die Liste zeigt kleine proportionale Cover, Titel, Konsole, Versionszahl, fehlende Dateien und den bisherigen Spielverlauf. Fehlende Cover erhalten einen kompakten Platzhalter. Auf breiten Desktop-Fenstern kann dieselbe Detailspalte wie beim Raster verwendet werden; im TV-Modus bleiben größere Schrift und Zeilen aktiv. Die Werkzeugleiste bricht bei wenig Platz um.
+
+Beide Ansichten verwenden dieselbe Datenaufbereitung für Suche, Konsolenfilter, Favoriten, Sammlungen, Sortierung und Versionen. Der Wechsel erhält die aktuelle Seite und ausgewählte Datei. Jede Ansicht merkt sich ihre Scrollposition während der Sitzung, sofern Seite und Auswahl gleich geblieben sind. Bei geänderter Auswahl wird diese stattdessen sichtbar gemacht. Der Layouttyp wird gespeichert; Suche, Auswahl und Scrollposition werden nicht dauerhaft über einen Neustart gespeichert.
+
+Controller-Auf/Ab bewegt sich in der Liste jeweils um einen Titel; Seitenwechsel und Spielen mit A, Coververwaltung mit X sowie Favoriten mit Y bleiben erhalten. Über den Bedienmodus (Back/View) ist auch die Layout-Auswahl erreichbar. Maus-Doppelklick und Enter starten weiterhin das ausgewählte Spiel. Es werden höchstens 48 Titel pro Seite bereitgestellt; die Liste erzeugt ihre sichtbaren Zeilen bedarfsweise. Bibliotheksdaten und ROM-Dateien werden durch einen Layoutwechsel nicht verändert.
+
+Dies ist die gemeinsame Grundlage für weitere native Ansichten. Karussell, eigenständige Konsolenauswahl und die Übernahme fremder Theme-Layouts folgen separat. Der bestehende Theme-Import verändert weiterhin nur die unten beschriebenen Eigenschaften.
+
 ## EmulationStation-/ES-DE-Theme anpassen
 
 Den entpackten Theme-Ordner über **ES-DE-/EmulationStation-Theme anpassen …** auswählen. Das Original bleibt unverändert. EmuVora kopiert das Theme in den Datenordner und übernimmt unterstützte Hintergründe, Konsolenlogos und Listen-/Detailfarben. Bei ES-DE-Themes mit `capabilities.xml` wird die erste auswählbare Variante, ein zum hellen/dunklen Basisstil passendes Farbschema und bevorzugt die 16:9-Vorlage gewählt. Diese Vorlage wird in das native Layout eingepasst; sie verändert nicht die Windows-Auflösung.

@@ -31,17 +31,17 @@ public class NativeSurfaceTests
         var groups=GameVariants.Group([a,b,c,d],b.Path);Assert.Equal(3,groups.Count);var family=Assert.Single(groups,g=>g.Versions.Count==2);Assert.Equal(b,family.Representative);Assert.Contains(a,family.Versions);Assert.Contains(b,family.Versions);
     }
     private static void Render(Window window){window.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();}
-    [AvaloniaTheory][InlineData("Aurora",false)][InlineData("Studio",true)]
-    public async Task NativeLibraryGroupsVersionsAndKeepsEqualConsoleRows(string theme,bool tv)
+    [AvaloniaTheory][InlineData("Aurora",false,"Grid")][InlineData("Studio",true,"Grid")][InlineData("Aurora",false,"List")][InlineData("Studio",true,"List")]
+    public async Task NativeLibraryGroupsVersionsAndKeepsEqualConsoleRows(string theme,bool tv,string libraryLayout)
     {
-        using var dir=new TestDirectory();new SettingsStore(Path.Combine(dir.Path,"settings.json")).Save(new(){Theme=theme,TvMode=tv,OnboardingCompleted=true,AutoDownloadCovers=false,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false});var store=new LibraryStore(Path.Combine(dir.Path,"library.db"));store.Upsert([new("Same","GBC","a.gbc"),new("Same","GBC","b.zip"),new("Other","GBA","c.gba"),new("Third","GameCube","d.iso")]);var window=new MainWindow(dir.Path);window.Show();Render(window);
+        using var dir=new TestDirectory();new SettingsStore(Path.Combine(dir.Path,"settings.json")).Save(new(){Theme=theme,TvMode=tv,LibraryLayout=libraryLayout,OnboardingCompleted=true,AutoDownloadCovers=false,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false});var store=new LibraryStore(Path.Combine(dir.Path,"library.db"));store.Upsert([new("Same","GBC","a.gbc"),new("Same","GBC","b.zip"),new("Other","GBA","c.gba"),new("Third","GameCube","d.iso")]);var window=new MainWindow(dir.Path);window.Show();Render(window);
         try
         {
             var list=window.GetVisualDescendants().OfType<ListBox>().Single();Assert.Equal(3,list.ItemCount);list.SelectedItem=list.Items.Cast<Game>().Single(g=>g.Title=="Same");Render(window);
             var task=(Task<Game?>)typeof(MainWindow).GetMethod("ChooseVersionAsync",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(window,[list.SelectedItem])!;var dialog=Assert.Single(window.OwnedWindows);Render(dialog);Assert.Equal(2,dialog.GetVisualDescendants().OfType<ListBox>().Single().ItemCount);dialog.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Abbrechen").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Assert.Null(await task);Assert.Equal(4,store.GetAll().Count);
             var buttons=window.GetVisualDescendants().OfType<Button>().Where(b=>b.Classes.Contains("console-filter")).ToArray();Assert.Single(buttons.Select(b=>b.Bounds.Height).Distinct());var badges=buttons.Select(b=>b.GetVisualDescendants().OfType<TextBlock>().Single(t=>t.Classes.Contains("console-count"))).ToArray();Assert.Single(badges.Select(b=>b.Bounds.Width).Distinct());
             Assert.DoesNotContain(window.GetVisualDescendants().OfType<Button>(),b=>(b.Content as string)?.Contains("ES-DE öffnen")==true);
-            var folder=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(folder!=null){Directory.CreateDirectory(folder);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(folder,$"Native-library-{theme}.png"));}
+            var folder=Environment.GetEnvironmentVariable("EMUVORA_SCREENSHOTS");if(folder!=null){Directory.CreateDirectory(folder);using var frame=window.CaptureRenderedFrame();frame!.Save(Path.Combine(folder,$"Native-library-{theme}-{libraryLayout}.png"));}
         }
         finally{window.Close();}
     }

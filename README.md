@@ -6,6 +6,8 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Eigenes Frontend:** Die ES-DE-Anwendung samt Start-/Export-/Downloadcode ist entfernt. Der lokale EmulationStation-/ES-DE-Theme-Import bleibt erhalten; echte Layoutübernahme folgt auf einer eigenen Layout-Engine. [GUI- und Theme-Roadmap](GUI_ROADMAP.md).
 
+**Native Layouts:** Unter der Suche zwischen Cover-Raster und kompakter Liste wechseln. Filter, Sortierung, Versionen, Seite und Auswahl bleiben gemeinsam; die Liste zeigt kleine Cover und den Spielverlauf. [Bedienung und Grenzen](NATIVE_THEMES.md#bibliothekslayout-wählen).
+
 **Aktueller geprüfter Stand: [0.14.128](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.128)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation

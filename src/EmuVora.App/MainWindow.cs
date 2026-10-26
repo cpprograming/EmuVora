@@ -71,7 +71,7 @@ public sealed partial class MainWindow : Window
     private readonly TextBlock themeStatus=new(){TextWrapping=TextWrapping.Wrap,FontSize=12};
     private readonly Grid main=new(){RowDefinitions=new("Auto,Auto,*,Auto,Auto"),RowSpacing=16,Margin=new(24)};
     private readonly Dictionary<string,Bitmap> coverImages=new(StringComparer.OrdinalIgnoreCase);
-    private const int LibraryPageSize=48;
+    private const int LibraryPageSize=LibraryPresentation.PageSize;
     private int libraryPage;
     private int libraryResultCount;
     private readonly TextBlock pageLabel=new(){VerticalAlignment=VerticalAlignment.Center};
@@ -124,7 +124,11 @@ public sealed partial class MainWindow : Window
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
         var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=16};
         header.Children.Add(themeLogo);var heading=new StackPanel{Spacing=5};heading.Children.Add(libraryEyebrow);heading.Children.Add(libraryHeading);Grid.SetColumn(heading,1);header.Children.Add(heading);summary.VerticalAlignment=VerticalAlignment.Center;summary.TextAlignment=TextAlignment.Right;Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
-        var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=10};Grid.SetColumnSpan(search,3);filters.Children.Add(search);Grid.SetRow(systems,1);filters.Children.Add(systems);Grid.SetRow(sort,1);Grid.SetColumn(sort,1);filters.Children.Add(sort);detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});Grid.SetRow(detailsToggle,1);Grid.SetColumn(detailsToggle,2);filters.Children.Add(detailsToggle);AddRow(main,filters,1);
+        var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=4};Grid.SetColumnSpan(search,3);filters.Children.Add(search);
+        var toolbar=new WrapPanel();Grid.SetRow(toolbar,1);Grid.SetColumnSpan(toolbar,3);filters.Children.Add(toolbar);
+        detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});
+        libraryLayoutChoice.SelectedIndex=IsListLayout?1:0;Avalonia.Automation.AutomationProperties.SetName(libraryLayoutChoice,"Bibliothekslayout");ToolTip.SetTip(libraryLayoutChoice,"Cover-Raster oder kompakte Liste · Auswahl und Filter bleiben erhalten");libraryLayoutChoice.SelectionChanged+=(_,_)=>Guard(ChangeLibraryLayout);
+        foreach(var control in new Control[]{systems,sort,libraryLayoutChoice,detailsToggle}){control.Margin=new(0,0,8,8);toolbar.Children.Add(control);}AddRow(main,filters,1);
         gamesList.Classes.Add("game-library");
         filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);var gameActions=new Grid{ColumnDefinitions=new("*,*"),ColumnSpacing=10};Grid.SetRow(gameActions,2);Grid.SetColumnSpan(gameActions,3);gameActions.Children.Add(manageCover);Grid.SetColumn(collectionGame,1);gameActions.Children.Add(collectionGame);filters.Children.Add(gameActions);
         collectionGame.Click+=async(_,_)=>{try{await ChooseCollectionsAsync();}catch(Exception ex){ShowError(ex);}};
@@ -133,7 +137,8 @@ public sealed partial class MainWindow : Window
         manageCover.Click+=async(_,_)=>{try{await ManageCoverAsync();}catch(Exception ex){ShowError(ex);}};
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
-        gamesList.ItemsPanel=new FuncTemplate<Panel?>(()=>new WrapPanel());gamesList.ItemTemplate=new FuncDataTemplate<Game>((game,_)=>CreateCard(game));
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("list-layout").Descendant().OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.HorizontalAlignmentProperty,HorizontalAlignment.Stretch),new Setter(ListBoxItem.HorizontalContentAlignmentProperty,HorizontalAlignment.Stretch)}});
+        gamesList.AutoScrollToSelectedItem=false;ConfigureLibraryLayout();
         ScrollViewer.SetHorizontalScrollBarVisibility(gamesList,Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
         var library=new Grid{RowDefinitions=new("*,Auto")};library.Children.Add(gamesList);
         var pageButtons=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};pageButtons.Children.Add(previousPage);pageButtons.Children.Add(nextPage);libraryPager.Children.Add(pageLabel);libraryPager.Children.Add(pageButtons);Grid.SetRow(libraryPager,1);library.Children.Add(libraryPager);
@@ -149,7 +154,7 @@ public sealed partial class MainWindow : Window
         cover.Click+=async(_,_)=>await ChooseCoverAsync();edit.Click+=async(_,_)=>await EditAsync();remove.Click+=async(_,_)=>await RemoveAsync();reveal.Click+=(_,_)=>Guard(()=>{if(Selected is{} game)OpenPath(Path.GetDirectoryName(game.Path)!);});
         protectCover.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){if(!settings.ProtectedCovers.Remove(game.Path))settings.ProtectedCovers.Add(game.Path);settingsStore.Save(settings);UpdateSelected();}});
         onlineCover.Click+=async(_,_)=>await FetchCoverAsync();ToolTip.SetTip(onlineCover,"Sucht den Spieltitel bei libretro-thumbnails. Titel und Konsole werden dafür an GitHub gesendet.");
-        gamesList.SelectionChanged+=(_,_)=>UpdateSelected();gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
+        gamesList.SelectionChanged+=(_,_)=>{UpdateSelected();if(!changingLibraryLayout&&Selected!=null)gamesList.ScrollIntoView(Selected);};gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
         gamesList.KeyDown+=async(_,e)=>{if(e.Key==Key.Enter){e.Handled=true;await PlayAsync();}};
         search.TextChanged+=(_,_)=>Refresh();systems.SelectionChanged+=(_,_)=>Refresh();sort.SelectionChanged+=(_,_)=>Refresh();cancel.Click+=(_,_)=>RequestOperationCancel();
         KeyDown+=(_,e)=>{if(e.Key==Key.F&&e.KeyModifiers.HasFlag(KeyModifiers.Control)){search.Focus();e.Handled=true;}};
@@ -229,26 +234,21 @@ public sealed partial class MainWindow : Window
     private void Refresh(string? selectedPath=null,bool keepPage=false)
     {
         var explicitSelection=selectedPath!=null;if(!keepPage)libraryPage=0;selectedPath??=Selected?.Path;var query=search.Text?.Trim()??"";var console=systems.SelectedItem as string;
-        var filtered=allGames.Where(g=>(console is null or "Alle Konsolen"||g.System==console)&&(g.Title.Contains(query,StringComparison.OrdinalIgnoreCase)||g.System.Contains(query,StringComparison.OrdinalIgnoreCase)));
-        filtered=view switch {"Favoriten"=>filtered.Where(g=>g.Favorite),"Zuletzt gespielt"=>filtered.Where(g=>g.LastPlayed!=null),"Konsole zuordnen"=>filtered.Where(g=>!EmulatorCatalog.Systems.Contains(g.System)),"Fehlende Dateien"=>filtered.Where(g=>!File.Exists(g.Path)),"Fehlende Cover"=>filtered.Where(g=>CoverLibrary.IsMissing(settings,g.Path)),"Zuletzt hinzugefügt"=>filtered.Where(g=>addedTimes.ContainsKey(g.Path)),"Sammlung"=>filtered.Where(g=>collectionChoice.SelectedItem is string name&&settings.Collections.TryGetValue(name,out var members)&&members.Contains(g.Path)),_=>filtered};
-        var ordered=(sort.SelectedIndex==3||view=="Zuletzt hinzugefügt"?filtered.OrderByDescending(g=>addedTimes.GetValueOrDefault(g.Path)).ThenBy(g=>g.Title):sort.SelectedIndex==2||view=="Zuletzt gespielt"?filtered.OrderByDescending(g=>g.LastPlayed):sort.SelectedIndex==1?filtered.OrderBy(g=>g.System).ThenBy(g=>g.Title):filtered.OrderBy(g=>g.Title)).ToArray();
-        visibleVersions.Clear();var families=settings.GroupGameVersions?GameVariants.Group(ordered,selectedPath):ordered.Select(g=>new GameVariantGroup(g,new[]{g})).ToArray();foreach(var family in families)visibleVersions[family.Representative.Path]=family.Versions;var result=families.Select(g=>g.Representative).ToArray();
-        libraryResultCount=result.Length;
-        if(explicitSelection&&selectedPath!=null&&!keepPage){var position=Array.FindIndex(result,g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));if(position>=0)libraryPage=position/LibraryPageSize;}
-        libraryPage=Math.Clamp(libraryPage,0,Math.Max(0,(result.Length-1)/LibraryPageSize));
-        var page=result.Skip(libraryPage*LibraryPageSize).Take(LibraryPageSize).ToArray();
+        var presented=LibraryPresentation.Create(allGames,settings,addedTimes,new(query,console,view,sort.SelectedIndex,collectionChoice.SelectedItem as string,selectedPath,libraryPage,explicitSelection&&!keepPage));
+        visibleVersions.Clear();foreach(var family in presented.Families)visibleVersions[family.Representative.Path]=family.Versions;var result=presented.Families.Select(g=>g.Representative).ToArray();
+        libraryResultCount=result.Length;libraryPage=presented.Index;var page=presented.Games;
         foreach(var imageControl in gamesList.GetVisualDescendants().OfType<Image>())imageControl.Source=null;
         gamesList.ItemsSource=null;detailCover.Content=null;
         foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();
         gamesList.ItemsSource=page;gamesList.SelectedItem=page.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase));
         libraryPager.IsVisible=result.Length>LibraryPageSize;previousPage.IsEnabled=libraryPage>0;nextPage.IsEnabled=(libraryPage+1)*LibraryPageSize<result.Length;
-        pageLabel.Text=$"Seite {libraryPage+1} / {Math.Max(1,(result.Length+LibraryPageSize-1)/LibraryPageSize)} · {libraryPage*LibraryPageSize+1}–{libraryPage*LibraryPageSize+page.Length} von {result.Length}";
+        pageLabel.Text=$"Seite {libraryPage+1} / {Math.Max(1,(result.Length+LibraryPageSize-1)/LibraryPageSize)} · {libraryPage*LibraryPageSize+1}–{libraryPage*LibraryPageSize+page.Count} von {result.Length}";
         emptyState.IsVisible=empty.IsVisible=result.Length==0;emptyAction.Content=allGames.Count==0?"Ersten ROM-Ordner importieren":"Filter zurücksetzen";empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Deine Klassiker bekommen hier ein Zuhause. Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
         libraryHeading.Text=view=="Sammlung"?collectionChoice.SelectedItem as string??"Sammlung":view=="Alle Spiele"?(console is null or "Alle Konsolen"?"Deine Spiele":console):view;
         if(view=="Fehlende Cover"&&allGames.Count>0){empty.Title="Keine fehlenden Cover in dieser Auswahl";empty.Message="Alle passenden Spiele haben ein Cover. Suche oder Konsole ändern, um andere Einträge zu prüfen.";}
         if(view=="Zuletzt hinzugefügt"&&result.Length==0){empty.Title="Noch keine neuen Importe in dieser Auswahl";empty.Message="Das Importdatum wird ab dieser Version erfasst. Ältere Einträge bleiben unter Alle Spiele erhalten; ihr ursprüngliches Importdatum ist nicht bekannt.";}
         libraryEyebrow.Text=view=="Favoriten"?"DEINE LIEBLINGSSTÜCKE":view=="Zuletzt gespielt"?"WEITERSPIELEN":"DEINE SAMMLUNG";
-        var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=settings.GroupGameVersions?$"{result.Length} Titel · {ordered.Length} Dateien\n{consoleCount} Konsolen":$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
+        var consoleCount=allGames.Select(g=>g.System).Distinct().Count();summary.Text=settings.GroupGameVersions?$"{result.Length} Titel · {presented.FileCount} Dateien\n{consoleCount} Konsolen":$"{result.Length} von {allGames.Count} Spielen\n{consoleCount} "+(consoleCount==1?"Konsole":"Konsolen");UpdateSelected();
         ApplyExternalTheme();
         var selectedBrush=Brush.Parse(settings.Theme=="Classic Light"?"#D5E9E5":"#273D3D");foreach(var(name,button)in viewButtons){button.FontWeight=name==view?FontWeight.Bold:FontWeight.Normal;button.Background=name==view?selectedBrush:Brushes.Transparent;}
         foreach(var button in consoleNavigation.Children.OfType<Button>()){var selectedConsole=button.Tag as string==console;button.Background=selectedConsole?selectedBrush:Brushes.Transparent;button.Classes.Set("selected-console",selectedConsole);}
@@ -278,7 +278,7 @@ public sealed partial class MainWindow : Window
         var width=CardWidth;var card=new StackPanel {Width=width,Spacing=9,Margin=new(8,8,8,12)};
         card.Children.Add(new Border {Height=width*1.34,Padding=new Thickness(5),CornerRadius=new(12),Background=Brush.Parse(settings.Theme=="Classic Light"?"#E4EAEC":"#1E2932"),Child=Artwork(game,width),ClipToBounds=true});
         card.Children.Add(new TextBlock {Text=(game.Favorite?"★ ":"")+game.Title,TextWrapping=TextWrapping.Wrap,Height=settings.TvMode?60:44,TextTrimming=TextTrimming.CharacterEllipsis,FontSize=settings.TvMode?18:14,FontWeight=FontWeight.SemiBold});
-        card.Children.Add(new TextBlock {Text=game.System+(Versions(game).Count>1?$" · {Versions(game).Count} Versionen":"")+(File.Exists(game.Path)?"":" · Datei fehlt"),FontSize=settings.TvMode?16:12,Opacity=0.7});ToolTip.SetTip(card,game.Title+"\n"+game.Path);return card;
+        card.Children.Add(new TextBlock {Text=LibraryItemInfo(game),FontSize=settings.TvMode?16:12,Opacity=0.7});ToolTip.SetTip(card,game.Title+"\n"+game.Path);return card;
     }
     private void UpdateSelected()
     {

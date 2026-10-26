@@ -16,6 +16,7 @@ public sealed partial class MainWindow
     }
     private int LibraryColumns()
     {
+        if(IsListLayout)return 1;
         var containers=gamesList.GetVisualDescendants().OfType<ListBoxItem>().Where(c=>c.Bounds.Width>0&&c.Bounds.Height>0).ToArray();
         if(containers.Length>0){var row=containers.Min(c=>c.Bounds.Y);return Math.Max(1,containers.Count(c=>Math.Abs(c.Bounds.Y-row)<2));}
         return Math.Max(1,(int)(gamesList.Bounds.Width/(CardWidth+20)));
