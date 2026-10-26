@@ -2,7 +2,15 @@
 
 Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.120](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.120).
+Aktueller geprüfter Release: [0.14.122](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.122).
+
+## 0.14.122 – Bedienhinweise (abgeschlossen)
+
+- [x] Grundbedienung aller 47 Systeme in einem durchsuchbaren Leitfaden erklären; zehn Systeme mit möglichen Zusatzeingaben kennzeichnen.
+- [x] Hinweise bei Spielauswahl, ausgeblendeten Details und im TV-Modus sichtbar machen sowie in die Systemübersicht integrieren.
+- [x] Keine pauschale Gamepad-Zusage für unzugeordnete Systeme; Systemgrundhinweise von spielabhängigen Anforderungen unterscheiden.
+- [x] 323 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; helle/dunkle/TV-Ansichten visuell geprüft. [Anleitung](INPUT_GUIDE.md).
+- [ ] Echte USB-/Bluetooth-, Mehrspieler-, Spiel- und Monitor-Hardwaretests bleiben wie gewünscht offen.
 
 ## 0.14.120 – Systemzentrale (abgeschlossen)
 
@@ -204,7 +212,7 @@ Externe Bausteine und Reihenfolge: [Repository-Plan](REPOSITORY_PLAN.md). Fluent
 - [ ] 1080p, 1440p, 4K und mehrere Monitore praktisch testen.
 - [ ] Windows-Anzeigeskalierung und Bildschirmwechsel prüfen.
 - [ ] Seitenverhältnis und scharfe Skalierung mit repräsentativen 2D- und 3D-Systemen vergleichen.
-- [x] Systemgrundhinweise für besondere Eingaben in Bibliothek, Systemübersicht und durchsuchbarem Leitfaden ergänzen (Entwicklungsstand). Spielabhängige Anforderungen und Hardwareabnahme bleiben separat. [Anleitung](INPUT_GUIDE.md).
+- [x] Systemgrundhinweise für besondere Eingaben in Bibliothek, Systemübersicht und durchsuchbarem Leitfaden ergänzen (ab 0.14.122). Spielabhängige Anforderungen und Hardwareabnahme bleiben separat. [Anleitung](INPUT_GUIDE.md).
 
 ## 1.0 – Stabile Privatversion
 

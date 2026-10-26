@@ -4,6 +4,8 @@ Stand: 26. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 
 ## Aktueller Stand
 
+- [x] Bedienhinweise in 0.14.122 veröffentlicht ([PR #39](https://github.com/cpprograming/EmuVora/pull/39)): Leitfaden für alle 47 Systeme, Hinweise zu möglichen Zusatzeingaben bei zehn Systemen, Sichtbarkeit vor dem Spielen auch ohne Details/mit TV-Modus sowie Integration in die Systemübersicht. 323 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Keine Veränderung von Belegungen oder Bibliotheksdaten; echte Hardwaretests bleiben offen. [Anleitung](INPUT_GUIDE.md).
+
 - [x] Systemzentrale in 0.14.120 veröffentlicht ([PR #38](https://github.com/cpprograming/EmuVora/pull/38)): Suche und Zustandsprüfung für importierte/alle Systeme, bestätigte Sammel-Einrichtung fehlender Programme/Cores, BIOS-/Einstellungsaktionen und direkte Spiele-/Coverfilter. Feste Aktionsleiste für helle/dunkle, schmale und TV-Layouts; eigene funktionierende Pfade erhalten. 318 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Mit 5.805 Einträgen lesend geprüft. [Anleitung](SYSTEM_CENTER.md).
 
 - [x] Diagnosebericht in 0.14.118 veröffentlicht ([PR #37](https://github.com/cpprograming/EmuVora/pull/37)): schreibgeschützte Vorschau, freiwilliger lokaler Export, allgemeine Bibliotheks-/Emulator-/Core-/Firmware-/Bildprüfung ohne private Namen/Pfade oder Protokolltexte und ohne Upload. 310 Funktions- und 7 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Mit 5.805 Einträgen lesend geprüft. [Anleitung](DIAGNOSTICS.md).
@@ -41,14 +43,14 @@ Stand: 26. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den priv
 - [x] Eigene EmuVora-Themes und angepassten EmulationStation-/ES-DE-Import implementieren; separaten ES-DE-Start entfernen (ab 0.14.112).
 - [x] EmuVora-Selbstupdate und automatische GitHub-Builds eingerichtet.
 - [x] Datensicherung mit Prüfsummen und Wiederherstellung in einen neuen Ordner implementiert.
-- [x] 318 Funktionstests und 7 Netzwerktests auch im Release-Build 0.14.120 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
+- [x] 323 Funktionstests und 7 Netzwerktests auch im Release-Build 0.14.122 bestanden; Setup-Installation, Update und Datenerhalt geprüft.
 - [x] Gemeinsamen Statusbereich in Standarddialogen, Einstellungen und Einrichtung ergänzt ([PR #32](https://github.com/cpprograming/EmuVora/pull/32)): Fortschritt, Abbruch und Fehlerdetails; Timeouts, Anfragelimits, veraltete Meldungen und Controller-B geprüft; sofortigen Abbruch korrigiert ([PR #33](https://github.com/cpprograming/EmuVora/pull/33)).
 - [x] Saturn-/Dreamcast-Playlists für CHD/CUE mit Vorschau, korrekter Konsolenzuordnung und Erhalt der Einzel-Discs ergänzt ([PR #31](https://github.com/cpprograming/EmuVora/pull/31)).
 - [x] Bestätigte Duplikate mit Metadatenübernahme, Auswahl, Sicherung und Wiederaufnahme zusammenführen ([PR #30](https://github.com/cpprograming/EmuVora/pull/30)); unveränderte Duplikatpfade bei erneuten Scans unterdrücken. ROM-Dateien bleiben erhalten.
 - [x] SHA-256-Inhaltsvergleich und PS1-Playlist-Erstellung mit Vorschau veröffentlicht ([PR #29](https://github.com/cpprograming/EmuVora/pull/29)); Abbruch, CUE-Abhängigkeiten, geänderte Eingaben und Erhalt einzelner Disc-Metadaten geprüft. Keine automatische Zusammenführung oder Löschung.
 - [x] Prüfungsübersicht für gleiche Titel und nummerierte Disc-Sätze ergänzt ([PR #28](https://github.com/cpprograming/EmuVora/pull/28)); keine automatische Löschung oder Zusammenführung. Dialog mit einer privaten Bibliothekskopie zusätzlich geprüft.
 
-Der aktuelle Stand ist als [Release 0.14.120](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.120) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
+Der aktuelle Stand ist als [Release 0.14.122](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.122) veröffentlicht. [PR #11](https://github.com/cpprograming/EmuVora/pull/11) ergänzt zusätzliche Spielstandsordner mit getrennter Wiederherstellung. [PR #12](https://github.com/cpprograming/EmuVora/pull/12) ergänzt Bibliothekswechsel, Rückkehr zur vorherigen Bibliothek und optionale Sicherungserinnerungen. Automatisierte Tests und UI-Aufnahmen ersetzen keine Tests mit echten Controllern, Monitoren und Spielen.
 
 - [x] BIOS-Dateiauswahl mit sichtbarer Bestätigung, direktem Pfadimport, automatischer Benennung erkannter Inhalte und Ergebnisübersicht korrigiert ([PR #13](https://github.com/cpprograming/EmuVora/pull/13), ab 0.11.59). Originaldateien bleiben erhalten.
 
@@ -114,7 +116,7 @@ Abnahme: Eine größere Bibliothek bleibt übersichtlich; eigene Korrekturen üb
 - [ ] Echte Tests auf 1080p-, 1440p- und 4K-Monitoren sowie mit mehreren Monitoren durchführen.
 - [ ] Windows-Anzeigeskalierung und Bildschirmwechsel prüfen.
 - [ ] Seitenverhältnis und ganzzahlige Skalierung mit repräsentativen 2D- und 3D-Systemen vergleichen.
-- [x] Systemgrundhinweise für Maus/Touch, Tastatur und besondere Steuerung vor dem Spielen sowie in einer gefilterten Übersicht anzeigen (Entwicklungsstand). Keine pauschale Spiel-/Hardware-Kompatibilitätszusage. [Anleitung](INPUT_GUIDE.md).
+- [x] Systemgrundhinweise für Maus/Touch, Tastatur und besondere Steuerung vor dem Spielen sowie in einer gefilterten Übersicht anzeigen (ab 0.14.122). Keine pauschale Spiel-/Hardware-Kompatibilitätszusage. [Anleitung](INPUT_GUIDE.md).
 - [x] Verständlichen Diagnosebericht mit Vorschau und ausdrücklichem lokalem Speichern ergänzen; private Namen/Pfade und Protokolltexte auslassen, kein Upload (ab 0.14.118). [Anleitung](DIAGNOSTICS.md).
 - [ ] Updatefehler, Offlinebetrieb und Rückkehr zur vorherigen Emulatorversion praktisch testen.
 
