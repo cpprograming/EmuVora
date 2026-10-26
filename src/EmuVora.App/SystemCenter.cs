@@ -37,7 +37,7 @@ public sealed partial class MainWindow
         void Detail()
         {
             var row=SelectedSystem();name.Text=row?.System??"System auswählen";state.Text=row==null?"":row.Status+"\n"+(row.EmulatorId==null?"Konsole in den Spieldetails zuordnen.":EmulatorCatalog.Get(row.EmulatorId).Name+": "+(row.EmulatorMissing?"Programm fehlt / Pfad prüfen":"Programmdatei erreichbar")+(row.EmulatorId=="retroarch"?row.CoreMissing?"\nCore fehlt / Pfad prüfen":"\nCore-Datei erreichbar":""));
-            library.Text=row==null?"":$"{row.Titles} Titel · {row.Files} Dateien\n{row.MissingFiles} nicht erreichbare Spiele\n{row.MissingCovers} fehlende Cover";firmware.Text=row==null?"":!row.Known?"Firmwarestatus erst nach Konsolenzuordnung prüfbar.":row.FirmwareHint??"Keine fehlende Pflicht-Firmware erkannt.";notes.Text=row?.Note;ActionState();
+            library.Text=row==null?"":$"{row.Titles} Titel · {row.Files} Dateien\n{row.MissingFiles} nicht erreichbare Spiele\n{row.MissingCovers} fehlende Cover";firmware.Text=row==null?"":!row.Known?"Firmwarestatus erst nach Konsolenzuordnung prüfbar.":row.FirmwareHint??"Keine fehlende Pflicht-Firmware erkannt.";notes.Text=row==null?null:InputGuide.Describe(row.System)+(row.Note==null?"":"\n"+row.Note);ActionState();
         }
         void ActionState(){var row=SelectedSystem();foreach(var button in centerActions)button.IsEnabled=operation==null;setup.IsEnabled=row?.NeedsSetup==true&&operation==null;preferences.IsEnabled=row?.Known==true&&operation==null;showGames.IsEnabled=row?.Files>0&&operation==null;showCovers.IsEnabled=row?.Files>0&&operation==null;}
         void Filter()
