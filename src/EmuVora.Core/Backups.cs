@@ -34,6 +34,15 @@ public static class Backups
             {input.Open();output.Open();input.BackupDatabase(output);}
             files.Add("library.db",Path.Combine(stage,"library.db"));
             foreach(var folder in Folders)AddFolder(Path.Combine(source,folder));
+            // Older libraries can still reference cover media in the retired frontend folder.
+            // Include only referenced images, never the whole frontend/ROM export tree.
+            foreach(var cover in settings.Covers.Values.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                token.ThrowIfCancellationRequested();
+                if(File.Exists(cover)&&Inside(cover,source)){NoLinks(cover);files.TryAdd(Path.GetRelativePath(source,cover).Replace('\\','/'),cover);}
+                if(files.Count>100000)throw new IOException("Zu viele Dateien für eine Sicherung.");
+            }
+            if(settings.EmulationStationTheme is{} theme&&Inside(theme,source)&&!Path.GetFullPath(theme).Equals(source,StringComparison.OrdinalIgnoreCase)&&File.Exists(Path.Combine(theme,"theme.xml")))AddFolder(theme);
             if(settings.IncludeFirmwareInBackups)AddFolder(EmulatorSetup.FirmwareDirectory(source));
             foreach(var (id,folders) in SaveData.Folders)
                 if(settings.EmulatorPaths.TryGetValue(id,out var executable)&&Inside(executable,source))
@@ -128,6 +137,7 @@ public static class Backups
             }
             var settingsPath=Path.Combine(stage,"settings.json");
             var settings=JsonSerializer.Deserialize<AppSettings>(await File.ReadAllTextAsync(settingsPath,token),SettingsStore.JsonOptions)??throw new IOException("Ungültige Einstellungen.");
+            SettingsStore.RemoveRetiredFrontend(settings);
             SaveData.PrepareRestore(settings,manifest.SourceDirectory,stage);
             settings.ExternalSaveFolders=[];
             foreach(var folder in manifest.ExternalFolders??[])
@@ -140,7 +150,6 @@ public static class Backups
             string Rebase(string path)=>Inside(path,manifest.SourceDirectory)?Path.Combine(destination,Path.GetRelativePath(manifest.SourceDirectory,path)):path;
             foreach(var map in new[]{settings.Covers,settings.EmulatorPaths,settings.CorePaths})foreach(var key in map.Keys.ToArray())map[key]=Rebase(map[key]);
             settings.EmulationStationTheme=settings.EmulationStationTheme is{} theme?Rebase(theme):null;
-            settings.EsDeExecutable=settings.EsDeExecutable is{} esde?Rebase(esde):null;
             settings.Packages.Clear(); // Emulator binaries are intentionally not part of the backup.
             settings.LastBackupAt=manifest.Created;
             await File.WriteAllTextAsync(settingsPath,JsonSerializer.Serialize(settings,SettingsStore.JsonOptions),token);

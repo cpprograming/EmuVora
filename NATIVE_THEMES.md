@@ -1,6 +1,6 @@
 # Native Oberfläche und angepasste Themes
 
-EmuVora verwendet seine eigene Oberfläche. Der separate ES-DE-Start, dessen Autostart und die Download-Schaltflächen sind entfernt. Bereits vorhandene ES-DE-Dateien und Bibliotheksdaten werden nicht gelöscht; Kompatibilitätscode für ältere Spielverweise bleibt erhalten.
+EmuVora verwendet seine eigene Oberfläche. Die ES-DE-Anwendung, ihr Start-/Exportcode und ihre Download-Unterstützung sind entfernt. Alte Startverweise zeigen nur einen Hinweis zum direkten Öffnen von EmuVora. Alte Einstellungen werden eingelesen, ohne ES-DE zu aktivieren. Bereits vorhandene Ordner und darin referenzierte Cover oder Themes bleiben erhalten.
 
 Unter **Einstellungen → Darstellung** stehen die eigenen Basis-Themes **Midnight**, **Aurora**, **Studio**, **Classic Light**, **Retro Green** und **Neon Purple** bereit. Sie behalten Suche, Cover-Raster, Versionen, Sammlungen und Controller-Bedienung in einer gemeinsamen Oberfläche. Die Konsolenleiste reserviert für jede Zeile denselben Platz für Logo und Anzahl; Auswahlrahmen verändern die Breite nicht. Titelzeilen der Cover-Karten haben eine einheitliche Höhe.
 

@@ -34,7 +34,7 @@ public class NativeSurfaceTests
     [AvaloniaTheory][InlineData("Aurora",false)][InlineData("Studio",true)]
     public async Task NativeLibraryGroupsVersionsAndKeepsEqualConsoleRows(string theme,bool tv)
     {
-        using var dir=new TestDirectory();new SettingsStore(Path.Combine(dir.Path,"settings.json")).Save(new(){Theme=theme,TvMode=tv,OnboardingCompleted=true,AutoDownloadCovers=false,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false,StartInEsDe=true});var store=new LibraryStore(Path.Combine(dir.Path,"library.db"));store.Upsert([new("Same","GBC","a.gbc"),new("Same","GBC","b.zip"),new("Other","GBA","c.gba"),new("Third","GameCube","d.iso")]);var window=new MainWindow(dir.Path);window.Show();Render(window);
+        using var dir=new TestDirectory();new SettingsStore(Path.Combine(dir.Path,"settings.json")).Save(new(){Theme=theme,TvMode=tv,OnboardingCompleted=true,AutoDownloadCovers=false,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false});var store=new LibraryStore(Path.Combine(dir.Path,"library.db"));store.Upsert([new("Same","GBC","a.gbc"),new("Same","GBC","b.zip"),new("Other","GBA","c.gba"),new("Third","GameCube","d.iso")]);var window=new MainWindow(dir.Path);window.Show();Render(window);
         try
         {
             var list=window.GetVisualDescendants().OfType<ListBox>().Single();Assert.Equal(3,list.ItemCount);list.SelectedItem=list.Items.Cast<Game>().Single(g=>g.Title=="Same");Render(window);

@@ -68,7 +68,7 @@ public class CoverIdentityTests
     {
         using var dir=new TestDirectory();var file=dir.File("fixture.gb");File.WriteAllBytes(file,Rom(0x80));var game=new Game("038 Tetris DX","GB",file);
         var handler=new Source();using var http=new HttpClient(handler);var result=await new CoverCatalog(http,Path.Combine(dir.Path,"cache")).DownloadAsync(game,Path.Combine(dir.Path,"covers"));
-        Assert.NotNull(result);Assert.Equal(EsDeFrontend.GameId(game)+".png",Path.GetFileName(result));Assert.All(handler.Requests,u=>Assert.Contains("Nintendo_-_Game_Boy_Color",u.AbsolutePath));
+        Assert.NotNull(result);Assert.Equal(LibraryIdentity.GameId(game)+".png",Path.GetFileName(result));Assert.All(handler.Requests,u=>Assert.Contains("Nintendo_-_Game_Boy_Color",u.AbsolutePath));
         Assert.Equal("GB",game.System);Assert.Equal("038 Tetris DX",game.Title);Assert.Equal(Rom(0x80),File.ReadAllBytes(file));
     }
     [Fact] public async Task UnverifiedCartridgesNeverGuessAnotherPlatformsCover()

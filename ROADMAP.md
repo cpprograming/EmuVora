@@ -4,6 +4,14 @@ Stand: 26. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.126](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.126).
 
+## Nächste Etappe – eigenes Frontend ohne ES-DE-Anwendung
+
+- [x] ES-DE-Start-/Export-/Downloadcode und zugehörige Paketfreigaben entfernen; Cover-Kennungen und Konsolenlogos entkoppeln.
+- [x] Alte Startverweise kontrolliert stilllegen; alte Einstellungen ohne Frontend-Aktivierung laden und persönliche Ordner erhalten.
+- [x] Neue Sicherungen um referenzierte alte Cover und aktive lokale Themes ergänzen; veraltete Bedienhinweise bereinigen.
+- [ ] Release-/Installationsprüfung abschließen.
+- [ ] Anschließend gemeinsame Layout-Engine und native Listen-/Rasterauswahl umsetzen; erweiterter Theme-Import folgt darauf. [Detaillierte GUI-Roadmap](GUI_ROADMAP.md).
+
 ## 0.14.126 – Bibliotheksdialoge (abgeschlossen)
 
 - [x] Feste Aktionsleisten für Duplikatübersicht, Inhaltsvergleich, Zusammenführung, Playlist-Vorschau und ROM-Pfadzuordnung ergänzen.

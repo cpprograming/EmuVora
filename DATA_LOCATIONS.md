@@ -2,7 +2,7 @@
 
 Unter **Einstellungen → Bibliothek → Bibliothek wechseln** zeigt EmuVora den aktuellen und gegebenenfalls den vorherigen Datenordner.
 
-1. Laufende Spiele, ES-DE und andere Vorgänge beenden.
+1. Laufende Spiele und andere Vorgänge beenden.
 2. **Vorhandenen Datenordner wählen** öffnen und einen bestehenden EmuVora-Datenordner auswählen. Darin müssen settings.json und library.db liegen; der Programmordner App ist nicht das richtige Ziel.
 3. EmuVora prüft Einstellungen und Datenbank und zeigt den Zielpfad und die Spieleanzahl.
 4. Mit **Wechseln und neu starten** ausdrücklich bestätigen. Abbrechen ändert den gespeicherten Datenpfad nicht.

@@ -158,7 +158,7 @@ public static class RomRelocation
     private static FileStream Lock(string data)
     {
         try{return new FileStream(Path.Combine(data,".game-launch.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None,1,FileOptions.DeleteOnClose);}
-        catch(IOException ex){throw new IOException("Bitte laufende ES-DE-Spielstarts oder eine andere ROM-Zuordnung zuerst beenden.",ex);}
+        catch(IOException ex){throw new IOException("Bitte laufende Bibliotheksübernahmen oder eine andere ROM-Zuordnung zuerst beenden.",ex);}
     }
     private static void RecoverCore(string data)
     {

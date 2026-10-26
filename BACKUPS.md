@@ -1,6 +1,8 @@
 # Private Datensicherung (ab 0.10)
 
-Unter **Einstellungen → Sicherung** eine Datensicherung erstellen. Als Ziel einen Ordner außerhalb des aktiven EmuVora-Datenordners wählen, möglichst auf einem anderen Laufwerk. Bestehende Sicherungsdateien werden nicht ersetzt. Spiele und ES-DE vorher beenden; unabhängig gestartete Emulatoren ebenfalls selbst schließen.
+Unter **Einstellungen → Sicherung** eine Datensicherung erstellen. Als Ziel einen Ordner außerhalb des aktiven EmuVora-Datenordners wählen, möglichst auf einem anderen Laufwerk. Bestehende Sicherungsdateien werden nicht ersetzt. Laufende Spiele und Emulatoren vorher beenden; unabhängig gestartete Emulatoren ebenfalls selbst schließen.
+
+Referenzierte Cover innerhalb des Datenordners werden auch dann mitgesichert, wenn sie noch im früheren Frontend-Ordner liegen. Ein aktiv ausgewähltes lokales Theme innerhalb des Datenordners wird einschließlich seiner Dateien gesichert, sofern seine `theme.xml` vorhanden ist. Die entfernte ES-DE-Anwendung und alte ROM-Spielverweise werden dafür nicht benötigt oder pauschal mitkopiert. Ältere Archive können nur Dateien wiederherstellen, die tatsächlich im Archiv enthalten sind; fehlende historische Cover werden dadurch nicht rückwirkend ergänzt. Externe Cover-/Theme-Ordner separat sichern.
 
 Enthalten sind settings.json, eine konsistente SQLite-Kopie der Bibliothek (Favoriten und Verlauf eingeschlossen), covers, saves und states im Datenordner. Bei innerhalb des Datenordners konfigurierten Emulatoren zusätzlich:
 
