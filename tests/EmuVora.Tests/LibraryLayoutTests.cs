@@ -95,9 +95,9 @@ public class LibraryLayoutTests
         }
         finally { window.Close(); }
     }
-    [AvaloniaFact] public async Task SixThousandListEntriesStayBoundedAndSearchable()
+    [AvaloniaTheory][InlineData("List")][InlineData("Carousel")] public async Task SixThousandListEntriesStayBoundedAndSearchable(string libraryLayout)
     {
-        using var dir = new TestDirectory(); var window = Open(dir, "Midnight", 1320, false, 6000, "List");
+        using var dir = new TestDirectory(); var window = Open(dir, "Midnight", 1320, false, 6000, libraryLayout);
         try
         {
             var list = Field<ListBox>(window, "gamesList"); Assert.Equal(48, list.ItemCount);
