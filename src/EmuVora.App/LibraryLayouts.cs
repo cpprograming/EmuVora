@@ -12,7 +12,7 @@ namespace EmuVora.App;
 
 public sealed partial class MainWindow
 {
-    private readonly ComboBox libraryLayoutChoice = new() { ItemsSource = new[] { "Cover-Raster", "Kompakte Liste", "Cover-Karussell" }, MinWidth = 152 };
+    private readonly ComboBox libraryLayoutChoice = new() { ItemsSource = new[] { "Cover-Raster", "Kompakte Liste", "Cover-Karussell", "Theme-Layout" }, MinWidth = 152 };
     private readonly Dictionary<string, (int Page, string? Selected, Vector Offset)> layoutPositions = [];
     private int layoutRevision;
     private bool changingLibraryLayout;
@@ -36,20 +36,22 @@ public sealed partial class MainWindow
     private void ConfigureLibraryLayout()
     {
         if (IsCarouselLayout) carouselCardWidth = CarouselWidth();
-        gamesList.Classes.Set("list-layout", IsListLayout);
+        currentThemeSystem = null;
+        gamesList.Classes.Set("list-layout", IsListLayout || IsThemeLayout);
         gamesList.Classes.Set("carousel-layout", IsCarouselLayout);
         ScrollViewer.SetHorizontalScrollBarVisibility(gamesList, IsCarouselLayout ? Avalonia.Controls.Primitives.ScrollBarVisibility.Auto : Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled);
         ScrollViewer.SetVerticalScrollBarVisibility(gamesList, Avalonia.Controls.Primitives.ScrollBarVisibility.Auto);
-        gamesList.ItemsPanel = new FuncTemplate<Panel?>(() => IsCarouselLayout ? new VirtualizingStackPanel { Orientation = Orientation.Horizontal } : IsListLayout ? new VirtualizingStackPanel() : new WrapPanel());
-        gamesList.ItemTemplate = new FuncDataTemplate<Game>((game, _) => game == null ? new Border() : IsListLayout ? CreateListRow(game) : CreateCard(game));
+        gamesList.ItemsPanel = new FuncTemplate<Panel?>(() => IsCarouselLayout ? new VirtualizingStackPanel { Orientation = Orientation.Horizontal } : IsListLayout || IsThemeLayout ? new VirtualizingStackPanel() : new WrapPanel());
+        gamesList.ItemTemplate = new FuncDataTemplate<Game>((game, _) => game == null ? new Border() : IsListLayout || IsThemeLayout ? CreateListRow(game) : CreateCard(game));
+        if (librarySurface.Content != null) MountLibrarySurface();
     }
     private void ChangeLibraryLayout()
     {
-        var next = libraryLayoutChoice.SelectedIndex switch { 1 => "List", 2 => "Carousel", _ => "Grid" };
+        var next = libraryLayoutChoice.SelectedIndex switch { 1 => "List", 2 => "Carousel", 3 => "Theme", _ => "Grid" };
         if (settings.LibraryLayout == next) return;
         var selected = Selected?.Path;
         var scroll = gamesList.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
-        layoutPositions[IsCarouselLayout ? "Carousel" : IsListLayout ? "List" : "Grid"] = (libraryPage, selected, scroll?.Offset ?? default);
+        layoutPositions[IsThemeLayout ? "Theme" : IsCarouselLayout ? "Carousel" : IsListLayout ? "List" : "Grid"] = (libraryPage, selected, scroll?.Offset ?? default);
         settings.LibraryLayout = next; settingsStore.Save(settings);
         changingLibraryLayout = true;
         ConfigureLibraryLayout(); Refresh(selected, keepPage: true);

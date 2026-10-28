@@ -20,7 +20,7 @@ public sealed partial class MainWindow
         if (!await BusyAsync(async token => options = await Task.Run(() => EmulationStationTheme.InspectOptions(source, preferDark), token)) || options == null || isClosed || !owner.IsVisible) return;
         var body = new StackPanel { Spacing = 12 };
         body.Children.Add(new TextBlock { Text = "Theme auswählen und prüfen", FontSize = 26, FontWeight = FontWeight.Bold });
-        body.Children.Add(new TextBlock { Text = "Vorschau mit Beispieldaten in EmuVoras Oberfläche. Übernommen werden unterstützte Farben, Hintergründe und Logos. Eigene Positionen, Videos und Animationen des Original-Themes bleiben noch offen.", TextWrapping = TextWrapping.Wrap });
+        body.Children.Add(new TextBlock { Text = "Vorschau mit Beispieldaten in EmuVoras Oberfläche. Unterstützte Farben, Bilder und Layout-Rechtecke werden angepasst. Weitere Originalelemente, Videos und Animationen bleiben offen; der Bericht nennt die Grenzen.", TextWrapping = TextWrapping.Wrap });
         body.Children.Add(new TextBlock { Text = "Quelle: " + Path.GetFullPath(source), TextWrapping = TextWrapping.Wrap, Opacity = .7 });
         ComboBox Choice(string label, IReadOnlyList<ThemeOption> choices, string selected)
         {
@@ -33,9 +33,11 @@ public sealed partial class MainWindow
         var variant = Choice("Theme-Variante", options.Variants, options.Default.Variant);
         var scheme = Choice("Farbschema", options.ColorSchemes, options.Default.ColorScheme);
         var aspect = Choice("Vorlagen-Seitenverhältnis", options.AspectRatios, options.Default.AspectRatio);
-        body.Children.Add(new TextBlock { Text = "Das Vorlagenformat wählt passende Theme-Includes. Windows-Auflösung und natives Bibliothekslayout bleiben erhalten.", TextWrapping = TextWrapping.Wrap, Opacity = .75 });
+        body.Children.Add(new TextBlock { Text = "Das Vorlagenformat wählt passende Theme-Includes. Das Theme-Layout wird mit diesem Seitenverhältnis ins Fenster eingepasst; die Windows-Auflösung bleibt erhalten.", TextWrapping = TextWrapping.Wrap, Opacity = .75 });
         body.Children.Add(new TextBlock { Text = "Konsole für die Vorschau" });
         var system = new ComboBox { ItemsSource = EmulatorCatalog.Systems, SelectedItem = EmulatorCatalog.Systems.Contains(Selected?.System ?? "") ? Selected!.System : "NES", HorizontalAlignment = HorizontalAlignment.Stretch }; body.Children.Add(system);
+        var useLayout = new CheckBox { Content = "Theme-Layout in Vorschau und nach Übernahme verwenden", IsChecked = IsThemeLayout }; body.Children.Add(useLayout);
+        body.Children.Add(new TextBlock { Text = "Teilweiser Layout-Adapter: Liste, Bilder und Texte. Die native Liste bleibt bedienbar; bei ungeeigneten oder kleinen Flächen wird sie als Ersatzansicht verwendet.", TextWrapping = TextWrapping.Wrap, Opacity = .75 });
         var preview = new ContentControl(); body.Children.Add(preview);
         var report = new TextBlock { TextWrapping = TextWrapping.Wrap }; body.Children.Add(report);
         var actions = new StackPanel { Spacing = 8 }; var dialog = LibraryDialog("EmuVora · Theme-Import mit Vorschau", body, actions); dialog.Width = 900; dialog.Height = 900;
@@ -49,16 +51,17 @@ public sealed partial class MainWindow
             var completed = await BusyAsync(async token => imported = await Task.Run(() => EmulationStationTheme.ApplyImport(selected, dataDir, token), token));
             if (!completed || imported == null) { plan = null; report.Text = status.Text; State(); return; }
             if (isClosed || !dialog.IsVisible) return;
-            var previous = settings.EmulationStationTheme; settings.EmulationStationTheme = imported;
-            try { settingsStore.Save(settings); } catch { settings.EmulationStationTheme = previous; throw; }
-            themeBackground.Source = themeLogo.Source = null; foreach (var image in themeImages.Values) image.Dispose(); themeImages.Clear();
-            loadedThemes.Clear(); ApplyTheme(); Refresh(); status.Text = "Geprüftes Theme mit gewählter Variante übernommen. Importbericht unter Darstellung verfügbar."; dialog.Close();
+            var previous = settings.EmulationStationTheme; var previousLayout = settings.LibraryLayout; settings.EmulationStationTheme = imported;
+            settings.LibraryLayout = selected.Selection?.UseLayout == true ? "Theme" : IsThemeLayout ? "Grid" : settings.LibraryLayout;
+            try { settingsStore.Save(settings); } catch { settings.EmulationStationTheme = previous; settings.LibraryLayout = previousLayout; throw; }
+            ClearThemeStageImages(); themeBackground.Source = themeLogo.Source = null; foreach (var image in themeImages.Values) image.Dispose(); themeImages.Clear();
+            loadedThemes.Clear(); libraryLayoutChoice.SelectedIndex = IsThemeLayout ? 3 : IsCarouselLayout ? 2 : IsListLayout ? 1 : 0; ConfigureLibraryLayout(); ApplyTheme(); Refresh(); status.Text = "Geprüftes Theme mit gewählter Variante übernommen. Importbericht unter Darstellung verfügbar."; dialog.Close();
         });
         actions.Children.Add(check); actions.Children.Add(apply); actions.Children.Add(ActionButton("Abbrechen", () => { if (operation != null) RequestOperationCancel(); else dialog.Close(); }));
         void State()
         {
             var idle = operation == null; check.IsEnabled = idle; apply.IsEnabled = idle && plan != null;
-            variant.IsEnabled = idle && options.Variants.Count > 0; scheme.IsEnabled = idle && options.ColorSchemes.Count > 0; aspect.IsEnabled = idle && options.AspectRatios.Count > 0; system.IsEnabled = idle;
+            variant.IsEnabled = idle && options.Variants.Count > 0; scheme.IsEnabled = idle && options.ColorSchemes.Count > 0; aspect.IsEnabled = idle && options.AspectRatios.Count > 0; system.IsEnabled = useLayout.IsEnabled = idle;
         }
         void Clear()
         {
@@ -72,13 +75,13 @@ public sealed partial class MainWindow
         async Task Verify()
         {
             if (operation != null) return;
-            Invalidate(); var stamp = revision; var selection = new ThemeSelection(((ThemeOption)variant.SelectedItem!).Id, ((ThemeOption)scheme.SelectedItem!).Id, ((ThemeOption)aspect.SelectedItem!).Id);
+            Invalidate(); var stamp = revision; var selection = new ThemeSelection(((ThemeOption)variant.SelectedItem!).Id, ((ThemeOption)scheme.SelectedItem!).Id, ((ThemeOption)aspect.SelectedItem!).Id, useLayout.IsChecked == true);
             var console = system.SelectedItem as string ?? "NES"; ThemeImportPlan? result = null;
             report.Text = "Auswahl und Dateiinhalte werden geprüft. Die bisherige Darstellung bleibt aktiv.";
             if (!await BusyAsync(async token => result = await Task.Run(() => EmulationStationTheme.PreviewImport(source, console, preferDark, selection, token), token)) || result == null || stamp != revision || isClosed || !dialog.IsVisible) { if (dialog.IsVisible) report.Text = status.Text; State(); return; }
             try
             {
-                preview.Content = ThemeSample(result.Preview, images);
+                preview.Content = ThemeSample(result.Preview, images, selection.UseLayout);
                 report.Text = $"{result.Files.Count} Dateien · {result.Bytes / 1024d / 1024d:F1} MiB · ausgewählte Kombination für alle {EmulatorCatalog.Systems.Length} Systeme strukturell geprüft.\n\n" + string.Join("\n", result.Notes);
                 plan = result;
                 Dispatcher.UIThread.Post(() => { if (dialog.IsVisible && stamp == revision) preview.BringIntoView(); }, DispatcherPriority.Loaded);
@@ -87,10 +90,11 @@ public sealed partial class MainWindow
             finally { State(); }
         }
         variant.SelectionChanged += (_, _) => Invalidate(); scheme.SelectionChanged += (_, _) => Invalidate(); aspect.SelectionChanged += (_, _) => Invalidate(); system.SelectionChanged += (_, _) => Invalidate();
+        useLayout.IsCheckedChanged += (_, _) => Invalidate();
         FeedbackChanged += State; dialog.Closed += (_, _) => { FeedbackChanged -= State; Clear(); }; State();
         await dialog.ShowDialog(owner);
     }
-    private Control ThemeSample(EmulationStationTheme theme, List<Bitmap> images)
+    private Control ThemeSample(EmulationStationTheme theme, List<Bitmap> images, bool useLayout = false)
     {
         ThemeElement? Find(string name) => theme.Elements.LastOrDefault(e => e.Name == name);
         IBrush ColorFor(ThemeElement? element, string key, IBrush fallback)
@@ -103,6 +107,18 @@ public sealed partial class MainWindow
         {
             var path = Find(name)?.Properties.GetValueOrDefault("path"); if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
             var bitmap = ThemeArtwork.Load(path); images.Add(bitmap); return new Image { Source = bitmap, Stretch = Stretch.Uniform, Opacity = opacity };
+        }
+        if (useLayout)
+        {
+            var stage = new ThemeLayoutPanel { Height = settings.TvMode ? 350 : 300, Model = ThemeLayout.From(theme), Background = ColorFor(Find("canvas") ?? Find("background"), "color", Background ?? Brushes.Black) };
+            if (ImageFor("background", 1) is {} stageBackgroundImage) { stageBackgroundImage.Stretch = Stretch.UniformToFill; stageBackgroundImage.IsHitTestVisible = false; stage.AddSlot("background", stageBackgroundImage); }
+            if (ImageFor("logo", 1) is {} stageLogoImage) { stageLogoImage.IsHitTestVisible = false; stage.AddSlot("logo", stageLogoImage); }
+            var list = new ListBox { ItemsSource = new[] { "Beispielspiel", "Weiteres Spiel", "Drittes Spiel" }, SelectedIndex = 0, Background = stage.Background, Foreground = ColorFor(Find("gamelist"), "primaryColor", Foreground ?? Brushes.White) };
+            stage.AddSlot("gamelist", list);
+            stage.AddSlot("md_name", new TextBlock { Text = "Beispielspiel", FontSize = 18, TextWrapping = TextWrapping.Wrap, Foreground = ColorFor(Find("md_name"), "color", Foreground ?? Brushes.White), IsHitTestVisible = false });
+            stage.AddSlot("md_description", new TextBlock { Text = "Beispiel-Konsole\n3 Starts · Beispieldaten", FontSize = 13, TextWrapping = TextWrapping.Wrap, Foreground = ColorFor(Find("md_description") ?? Find("description"), "color", Foreground ?? Brushes.White), IsHitTestVisible = false });
+            stage.AddSlot("md_image", new Border { Background = Brush.Parse("#354C56"), Child = new TextBlock { Text = "EMUVORA", Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }, IsHitTestVisible = false });
+            var adapted = new Border { CornerRadius = new(12), Child = stage, ClipToBounds = true }; adapted.Classes.Add("theme-preview"); return adapted;
         }
         var canvas = new Grid { Height = settings.TvMode ? 330 : 280, Background = ColorFor(Find("canvas"), "color", Background ?? Brushes.Black), ClipToBounds = true };
         if (ImageFor("background", .25) is {} background) { background.Stretch = Stretch.UniformToFill; canvas.Children.Add(background); }

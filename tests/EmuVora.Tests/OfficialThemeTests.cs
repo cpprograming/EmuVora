@@ -17,6 +17,7 @@ public class OfficialThemeTests
         {
             var theme=EmulationStationTheme.Load(root,system);Assert.Equal("777777",theme.Elements.Single(e=>e.Name=="gamelist").Properties["primaryColor"]);Assert.Contains(theme.Elements,e=>e.Name=="logo"&&e.Properties.ContainsKey("path"));Assert.Contains(theme.Warnings,w=>w.Contains("ES-DE an natives"));
             var light=EmulationStationTheme.Load(root,system,selection:new("gamelist-metadata-on-boxart","light-original","16:9"));Assert.Equal("a0a0a0",light.Elements.Single(e=>e.Name=="gamelist").Properties["primaryColor"]);
+            var layout=ThemeLayout.From(theme);Assert.True(layout.Usable);Assert.Equal(.082291666666667,layout.Elements["gamelist"].Left,10);Assert.Equal(.348958333333333,layout.Elements["gamelist"].Width,10);Assert.Contains(theme.Elements,e=>e.Name=="md_image"&&e.Type=="image");
         }
     }
     [AvaloniaFact][Trait("Category","Network")]

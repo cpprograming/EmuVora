@@ -95,7 +95,7 @@ public class LibraryLayoutTests
         }
         finally { window.Close(); }
     }
-    [AvaloniaTheory][InlineData("List")][InlineData("Carousel")] public async Task SixThousandListEntriesStayBoundedAndSearchable(string libraryLayout)
+    [AvaloniaTheory][InlineData("List")][InlineData("Carousel")][InlineData("Theme")] public async Task SixThousandListEntriesStayBoundedAndSearchable(string libraryLayout)
     {
         using var dir = new TestDirectory(); var window = Open(dir, "Midnight", 1320, false, 6000, libraryLayout);
         try

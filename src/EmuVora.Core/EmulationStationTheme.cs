@@ -15,6 +15,7 @@ public sealed partial class EmulationStationTheme
     }
     public List<ThemeElement> Elements { get; } = [];
     public List<string> Warnings { get; } = [];
+    public string AspectRatio { get; private set; } = "16:9";
     public static string SystemId(string system) => system switch
     {
         "PS1" => "psx", "PS2" => "ps2", "PSP" => "psp", "GameCube" => "gc", "Wii" => "wii",
@@ -25,13 +26,14 @@ public sealed partial class EmulationStationTheme
         var root=Path.TrimEndingDirectorySeparator(Path.GetFullPath(directory)); var theme=new EmulationStationTheme();
         Backups.NoLinks(root);
         var selected=ResolveSelection(root,preferDark,selection);
+        theme.AspectRatio=selected.AspectRatio.Length>0?selected.AspectRatio:"16:9";
         var modern=File.Exists(Path.Combine(root,"capabilities.xml"));string variant="",scheme="",aspect="16:9";
         if(modern)
         {
             var caps=ReadXml(Path.Combine(root,"capabilities.xml"));if(caps.Name.LocalName!="themeCapabilities")throw new IOException("Ungültige ES-DE-capabilities.xml.");
             variant=selected.Variant;scheme=selected.ColorScheme;aspect=selected.AspectRatio.Length>0?selected.AspectRatio:"16:9";
             theme.Warnings.Add($"ES-DE an natives EmuVora-Layout angepasst. Variante: {variant}; Farbschema: {scheme}; Vorlagenformat: {aspect}.");
-            theme.Warnings.Add("Videos, Sounds, Animationen, eigene Schriftarten und Speziallayouts werden nicht übernommen. Ressourcen und Lizenzhinweise bleiben erhalten.");
+            theme.Warnings.Add("Teilweise Layoutanpassung für Liste, Hintergrund, Logo, Cover und Texte. Videos werden höchstens als statisches Cover angenähert; Sounds, Animationen und eigene Schriftarten bleiben offen.");
         }
         var id=SystemId(system);
         var aliases=new[]{id}.Concat(SystemCatalog.Find(system)?.Aliases.Split('|')??[]).Distinct(StringComparer.OrdinalIgnoreCase);
@@ -88,8 +90,9 @@ public sealed partial class EmulationStationTheme
                     foreach(var element in node.Elements())foreach(var name in Regex.Split((string?)element.Attribute("name")??"",@"[\s,]+").Where(n=>n.Length>0))
                     {
                         var type=element.Name.LocalName;
+                        if(type=="video"&&name is "game-media" or "md_video"){type="image";theme.Warnings.Add("Videoelement als statisches Spielcover angenähert: "+name);}
                         if(type is not ("image" or "text" or "textlist" or "helpsystem")) {theme.Warnings.Add("Nicht unterstütztes Element: "+type);continue;}
-                        var mapped=modern?name switch{"background"=>"canvas","background-art"=>"background","system-logo"=>"logo","game-list"=>"gamelist","game-name"=>"md_name","game-description"=>"md_description",_=>name}:name;
+                        var mapped=name is "game-media" or "game-image" or "game-cover" or "md_video"?"md_image":modern?name switch{"background"=>"canvas","background-art"=>"background","system-logo"=>"logo","game-list"=>"gamelist","game-name"=>"md_name","game-description"=>"md_description",_=>name}:name;
                         var existing=theme.Elements.FirstOrDefault(e=>e.Type==type&&e.Name==mapped);
                         if(existing==null) {existing=new(type,mapped,[]);theme.Elements.Add(existing);}
                         foreach(var property in element.Elements())
@@ -105,6 +108,7 @@ public sealed partial class EmulationStationTheme
         }
         Read(entry,0);
         if(modern)foreach(var image in theme.Elements.Where(e=>e.Type=="image"))if(image.Properties.TryGetValue("path",out var path)&&!File.Exists(path)&&image.Properties.TryGetValue("default",out var fallback)&&File.Exists(fallback))image.Properties["path"]=fallback;
+        theme.Warnings.AddRange(ThemeLayout.From(theme).Notes);
         return theme;
     }
     public static string Import(string source,string dataDirectory,bool preferDark=true,CancellationToken token=default)

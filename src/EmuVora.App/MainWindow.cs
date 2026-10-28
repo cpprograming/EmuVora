@@ -127,7 +127,7 @@ public sealed partial class MainWindow : Window
         var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=4};Grid.SetColumnSpan(search,3);filters.Children.Add(search);
         var toolbar=new WrapPanel();Grid.SetRow(toolbar,1);Grid.SetColumnSpan(toolbar,3);filters.Children.Add(toolbar);
         detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});
-        libraryLayoutChoice.SelectedIndex=IsCarouselLayout?2:IsListLayout?1:0;Avalonia.Automation.AutomationProperties.SetName(libraryLayoutChoice,"Bibliothekslayout");ToolTip.SetTip(libraryLayoutChoice,"Raster, Liste oder Karussell · Auswahl und Filter bleiben erhalten");libraryLayoutChoice.SelectionChanged+=(_,_)=>Guard(ChangeLibraryLayout);
+        libraryLayoutChoice.SelectedIndex=IsThemeLayout?3:IsCarouselLayout?2:IsListLayout?1:0;Avalonia.Automation.AutomationProperties.SetName(libraryLayoutChoice,"Bibliothekslayout");ToolTip.SetTip(libraryLayoutChoice,"Raster, Liste, Karussell oder Theme-Layout · Auswahl und Filter bleiben erhalten");libraryLayoutChoice.SelectionChanged+=(_,_)=>Guard(ChangeLibraryLayout);
         foreach(var control in new Control[]{systems,sort,libraryLayoutChoice,detailsToggle}){control.Margin=new(0,0,8,8);toolbar.Children.Add(control);}AddRow(main,filters,1);
         gamesList.Classes.Add("game-library");
         filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);var gameActions=new Grid{ColumnDefinitions=new("*,*"),ColumnSpacing=10};Grid.SetRow(gameActions,2);Grid.SetColumnSpan(gameActions,3);gameActions.Children.Add(manageCover);Grid.SetColumn(collectionGame,1);gameActions.Children.Add(collectionGame);filters.Children.Add(gameActions);
@@ -142,7 +142,7 @@ public sealed partial class MainWindow : Window
         gamesList.SizeChanged+=(_,_)=>ResizeCarousel();
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("carousel-layout").Descendant().OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.VerticalAlignmentProperty,VerticalAlignment.Center),new Setter(ListBoxItem.OpacityProperty,.72)}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("carousel-layout").Descendant().OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.OpacityProperty,1d)}});
-        var library=new Grid{RowDefinitions=new("*,Auto")};library.Children.Add(gamesList);
+        var library=new Grid{RowDefinitions=new("*,Auto")};MountLibrarySurface();library.Children.Add(librarySurface);
         var pageButtons=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};pageButtons.Children.Add(previousPage);pageButtons.Children.Add(nextPage);libraryPager.Children.Add(pageLabel);libraryPager.Children.Add(pageButtons);Grid.SetRow(libraryPager,1);library.Children.Add(libraryPager);
         previousPage.Click+=(_,_)=>ChangeLibraryPage(-1);nextPage.Click+=(_,_)=>ChangeLibraryPage(1);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
         AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);var notices=new StackPanel{Spacing=8};notices.Children.Add(CreateOperationNotice(false));notices.Children.Add(footer);AddRow(main,notices,4);
@@ -198,7 +198,7 @@ public sealed partial class MainWindow : Window
     {
         var system=systems.SelectedItem as string; if(system is null or "Alle Konsolen")system=Selected?.System??allGames.FirstOrDefault()?.System??"NES";
         if(currentThemeSystem==system)return;currentThemeSystem=system;
-        themeBackground.Source=null;themeLogo.Source=null;themeLogo.IsVisible=false;themeStatus.Text="";
+        themeBackground.Source=null;themeLogo.Source=null;themeLogo.IsVisible=false;themeStatus.Text="";ResetThemeStage();
         gamesList.Foreground=Foreground;detailTitle.Foreground=Foreground;detailInfo.Foreground=Foreground;detailTitle.FontSize=24;detailInfo.FontSize=13;
         if(settings.EmulationStationTheme==null)return;
         try
@@ -221,8 +221,9 @@ public sealed partial class MainWindow : Window
             detailTitle.Foreground=ColorFor(Find("md_name"),"color")??Foreground;detailInfo.Foreground=ColorFor(Find("md_description")??Find("description"),"color")??Foreground;
             if(ColorFor(Find("canvas"),"color") is{} canvas)Background=canvas;
             themeStatus.Text="Angepasstes Theme · "+system+"\nFarben / Hintergrund / Logo"+(external.Warnings.Count>0?"\n"+string.Join(" ",external.Warnings.Distinct().Take(2)):"");
+            ApplyThemeStage(external,ImageFor,ColorFor);
         }
-        catch(Exception ex){themeStatus.Text="Theme konnte nicht geladen werden: "+ex.Message;Log(ex);}
+        catch(Exception ex){ResetThemeStage();themeStatus.Text="Theme konnte nicht geladen werden: "+ex.Message;Log(ex);}
     }
     private void UpdateSystems()
     {
@@ -240,9 +241,9 @@ public sealed partial class MainWindow : Window
         visibleVersions.Clear();foreach(var family in presented.Families)visibleVersions[family.Representative.Path]=family.Versions;var result=presented.Families.Select(g=>g.Representative).ToArray();
         libraryResultCount=result.Length;libraryPage=presented.Index;var page=presented.Games;
         foreach(var imageControl in gamesList.GetVisualDescendants().OfType<Image>())imageControl.Source=null;
-        gamesList.ItemsSource=null;detailCover.Content=null;
+        gamesList.ItemsSource=null;detailCover.Content=null;stageCover.Content=null;
         foreach(var image in coverImages.Values)image.Dispose();coverImages.Clear();
-        gamesList.ItemsSource=page;gamesList.SelectedItem=page.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase))??(IsCarouselLayout?page.FirstOrDefault():null);
+        gamesList.ItemsSource=page;gamesList.SelectedItem=page.FirstOrDefault(g=>g.Path.Equals(selectedPath,StringComparison.OrdinalIgnoreCase))??(IsCarouselLayout||IsThemeLayout?page.FirstOrDefault():null);
         libraryPager.IsVisible=result.Length>LibraryPageSize;previousPage.IsEnabled=libraryPage>0;nextPage.IsEnabled=(libraryPage+1)*LibraryPageSize<result.Length;
         pageLabel.Text=$"Seite {libraryPage+1} / {Math.Max(1,(result.Length+LibraryPageSize-1)/LibraryPageSize)} · {libraryPage*LibraryPageSize+1}–{libraryPage*LibraryPageSize+page.Count} von {result.Length}";
         emptyState.IsVisible=empty.IsVisible=result.Length==0;emptyAction.Content=allGames.Count==0?"Ersten ROM-Ordner importieren":"Filter zurücksetzen";empty.Title=allGames.Count==0?"Deine Bibliothek ist leer":"Keine passenden Spiele";empty.Message=allGames.Count==0?"Deine Klassiker bekommen hier ein Zuhause. Importiere einen Ordner mit deinen ROMs.":"Passe Suche, Konsole oder Bibliotheksansicht an.";
@@ -294,7 +295,7 @@ public sealed partial class MainWindow : Window
         detailInfo.Text=game==null?"Wähle ein Spiel, um zu starten oder Details zu bearbeiten.":$"{game.System}\n{game.PlayCount} Starts · {(game.LastPlayed is{} last?last.ToLocalTime().ToString("g"):"Noch nicht gespielt")}";
         ToolTip.SetTip(detailInfo,game?.Path);displayStatus.Text=game==null?"":DisplayProfiles.Description(game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,game.Path);
         if(game!=null&&settings.ProtectedCovers.Contains(game.Path))detailInfo.Text+="\nCover geschützt"+(CoverLibrary.IsMissing(settings,game.Path)?" · Bilddatei fehlt; eigenes Bild wählen oder Schutz aufheben.":"");
-        ApplyExternalTheme();
+        ApplyExternalTheme();UpdateThemeStageSelection(game);
     }
     private async Task<bool> BusyAsync(Func<CancellationToken,Task> action)
     {

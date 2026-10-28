@@ -40,10 +40,12 @@ Karussell-/Konsolenstand ab 0.14.132: 362 Funktions- und 6 Netzwerktests sowie S
 
 - [x] Referenz-Theme Alekfull NX anhand seiner festgehaltenen XML-Varianten inventarisieren und eine Unterstützungsmatrix erstellen.
 - [x] Variante, Farbschema und Vorlagen-Seitenverhältnis vor dem Import auswählbar machen; Auswahl in der importierten Kopie speichern.
-- [ ] XML zunächst in ein unabhängiges Theme-Modell übersetzen; Parsing und Rendering getrennt halten.
-- [ ] Unterstützte Positionen, Größen, Ausrichtung, Sichtbarkeit, Ebenen und Bild-Skalierung auf die native Layout-Engine abbilden.
+- [x] XML-Geometrie zunächst in ein unabhängiges Theme-Modell übersetzen; Parsing und Rendering für die definierten Rollen getrennt halten.
+- [x] Positionen, Größen, Ursprung, Sichtbarkeit, Transparenz und Ebenen für Liste, Hintergrund, Logo, Cover und Texte auf denselben nativen Renderer in Vorschau und Bibliothek abbilden.
+- [ ] Weitere Dekorationen, Textausrichtung, automatische Bildachsen und zusätzliche Bild-Skalierung ergänzen.
 - [ ] System-/Spieleansichten, Listen, Raster und Karussells schrittweise unterstützen; gemeinsame Bedienfunktionen in jeder Ansicht erhalten.
-- [ ] Metadatenbereiche, vorhandene lokale Medien und Platzhalter zuordnen. Fehlende Medien dürfen keine leeren oder unbedienbaren Ansichten erzeugen.
+- [x] Ausgewählte native Cover, Platzhalter sowie vorhandene Titel-/System-/Startangaben zuordnen; ungültige oder kleine Flächen erhalten eine bedienbare Ersatzliste.
+- [ ] Weitere Metadaten-/Medientypen und fremde Scraper-Beschreibungen gezielt integrieren.
 - [ ] Geeignete lokale Schriften, Übergänge und anschließend optionale Video-/Audioelemente mit Leistungsgrenzen ergänzen.
 - [x] Geprüfte native Vorschau mit Beispieldaten und Hinweisen vor Übernahme anbieten; Abbruch erhält die bisherige Darstellung, Auswahländerungen erfordern erneute Prüfung.
 - [ ] Vorschau bei Auswahländerungen automatisch aktualisieren und weitere fremde Layouteigenschaften darstellen.
