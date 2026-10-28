@@ -85,3 +85,5 @@ Theme-Auswahl/Vorschau ab 0.14.134: 378 Funktions- und 6 Netzwerktests sowie Set
 5. Weitere GUI-Bereiche, eigene Themes und optionale Medien ausbauen.
 
 Jedes Paket erhält eine überprüfbare Veröffentlichung. Die gesamte Liste ist kein einzelner kleiner Import-Fix; Layout-Engine und Theme-Kompatibilität werden an konkreten Referenzansichten abgenommen.
+
+Layout-Adapter ab 0.14.136: 398 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per SHA-256 geprüft und installiert. Bibliothek und Cover unverändert erhalten. Echte Hardwareabnahme bleibt separat offen.

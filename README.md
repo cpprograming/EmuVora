@@ -14,7 +14,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Theme-Layout:** Positionen, Größen und Ebenen für Liste, Hintergrund, Logo, Cover und Texte lassen sich in eine native Ansicht übernehmen. Die Option steht in der Importvorschau und unter der Suche bereit. Bei ungeeigneten Vorlagen bleibt eine bedienbare Ersatzliste verfügbar. [Unterstützter Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
 
-**Aktueller geprüfter Stand: [0.14.134](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.134)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.136](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.136)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
