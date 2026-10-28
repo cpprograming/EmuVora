@@ -530,12 +530,12 @@ public sealed partial class MainWindow : Window
         var theme=new ComboBox {ItemsSource=new[]{"Midnight","Aurora","Studio","Classic Light","Retro Green","Neon Purple"},SelectedItem=settings.Theme};panel.Children.Add(new TextBlock {Text="Darstellung"});panel.Children.Add(theme);
         panel.Children.Add(new TextBlock {Text="Datenordner: "+dataDir,TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(ActionButton("Datenordner öffnen",()=>OpenPath(dataDir)));
-        panel.Children.Add(new TextBlock {Text="Eigene EmuVora-Themes: Midnight, Aurora, Studio und weitere Farbstile. EmuVora ist das einzige Frontend; die ES-DE-Anwendung wird nicht verwendet. EmulationStation-/ES-DE-Themes lassen sich als Hintergrund, Logo und Farben an das native Layout anpassen. Eine Variante, ein zur Basisdarstellung passendes Farbschema und ein Vorlagenformat werden automatisch gewählt. Videos, Sounds und vollständige Speziallayouts werden nicht nachgebaut; der Importbericht nennt Grenzen.",TextWrapping=TextWrapping.Wrap});
+        panel.Children.Add(new TextBlock {Text="Eigene EmuVora-Themes: Midnight, Aurora, Studio und weitere Farbstile. EmuVora ist das einzige Frontend; die ES-DE-Anwendung wird nicht verwendet. EmulationStation-/ES-DE-Themes lassen sich als Hintergrund, Logo und Farben an das native Layout anpassen. Variante, Farbschema und Vorlagenformat sind vor dem Import auswählbar. Eine geprüfte Vorschau mit Beispieldaten erscheint vor der Übernahme. Videos, Sounds und vollständige Speziallayouts werden nicht nachgebaut; der Importbericht nennt Grenzen.",TextWrapping=TextWrapping.Wrap});
         panel.Children.Add(AsyncButton("ES-DE-/EmulationStation-Theme anpassen …",async()=>
         {
             var folders=await new ControllerPicker(this).OpenFolderPickerAsync(new(){Title="Theme-Set mit theme.xml oder Konsolen-Unterordnern",AllowMultiple=false});
             if(folders.Count==0||folders[0].TryGetLocalPath() is not{} path)return;
-            await BusyAsync(async token=>{var imported=await Task.Run(()=>EmulationStationTheme.Import(path,dataDir,settings.Theme!="Classic Light",token),token);settings.EmulationStationTheme=imported;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();status.Text="Theme für EmuVora angepasst. Importbericht unter Darstellung öffnen; Layout und Bedienung bleiben nativ.";});
+            await ShowThemeImportAsync(path);
         }));
         panel.Children.Add(ActionButton("Theme-Importbericht öffnen",()=>{var report=settings.EmulationStationTheme==null?null:Path.Combine(settings.EmulationStationTheme,"emuvora-import-report.txt");if(report!=null&&File.Exists(report))OpenPath(report);else status.Text="Noch kein Importbericht vorhanden.";}));
         panel.Children.Add(ActionButton("EmuVora-Standarddarstellung verwenden",()=>{settings.EmulationStationTheme=null;settingsStore.Save(settings);loadedThemes.Clear();ApplyTheme();Refresh();}));

@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace EmuVora.Core;
 
 public sealed record ThemeElement(string Type, string Name, Dictionary<string,string> Properties);
-public sealed class EmulationStationTheme
+public sealed partial class EmulationStationTheme
 {
     private static XElement ReadXml(string file)
     {
@@ -20,17 +20,16 @@ public sealed class EmulationStationTheme
         "PS1" => "psx", "PS2" => "ps2", "PSP" => "psp", "GameCube" => "gc", "Wii" => "wii",
         _ => SystemCatalog.Find(system)?.Aliases.Split('|')[0] ?? "nes"
     };
-    public static EmulationStationTheme Load(string directory, string system,bool preferDark=true)
+    public static EmulationStationTheme Load(string directory, string system,bool preferDark=true,ThemeSelection? selection=null)
     {
         var root=Path.TrimEndingDirectorySeparator(Path.GetFullPath(directory)); var theme=new EmulationStationTheme();
         Backups.NoLinks(root);
+        var selected=ResolveSelection(root,preferDark,selection);
         var modern=File.Exists(Path.Combine(root,"capabilities.xml"));string variant="",scheme="",aspect="16:9";
         if(modern)
         {
             var caps=ReadXml(Path.Combine(root,"capabilities.xml"));if(caps.Name.LocalName!="themeCapabilities")throw new IOException("Ungültige ES-DE-capabilities.xml.");
-            variant=(string?)caps.Elements("variant").FirstOrDefault(e=>e.Element("selectable")?.Value!="false")?.Attribute("name")??"";
-            scheme=(string?)caps.Elements("colorScheme").FirstOrDefault(e=>((string?)e.Attribute("name"))?.Contains(preferDark?"dark":"light",StringComparison.OrdinalIgnoreCase)==true)?.Attribute("name")??(string?)caps.Element("colorScheme")?.Attribute("name")??"";
-            aspect=caps.Elements("aspectRatio").Any(e=>e.Value=="16:9")?"16:9":caps.Element("aspectRatio")?.Value??"16:9";
+            variant=selected.Variant;scheme=selected.ColorScheme;aspect=selected.AspectRatio.Length>0?selected.AspectRatio:"16:9";
             theme.Warnings.Add($"ES-DE an natives EmuVora-Layout angepasst. Variante: {variant}; Farbschema: {scheme}; Vorlagenformat: {aspect}.");
             theme.Warnings.Add("Videos, Sounds, Animationen, eigene Schriftarten und Speziallayouts werden nicht übernommen. Ressourcen und Lizenzhinweise bleiben erhalten.");
         }
@@ -109,28 +108,5 @@ public sealed class EmulationStationTheme
         return theme;
     }
     public static string Import(string source,string dataDirectory,bool preferDark=true,CancellationToken token=default)
-    {
-        var root=Path.GetFullPath(source).TrimEnd(Path.DirectorySeparatorChar);
-        var parent=Path.Combine(Path.GetFullPath(dataDirectory),"themes");
-        if(parent.StartsWith(root+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)||root.StartsWith(parent+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)||root.Equals(parent,StringComparison.OrdinalIgnoreCase))throw new IOException("Bitte einen Theme-Ordner außerhalb des verwalteten Theme-Verzeichnisses wählen.");
-        // Validate before copying; no network references, links or executable theme code.
-        var files=new List<string>();long bytes=0;
-        void Enumerate(string folder,int depth=0)
-        {
-            token.ThrowIfCancellationRequested();
-            if(depth>32)throw new IOException("Theme-Ordner ist zu tief verschachtelt.");
-            if((File.GetAttributes(folder)&FileAttributes.ReparsePoint)!=0)throw new IOException("Theme enthält eine Ordnerverknüpfung.");
-            foreach(var file in Directory.EnumerateFiles(folder)) {if((File.GetAttributes(file)&FileAttributes.ReparsePoint)!=0)throw new IOException("Theme enthält eine Dateiverknüpfung.");bytes+=new FileInfo(file).Length;files.Add(file);if(files.Count>10000||bytes>256L*1024*1024)throw new IOException("Theme ist zu groß (max. 256 MiB / 10.000 Dateien).");}
-            foreach(var child in Directory.EnumerateDirectories(folder))Enumerate(child,depth+1);
-        }
-        Enumerate(root);
-        var xmls=files.Where(f=>Path.GetFileName(f).Equals("theme.xml",StringComparison.OrdinalIgnoreCase)).ToArray();
-        if(xmls.Length==0)throw new IOException("Der Ordner enthält keine theme.xml.");
-        // Validate every system, not just the currently selected console.
-        var notes=new HashSet<string>();var supported=0;foreach(var system in EmulatorCatalog.Systems){token.ThrowIfCancellationRequested();var loaded=Load(root,system,preferDark);supported+=loaded.Elements.Count(e=>e.Properties.Count>0);foreach(var note in loaded.Warnings)notes.Add(note);}
-        if(supported==0)throw new IOException("Keine unterstützten Theme-Elemente gefunden.");
-        var destination=Path.Combine(parent,Path.GetFileName(root)+"-"+Guid.NewGuid().ToString("N"));
-        try {Directory.CreateDirectory(destination);foreach(var file in files){token.ThrowIfCancellationRequested();var target=Path.Combine(destination,Path.GetRelativePath(root,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);File.Copy(file,target);}File.WriteAllText(Path.Combine(destination,"emuvora-import-report.txt"),"EmuVora · Theme-Anpassung\nLayout und Bedienung bleiben nativ. Nicht jedes ES-DE-Element ist übertragbar.\n"+string.Join("\n",notes));return destination;}
-        catch {if(Directory.Exists(destination))Directory.Delete(destination,true);throw;}
-    }
+        => ApplyImport(PreviewImport(source,"NES",preferDark,token:token),dataDirectory,token);
 }

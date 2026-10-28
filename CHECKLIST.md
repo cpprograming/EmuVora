@@ -1,8 +1,10 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 26. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 28. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
+
+- [x] Theme-Auswahl und Importvorschau ergänzt: deklarierte Varianten/Farbschemata/Formate wählen, native Beispieldarstellung prüfen, erst nach Bestätigung kopieren und aktivieren. Änderungen sperren die Übernahme bis zur erneuten Prüfung; SHA-256-Snapshots schützen die geprüfte Dateiauswahl. Optionen bleiben in der importierten Kopie erhalten; Originale unverändert. Alekfull-NX-Unterstützungsmatrix dokumentiert, Releaseprüfung läuft. Vollständige fremde Layouts bleiben separat offen. [Anleitung](NATIVE_THEMES.md#emulationstation-es-de-theme-anpassen).
 
 - [x] Karussell und Konsolenauswahl in 0.14.132 veröffentlicht ([PR #44](https://github.com/cpprograming/EmuVora/pull/44)). Karussell teilt Filter/Versionen/Seiten und Spielaktionen mit Raster/Liste; Auswahl wird hervorgehoben, nach Möglichkeit zentriert und beim Verkleinern erhalten. Konsolenansicht berücksichtigt Titel-/Dateizahlen, Abbruch und Leerzustände. 362 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft und installiert. Private Bibliothekskopie mit 5.805 Einträgen geprüft; Originaldaten und Cover erhalten. Fremde Theme-Layouts bleiben separat offen. [Bedienung](NATIVE_THEMES.md#cover-karussell-und-konsolenauswahl).
 

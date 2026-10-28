@@ -10,6 +10,8 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Karussell und Konsolen:** Als dritte Ansicht steht eine horizontale Cover-Reihe mit hervorgehobener Auswahl bereit. Über **Konsolen auswählen** eine durchsuchbare Übersicht mit großen Logos öffnen und direkt zur Bibliothek einer Konsole wechseln. [Bedienung und Grenzen](NATIVE_THEMES.md#cover-karussell-und-konsolenauswahl).
 
+**Theme-Import mit Vorschau:** Variante, Farbschema und Vorlagenformat auswählen, die unterstützten Eigenschaften mit Beispieldaten prüfen und erst anschließend übernehmen. Änderungen am Original erfordern eine neue Prüfung. [Ablauf und Unterstützungsmatrix](NATIVE_THEMES.md#emulationstation-es-de-theme-anpassen).
+
 **Aktueller geprüfter Stand: [0.14.132](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.132)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
@@ -217,7 +219,7 @@ Vollständige Anleitung: [Sicherung und Wiederherstellung](BACKUPS.md).
 
 EmuVora verwendet seine eigene Oberfläche mit einheitlicher Konsolenleiste. Die nativen Basis-Themes Aurora und Studio ergänzen die bisherigen Stile. Der separate ES-DE-Start, Autostart und die Download-Schaltflächen sind entfernt; bereits vorhandene Daten werden nicht gelöscht.
 
-Über **Einstellungen → Darstellung → ES-DE-/EmulationStation-Theme anpassen …** lassen sich Hintergründe, Logos und Farben in das native Layout übernehmen. Varianten und Hell-/Dunkel-Stile werden automatisch gewählt; Videos, Sounds und vollständige Fremd-Layouts werden nicht identisch nachgebaut. Der Importbericht nennt Grenzen und behält Lizenzhinweise bei. [Anleitung zu nativen Themes, Versionen und BIOS-Auswahl](NATIVE_THEMES.md).
+Über **Einstellungen → Darstellung → ES-DE-/EmulationStation-Theme anpassen …** lassen sich Hintergründe, Logos und Farben in das native Layout übernehmen. Varianten, Farbschemata und Vorlagenformate werden vor dem Import mit Beispieldarstellung geprüft; Videos, Sounds und vollständige Fremd-Layouts werden nicht identisch nachgebaut. Der Importbericht nennt Grenzen und behält Lizenzhinweise bei. [Anleitung zu nativen Themes, Versionen und BIOS-Auswahl](NATIVE_THEMES.md).
 
 ## Unterstützte Systeme (47 Einträge)
 

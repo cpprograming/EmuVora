@@ -1,6 +1,6 @@
 # EmuVora – GUI und Theme-Roadmap
 
-Stand: 26. Oktober 2026. Aufgaben aus der aktuellen Quellcodeprüfung; abgehakte Aufgaben sind umgesetzt, offene Kästchen bezeichnen geplante Arbeiten.
+Stand: 28. Oktober 2026. Aufgaben aus der aktuellen Quellcodeprüfung; abgehakte Aufgaben sind umgesetzt, offene Kästchen bezeichnen geplante Arbeiten.
 
 ## Ziel
 
@@ -38,14 +38,15 @@ Karussell-/Konsolenstand ab 0.14.132: 362 Funktions- und 6 Netzwerktests sowie S
 
 ## 3. ES-DE-Theme-Import mit Layouts
 
-- [ ] Referenz-Theme Alekfull NX anhand seiner tatsächlichen XML-Varianten inventarisieren und eine Unterstützungsmatrix erstellen.
-- [ ] Variante, Farbschema und Vorlagen-Seitenverhältnis vor dem Import auswählbar machen.
+- [x] Referenz-Theme Alekfull NX anhand seiner festgehaltenen XML-Varianten inventarisieren und eine Unterstützungsmatrix erstellen.
+- [x] Variante, Farbschema und Vorlagen-Seitenverhältnis vor dem Import auswählbar machen; Auswahl in der importierten Kopie speichern.
 - [ ] XML zunächst in ein unabhängiges Theme-Modell übersetzen; Parsing und Rendering getrennt halten.
 - [ ] Unterstützte Positionen, Größen, Ausrichtung, Sichtbarkeit, Ebenen und Bild-Skalierung auf die native Layout-Engine abbilden.
 - [ ] System-/Spieleansichten, Listen, Raster und Karussells schrittweise unterstützen; gemeinsame Bedienfunktionen in jeder Ansicht erhalten.
 - [ ] Metadatenbereiche, vorhandene lokale Medien und Platzhalter zuordnen. Fehlende Medien dürfen keine leeren oder unbedienbaren Ansichten erzeugen.
 - [ ] Geeignete lokale Schriften, Übergänge und anschließend optionale Video-/Audioelemente mit Leistungsgrenzen ergänzen.
-- [ ] Live-Vorschau mit Beispieldaten, konkreten Warnungen und Rückkehr zur bisherigen Darstellung anbieten; erst nach Übernehmen aktivieren.
+- [x] Geprüfte native Vorschau mit Beispieldaten und Hinweisen vor Übernahme anbieten; Abbruch erhält die bisherige Darstellung, Auswahländerungen erfordern erneute Prüfung.
+- [ ] Vorschau bei Auswahländerungen automatisch aktualisieren und weitere fremde Layouteigenschaften darstellen.
 - [ ] Importbericht je Element: übernommen, angenähert oder nicht unterstützt. Bei ungeeigneten Layouts funktionsfähige native Ersatzansicht verwenden.
 - [ ] Vorhandene Pfad-, XML-, Größen- und Abbruchprüfungen erhalten; keine ausführbaren Theme-Skripte zulassen. Herkunft und Lizenzdateien erhalten.
 
