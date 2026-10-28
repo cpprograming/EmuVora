@@ -4,6 +4,15 @@ Stand: 28. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.134](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.134).
 
+## Nächste Etappe – nativer Theme-Layout-Adapter
+
+- [x] Normalisierte Positionen, Größen, Ursprünge, Ebenen, Sichtbarkeit und Transparenz für definierte Rollen in ein unabhängiges Modell übersetzen.
+- [x] Gemeinsamen Renderer für Vorschau und aktive Theme-Ansicht ergänzen; Spieleliste, ausgewählte Cover und native Metadaten anbinden.
+- [x] Seitenverhältnis einpassen, dekorative Eingaben sperren und eine bedienbare Ersatzliste bei ungeeigneten oder kleinen Flächen erhalten.
+- [x] Import-Opt-in, gespeicherten Ansichtsmodus sowie Wechsel zwischen Raster/Liste/Karussell/Theme bei unveränderten Bibliotheksdaten prüfen.
+- [ ] Vollständige Release-/Installationsprüfung abschließen.
+- [ ] Weitere Dekorationen, Textausrichtung, automatische Bildachsen und medienabhängige Varianten weiter ausbauen. [Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
+
 ## 0.14.134 – Theme-Auswahl und Importvorschau (abgeschlossen)
 
 - [x] Deklarierte Varianten, Farbschemata und Vorlagenformate mit gültigen Vorschlägen auswählbar machen; klassische Themes erhalten.

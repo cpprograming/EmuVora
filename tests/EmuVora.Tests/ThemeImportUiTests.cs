@@ -79,4 +79,19 @@ public class ThemeImportUiTests
         }
         finally { foreach (var child in window.OwnedWindows.ToArray()) child.Close(); window.Close(); }
     }
+    [AvaloniaFact] public async Task LayoutOptInUsesSamePanelForPreviewAndActiveLibraryAndPersists()
+    {
+        using var dir = new TestDirectory(); var root = ThemeLayoutTests.Fixture(dir); var data = Path.Combine(dir.Path, "data"); var window = Open(data, "Midnight", false);
+        try
+        {
+            var shown = Show(window, root); var dialog = await Next(window);
+            var layout = dialog.GetVisualDescendants().OfType<CheckBox>().Single(c => c.Content as string == "Theme-Layout in Vorschau und nach Übernahme verwenden"); layout.IsChecked = true;
+            await Check(window, dialog); Assert.Single(dialog.GetVisualDescendants().OfType<ThemeLayoutPanel>()); Assert.Equal("Grid", new SettingsStore(Path.Combine(data, "settings.json")).Load().LibraryLayout);
+            Click(dialog, "Geprüftes Theme übernehmen"); await shown.WaitAsync(TimeSpan.FromSeconds(10)); Render(window);
+            var settings = new SettingsStore(Path.Combine(data, "settings.json")).Load(); Assert.Equal("Theme", settings.LibraryLayout); Assert.NotNull(settings.EmulationStationTheme);
+            using var selection = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(settings.EmulationStationTheme, "emuvora-theme-options.json"))); Assert.True(selection.RootElement.GetProperty("UseLayout").GetBoolean());
+            Assert.Single(window.GetVisualDescendants().OfType<ThemeLayoutPanel>()); Assert.Empty(new LibraryStore(Path.Combine(data, "library.db")).GetAll());
+        }
+        finally { foreach (var child in window.OwnedWindows.ToArray()) child.Close(); window.Close(); }
+    }
 }

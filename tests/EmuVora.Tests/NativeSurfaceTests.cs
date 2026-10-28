@@ -31,7 +31,7 @@ public class NativeSurfaceTests
         var groups=GameVariants.Group([a,b,c,d],b.Path);Assert.Equal(3,groups.Count);var family=Assert.Single(groups,g=>g.Versions.Count==2);Assert.Equal(b,family.Representative);Assert.Contains(a,family.Versions);Assert.Contains(b,family.Versions);
     }
     private static void Render(Window window){window.UpdateLayout();AvaloniaHeadlessPlatform.ForceRenderTimerTick();Dispatcher.UIThread.RunJobs();AvaloniaHeadlessPlatform.ForceRenderTimerTick();}
-    [AvaloniaTheory][InlineData("Aurora",false,"Grid")][InlineData("Studio",true,"Grid")][InlineData("Aurora",false,"List")][InlineData("Studio",true,"List")][InlineData("Aurora",false,"Carousel")][InlineData("Studio",true,"Carousel")]
+    [AvaloniaTheory][InlineData("Aurora",false,"Grid")][InlineData("Studio",true,"Grid")][InlineData("Aurora",false,"List")][InlineData("Studio",true,"List")][InlineData("Aurora",false,"Carousel")][InlineData("Studio",true,"Carousel")][InlineData("Aurora",false,"Theme")][InlineData("Studio",true,"Theme")]
     public async Task NativeLibraryGroupsVersionsAndKeepsEqualConsoleRows(string theme,bool tv,string libraryLayout)
     {
         using var dir=new TestDirectory();new SettingsStore(Path.Combine(dir.Path,"settings.json")).Save(new(){Theme=theme,TvMode=tv,LibraryLayout=libraryLayout,OnboardingCompleted=true,AutoDownloadCovers=false,CheckAppUpdatesOnStartup=false,CheckUpdatesOnStartup=false});var store=new LibraryStore(Path.Combine(dir.Path,"library.db"));store.Upsert([new("Same","GBC","a.gbc"),new("Same","GBC","b.zip"),new("Other","GBA","c.gba"),new("Third","GameCube","d.iso")]);var window=new MainWindow(dir.Path);window.Show();Render(window);

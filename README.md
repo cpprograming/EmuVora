@@ -4,13 +4,15 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Zusammenführung, Mehrdisc-Playlists und ROM-Pfadzuordnung zeigen ihre Entscheidungen auch bei langen Vorschauen unten an. [Bedienung](LIBRARY_AND_DISPLAY.md#bibliotheksdialoge-bedienen).
 
-**Eigenes Frontend:** Die ES-DE-Anwendung samt Start-/Export-/Downloadcode ist entfernt. Der lokale EmulationStation-/ES-DE-Theme-Import bleibt erhalten; echte Layoutübernahme folgt auf einer eigenen Layout-Engine. [GUI- und Theme-Roadmap](GUI_ROADMAP.md).
+**Eigenes Frontend:** Die ES-DE-Anwendung samt Start-/Export-/Downloadcode ist entfernt. Der lokale EmulationStation-/ES-DE-Theme-Import bleibt erhalten; ein erster Layout-Adapter verwendet ausschließlich EmuVoras eigene Oberfläche. [GUI- und Theme-Roadmap](GUI_ROADMAP.md).
 
 **Native Layouts:** Unter der Suche zwischen Cover-Raster und kompakter Liste wechseln. Filter, Sortierung, Versionen, Seite und Auswahl bleiben gemeinsam; die Liste zeigt kleine Cover und den Spielverlauf. [Bedienung und Grenzen](NATIVE_THEMES.md#bibliothekslayout-wählen).
 
 **Karussell und Konsolen:** Als dritte Ansicht steht eine horizontale Cover-Reihe mit hervorgehobener Auswahl bereit. Über **Konsolen auswählen** eine durchsuchbare Übersicht mit großen Logos öffnen und direkt zur Bibliothek einer Konsole wechseln. [Bedienung und Grenzen](NATIVE_THEMES.md#cover-karussell-und-konsolenauswahl).
 
 **Theme-Import mit Vorschau:** Variante, Farbschema und Vorlagenformat auswählen, die unterstützten Eigenschaften mit Beispieldaten prüfen und erst anschließend übernehmen. Änderungen am Original erfordern eine neue Prüfung. [Ablauf und Unterstützungsmatrix](NATIVE_THEMES.md#emulationstation-es-de-theme-anpassen).
+
+**Theme-Layout:** Positionen, Größen und Ebenen für Liste, Hintergrund, Logo, Cover und Texte lassen sich in eine native Ansicht übernehmen. Die Option steht in der Importvorschau und unter der Suche bereit. Bei ungeeigneten Vorlagen bleibt eine bedienbare Ersatzliste verfügbar. [Unterstützter Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
 
 **Aktueller geprüfter Stand: [0.14.134](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.134)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 

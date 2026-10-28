@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace EmuVora.Core;
 
-public sealed record ThemeSelection(string Variant = "", string ColorScheme = "", string AspectRatio = "");
+public sealed record ThemeSelection(string Variant = "", string ColorScheme = "", string AspectRatio = "", bool UseLayout = false);
 public sealed record ThemeOption(string Id, string Label)
 {
     public override string ToString() => string.IsNullOrWhiteSpace(Label) || Label == Id ? Id : Label + " · " + Id;
