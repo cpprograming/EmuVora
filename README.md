@@ -12,7 +12,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Theme-Import mit Vorschau:** Variante, Farbschema und Vorlagenformat auswählen, die unterstützten Eigenschaften mit Beispieldaten prüfen und erst anschließend übernehmen. Änderungen am Original erfordern eine neue Prüfung. [Ablauf und Unterstützungsmatrix](NATIVE_THEMES.md#emulationstation-es-de-theme-anpassen).
 
-**Aktueller geprüfter Stand: [0.14.132](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.132)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.134](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.134)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 

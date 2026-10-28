@@ -2,15 +2,15 @@
 
 Stand: 28. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.132](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.132).
+Aktueller geprüfter Release: [0.14.134](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.134).
 
-## Nächste Etappe – Theme-Auswahl und Importvorschau
+## 0.14.134 – Theme-Auswahl und Importvorschau (abgeschlossen)
 
 - [x] Deklarierte Varianten, Farbschemata und Vorlagenformate mit gültigen Vorschlägen auswählbar machen; klassische Themes erhalten.
 - [x] Vorschau mit Beispieldaten und Hinweisen vor Aktivierung ergänzen; Änderungen verwerfen die vorherige Prüfung und Abbrechen erhält die Darstellung.
 - [x] Ausgewählte Optionen in der importierten Kopie speichern; Quelldateien per SHA-256 vor Prüfung/Übernahme und beim Kopieren kontrollieren.
 - [x] Alekfull-NX-Optionen anhand festgehaltener Original-XML prüfen und Unterstützungsmatrix dokumentieren.
-- [ ] Vollständige Release-/Installationsprüfung abschließen.
+- [x] 378 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft und installiert. Bibliothek und Cover erhalten.
 - [ ] Anschließend Positionen, Größen und weitere Eigenschaften auf die native Layout-Engine abbilden. [Umfang](NATIVE_THEMES.md#emulationstation-es-de-theme-anpassen).
 
 ## 0.14.132 – Karussell und Konsolenauswahl (abgeschlossen)

@@ -50,6 +50,8 @@ Karussell-/Konsolenstand ab 0.14.132: 362 Funktions- und 6 Netzwerktests sowie S
 - [ ] Importbericht je Element: übernommen, angenähert oder nicht unterstützt. Bei ungeeigneten Layouts funktionsfähige native Ersatzansicht verwenden.
 - [ ] Vorhandene Pfad-, XML-, Größen- und Abbruchprüfungen erhalten; keine ausführbaren Theme-Skripte zulassen. Herkunft und Lizenzdateien erhalten.
 
+Theme-Auswahl/Vorschau ab 0.14.134: 378 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden. Optionen und Aktivierung getrennt; vollständige XML-Layoutübernahme bleibt offen.
+
 ## 4. Sichtbare GUI-Verbesserungen
 
 - [ ] Startansicht mit zuletzt gespielten Titeln, Favoriten und Sammlungen; Module ein-/ausblendbar machen.
