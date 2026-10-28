@@ -24,13 +24,35 @@ Die Übernahme fremder Theme-Layouts folgt separat. Der bestehende Theme-Import 
 
 ## EmulationStation-/ES-DE-Theme anpassen
 
-Den entpackten Theme-Ordner über **ES-DE-/EmulationStation-Theme anpassen …** auswählen. Das Original bleibt unverändert. EmuVora kopiert das Theme in den Datenordner und übernimmt unterstützte Hintergründe, Konsolenlogos und Listen-/Detailfarben. Bei ES-DE-Themes mit `capabilities.xml` wird die erste auswählbare Variante, ein zum hellen/dunklen Basisstil passendes Farbschema und bevorzugt die 16:9-Vorlage gewählt. Diese Vorlage wird in das native Layout eingepasst; sie verändert nicht die Windows-Auflösung.
+Unter **Einstellungen → Darstellung → ES-DE-/EmulationStation-Theme anpassen …** den entpackten Originalordner außerhalb des verwalteten `themes`-Verzeichnisses auswählen. Variante, Farbschema und Vorlagen-Seitenverhältnis aus den tatsächlich deklarierten Optionen wählen. Nicht auswählbare Varianten werden ausgelassen. Als Vorschlag dienen die erste auswählbare Variante, ein zum Basisstil passendes Farbschema und bevorzugt 16:9. Klassische Themes ohne Optionen bleiben unterstützt; ihre Optionsfelder sind deaktiviert.
+
+1. Die gewünschte Konsole für die Vorschau wählen und **Vorschau prüfen** drücken.
+2. Die dargestellten Farben, Bilder und Logos mit Beispieldaten sowie die Hinweise prüfen. Der Dialog scrollt zur Vorschau; die Übernahme bleibt unten erreichbar. Die Anordnung bleibt EmuVoras natives Raster, Liste oder Karussell.
+3. Änderungen an einer Auswahl verwerfen die vorherige Vorschau und sperren die Übernahme bis zur erneuten Prüfung.
+4. Erst **Geprüftes Theme übernehmen** kopiert und aktiviert das Theme. Abbrechen erhält die bisherige Darstellung und verändert die Quelldateien nicht.
+
+Die ausgewählte Kombination wird für alle 47 unterstützten Systeme strukturell geprüft. Vor und nach dieser Prüfung werden Dateiliste und SHA-256-Inhalte verglichen. Die Übernahme prüft die Vorschau erneut und verifiziert die kopierten Dateiinhalte. Geänderte, hinzugefügte oder entfernte Quelldateien erfordern eine neue Vorschau. Diese Strukturprüfung bestätigt keine vollständige Darstellung jedes fremden Elements.
+
+EmuVora übernimmt unterstützte Hintergründe, Konsolenlogos und Listen-/Detailfarben. Die gewählten Optionen werden nur in der importierten Kopie als `emuvora-theme-options.json` gespeichert und beim nächsten Start erneut berücksichtigt. Das Vorlagenformat bestimmt passende XML-Includes; Windows-Auflösung und natives Layout bleiben erhalten. Frühere Importe ohne diese Datei behalten ihre automatische Auswahl nach dem Basisstil. Neue Sicherungen enthalten die Optionen zusammen mit einem aktiven lokalen Theme im Datenordner.
 
 Es ist eine Anpassung, keine vollständige ES-DE-Emulation. Videos, Sounds, eigene Schriftarten, Animationen, Karussells und Speziallayouts werden nicht nachgebaut. Dynamische Eigenschaften und fehlende optionale Includes können ausgelassen werden. Klassische Theme-Elemente und typische ES-DE-Namen werden auf Hintergrund, Logo und Textfarben abgebildet; unbekannte Elemente erscheinen im **Theme-Importbericht**. Dieser liegt als `emuvora-import-report.txt` im importierten Ordner und lässt sich in den Darstellungseinstellungen öffnen. Nicht jedes Theme lässt sich sinnvoll übertragen.
 
 XML-Entitäten, externe Ressourcen, Pfade außerhalb des Theme-Ordners, Verknüpfungen und Include-Zyklen werden abgewiesen. Grenzen: 256 MiB und 10.000 Dateien. Ein Abbruch verhindert die Aktivierung eines unvollständigen Imports. Lizenz- und Herkunftsdateien werden mitkopiert; die Nutzungsbedingungen des jeweiligen Theme-Autors gelten weiterhin. Mit **EmuVora-Standarddarstellung verwenden** wird die externe Anpassung abgeschaltet; der gewählte native Basisstil bleibt aktiv.
 
-Alekfull NX wird anhand seiner festgehaltenen Original-XML mit den automatischen Varianten und Farben geprüft. Seine Originaldarstellung wird dabei nicht identisch nachgebaut. Quelle und Lizenzhinweise: [Alekfull NX ES-DE](https://github.com/anthonycaccese/alekfull-nx-es-de).
+### Referenz: Alekfull NX
+
+Geprüfter Referenzstand: `645b2bcc2248e93af8f0f4461a6ee7367fb89365`. [Deklarierte Optionen](https://github.com/anthonycaccese/alekfull-nx-es-de/blob/645b2bcc2248e93af8f0f4461a6ee7367fb89365/capabilities.xml).
+
+| Eigenschaft | Aktueller Umfang |
+| --- | --- |
+| Vier auswählbare Varianten | Auswählbar; nicht auswählbares `basic` bleibt verborgen. Unterstützte Elemente der Variante werden gelesen. |
+| Vier Farbschemata | Auswählbar und gespeichert; originale helle und dunkle XML-Farben automatisiert geprüft. |
+| Vier Vorlagenformate | Deklarierte Formate auswählbar; zugehörige Includes werden gelesen, die Monitorauflösung bleibt erhalten. |
+| Hintergrund, Logo, Textfarben | In der nativen Vorschau und Oberfläche für unterstützte Elemente angepasst. |
+| Positionen, Größen, Ebenen, eigene Listen-/Karussellanordnung | Noch keine vollständige XML-Layoutübernahme. |
+| Medienabhängige Varianten-Overrides, eigene Schriften, Videos, Sounds, Animationen | Noch nicht dargestellt bzw. ausgewertet. |
+
+Originalassets werden für die Referenzprüfung nicht mit EmuVora verteilt. Beim lokalen Import bleiben Herkunfts- und Lizenzdateien erhalten; Quelle und Lizenzhinweise: [Alekfull NX ES-DE](https://github.com/anthonycaccese/alekfull-nx-es-de).
 
 ## Doppelte Karten und Versionen
 
