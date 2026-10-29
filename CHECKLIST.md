@@ -1,10 +1,10 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 28. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 29. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
 
-- [x] Theme-Layout um Textausrichtung für Titel/Beschreibung sowie proportionale Logo-/Covergrößen mit automatischen Null-Achsen und korrekt berechnetem Ursprung erweitert. Formatwechsel, fehlende Cover und ungültige Werte geprüft; Releaseprüfung läuft. [Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
+- [x] Theme-Layout in 0.14.138 ([PR #47](https://github.com/cpprograming/EmuVora/pull/47)) um Textausrichtung für Titel/Beschreibung sowie proportionale Logo-/Covergrößen mit automatischen Null-Achsen und korrekt berechnetem Ursprung erweitert. Formatwechsel, fehlende Cover und ungültige Werte geprüft; 416 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft. Persönliche Installation und Bibliotheksprüfung warten auf das wieder angeschlossene Laufwerk E:. [Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
 
 - [x] Ersten nativen Theme-Layout-Adapter in 0.14.136 veröffentlicht ([PR #46](https://github.com/cpprograming/EmuVora/pull/46)): normalisierte Geometrie, Ursprung, Ebenen, Sichtbarkeit und Transparenz für definierte Rollen; derselbe Renderer in Vorschau und Bibliothek. Native Auswahl, Cover, Metadaten und Spielaktionen bleiben erhalten. Import-Opt-in und vierte Ansicht gespeichert, ungeeignete Flächen/Themes verwenden eine Ersatzliste. Alekfull-NX-Listenrechteck und statische Cover-Abbildung geprüft; 398 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft und installiert. 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. [Grenzen](NATIVE_THEMES.md#unterstütztes-theme-layout).
 

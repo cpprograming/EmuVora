@@ -1,15 +1,16 @@
 # EmuVora – Roadmap
 
-Stand: 28. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 29. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.136](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.136).
+Aktueller geprüfter Release: [0.14.138](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.138).
 
-## Nächste Etappe – Textausrichtung und proportionale Theme-Bilder
+## 0.14.138 – Textausrichtung und proportionale Theme-Bilder (veröffentlicht)
 
 - [x] Titel/Beschreibung horizontal und vertikal ausrichten; ungültige Angaben kontrolliert ersetzen und berichten.
 - [x] Logo-/Covergrößen aus tatsächlichem Bildformat bestimmen, Null-Achsen und proportionale Begrenzungsboxen unterstützen; Ursprung nach Größenberechnung anwenden.
 - [x] Formatwechsel bei Auswahl, fehlende Cover, Fenstergrößen und unveränderte Metadaten automatisiert prüfen.
-- [ ] Vollständige Release-/Installationsprüfung abschließen.
+- [x] 416 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #47](https://github.com/cpprograming/EmuVora/pull/47).
+- [ ] Persönliche Installation und erneute Prüfung der Bibliothekskopie nach Anschluss von Laufwerk E: nachholen. Hardwareabnahme bleibt separat.
 
 ## 0.14.136 – nativer Theme-Layout-Adapter (abgeschlossen)
 
