@@ -13,9 +13,12 @@ public sealed record ThemeLayout(IReadOnlyDictionary<string, ThemePlacement> Ele
     bool Usable, IReadOnlyList<string> Notes)
 {
     public static readonly ThemePlacement NativeList = new(.03, .04, .94, .92, Layer: 10000);
+    public const string DecorationPrefix = "decoration:";
+    public const int DecorationLimit = 32;
+    public IReadOnlyDictionary<string, ThemeElement> Decorations { get; init; } = new Dictionary<string, ThemeElement>();
     public static ThemeLayout From(EmulationStationTheme? theme)
     {
-        var elements = new Dictionary<string, ThemePlacement>(); var notes = new HashSet<string>(); var usable = false;
+        var elements = new Dictionary<string, ThemePlacement>(); var decorations = new Dictionary<string, ThemeElement>(); var notes = new HashSet<string>(); var usable = false;
         var ratio = 16d / 9;
         if (theme == null) return new(elements, ratio, false, ["Kein aktives Theme-Layout; native Liste wird verwendet."]);
         var parts = theme.AspectRatio.Split(':');
@@ -30,6 +33,16 @@ public sealed record ThemeLayout(IReadOnlyDictionary<string, ThemePlacement> Ele
                 "md_description" or "description" when element.Type == "text" => "md_description",
                 _ => null
             };
+            var decorative = false;
+            if (role == null && element.Name != "canvas" && !element.Name.StartsWith("md_", StringComparison.OrdinalIgnoreCase) && !element.Name.StartsWith("game-", StringComparison.OrdinalIgnoreCase))
+            {
+                var content = element.Properties.GetValueOrDefault(element.Type == "image" ? "path" : "text");
+                if (element.Type is "image" or "text" && !string.IsNullOrWhiteSpace(content) && !content.Contains("${"))
+                {
+                    if (decorations.Count >= DecorationLimit) { notes.Add("Dekorationslimit erreicht: höchstens 32 statische Elemente."); continue; }
+                    role = DecorationPrefix + element.Type + ":" + element.Name; decorative = true;
+                }
+            }
             if (role == null) { if (element.Name != "canvas") notes.Add("Layout-Element nicht abgebildet: " + element.Type + " / " + element.Name); continue; }
             var defaults = role switch
             {
@@ -45,6 +58,7 @@ public sealed record ThemeLayout(IReadOnlyDictionary<string, ThemePlacement> Ele
             var hasSize = Pair(p.GetValueOrDefault("size") ?? p.GetValueOrDefault("maxSize"), out var width, out var height)
                 && width is >= 0 and <= 2 && height is >= 0 and <= 2 && (width > 0 || height > 0)
                 && (proportional || width > 0 && height > 0);
+            if (decorative && (!hasPos || !hasSize)) { notes.Add("Dekoration ohne gültige Position/Größe ausgelassen: " + element.Name); continue; }
             if (!hasPos) { x = defaults.X; y = defaults.Y; notes.Add("Native Ersatzposition: " + role); }
             if (!hasSize) { width = defaults.Width; height = defaults.Height; notes.Add("Native Ersatzgröße: " + role); }
             var origin = Pair(p.GetValueOrDefault("origin"), out var ox, out var oy) && ox is >= 0 and <= 1 && oy is >= 0 and <= 1;
@@ -70,9 +84,14 @@ public sealed record ThemeLayout(IReadOnlyDictionary<string, ThemePlacement> Ele
                 placement = placement with { Layer = 10000, Opacity = Math.Max(.6, opacity), Visible = true };
             }
             elements[role] = placement;
+            if (decorative)
+            {
+                decorations[role] = element;
+                notes.Add("Statische Dekoration angepasst: " + element.Type + " / " + element.Name + (element.Type == "text" ? " (native Schrift; höchstens 512 Zeichen)" : " (proportional)"));
+            }
         }
         if (!usable) notes.Add("Kein vollständig nutzbares Listenlayout erkannt; native Liste wird verwendet.");
-        return new(elements, ratio, usable, notes.Order(StringComparer.Ordinal).ToArray());
+        return new(elements, ratio, usable, notes.Order(StringComparer.Ordinal).ToArray()) { Decorations = decorations };
     }
     private static bool Number(string? text, out double value) => double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) && double.IsFinite(value);
     private static bool Pair(string? text, out double x, out double y)

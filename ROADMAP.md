@@ -4,6 +4,14 @@ Stand: 29. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.138](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.138).
 
+## Nächste Etappe – statische Theme-Dekorationen
+
+- [x] Bis zu 32 frei benannte lokale Zierbilder und feste Beschriftungen mit expliziter Geometrie in Vorschau und Bibliothek abbilden.
+- [x] Native Bedienung und Vordergrundliste erhalten; dynamische Metadaten nicht erfinden und fehlende/kaputte optionale Bilder einzeln auslassen.
+- [x] Bilddekodierung begrenzen und aktive Dekorationsressourcen beim Layoutwechsel/Schließen freigeben; helle/dunkle, schmale und TV-Ansichten prüfen.
+- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [ ] Persönliche Installation und Bibliotheksprüfung nach Anschluss von Laufwerk E: nachholen.
+
 ## 0.14.138 – Textausrichtung und proportionale Theme-Bilder (veröffentlicht)
 
 - [x] Titel/Beschreibung horizontal und vertikal ausrichten; ungültige Angaben kontrolliert ersetzen und berichten.
@@ -19,7 +27,7 @@ Aktueller geprüfter Release: [0.14.138](https://github.com/cpprograming/EmuVora
 - [x] Seitenverhältnis einpassen, dekorative Eingaben sperren und eine bedienbare Ersatzliste bei ungeeigneten oder kleinen Flächen erhalten.
 - [x] Import-Opt-in, gespeicherten Ansichtsmodus sowie Wechsel zwischen Raster/Liste/Karussell/Theme bei unveränderten Bibliotheksdaten prüfen.
 - [x] 398 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft und installiert. 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. [PR #46](https://github.com/cpprograming/EmuVora/pull/46).
-- [ ] Weitere Dekorationen und medienabhängige Varianten weiter ausbauen. [Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
+- [ ] Dynamische Dekorationen und medienabhängige Varianten weiter ausbauen. [Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
 
 ## 0.14.134 – Theme-Auswahl und Importvorschau (abgeschlossen)
 
