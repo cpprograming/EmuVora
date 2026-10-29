@@ -2,14 +2,14 @@
 
 Stand: 29. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.138](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.138).
+Aktueller geprüfter Release: [0.14.140](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.140).
 
-## Nächste Etappe – statische Theme-Dekorationen
+## 0.14.140 – statische Theme-Dekorationen (veröffentlicht)
 
 - [x] Bis zu 32 frei benannte lokale Zierbilder und feste Beschriftungen mit expliziter Geometrie in Vorschau und Bibliothek abbilden.
 - [x] Native Bedienung und Vordergrundliste erhalten; dynamische Metadaten nicht erfinden und fehlende/kaputte optionale Bilder einzeln auslassen.
 - [x] Bilddekodierung begrenzen und aktive Dekorationsressourcen beim Layoutwechsel/Schließen freigeben; helle/dunkle, schmale und TV-Ansichten prüfen.
-- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [x] 435 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #48](https://github.com/cpprograming/EmuVora/pull/48).
 - [ ] Persönliche Installation und Bibliotheksprüfung nach Anschluss von Laufwerk E: nachholen.
 
 ## 0.14.138 – Textausrichtung und proportionale Theme-Bilder (veröffentlicht)

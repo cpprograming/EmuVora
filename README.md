@@ -16,7 +16,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Theme-Dekorationen:** Zusätzlich lassen sich bis zu 32 statische lokale Zierbilder und feste Beschriftungen übernehmen. Vorschau und Bibliothek teilen dieselbe Darstellung; fehlerhafte optionale Bilder werden einzeln ausgelassen. [Grenzen und Ressourcen](NATIVE_THEMES.md#statische-theme-dekorationen).
 
-**Aktueller geprüfter Stand: [0.14.138](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.138)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.140](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.140)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
