@@ -3,7 +3,8 @@ using System.Globalization;
 namespace EmuVora.Core;
 
 public sealed record ThemePlacement(double X, double Y, double Width, double Height, double OriginX = 0, double OriginY = 0,
-    int Layer = 0, double Opacity = 1, bool Visible = true)
+    int Layer = 0, double Opacity = 1, bool Visible = true,
+    bool ProportionalImage = false, string TextAlignment = "left", string VerticalAlignment = "top")
 {
     public double Left => X - Width * OriginX;
     public double Top => Y - Height * OriginY;
@@ -40,15 +41,27 @@ public sealed record ThemeLayout(IReadOnlyDictionary<string, ThemePlacement> Ele
                 _ => new ThemePlacement(.56, .8, .4, .16, Layer: 20)
             };
             var p = element.Properties; var hasPos = Pair(p.GetValueOrDefault("pos"), out var x, out var y) && x is >= -1 and <= 2 && y is >= -1 and <= 2;
-            var hasSize = Pair(p.GetValueOrDefault("size") ?? p.GetValueOrDefault("maxSize"), out var width, out var height) && width is > 0 and <= 2 && height is > 0 and <= 2;
+            var proportional = element.Type == "image" && role != "background";
+            var hasSize = Pair(p.GetValueOrDefault("size") ?? p.GetValueOrDefault("maxSize"), out var width, out var height)
+                && width is >= 0 and <= 2 && height is >= 0 and <= 2 && (width > 0 || height > 0)
+                && (proportional || width > 0 && height > 0);
             if (!hasPos) { x = defaults.X; y = defaults.Y; notes.Add("Native Ersatzposition: " + role); }
-            if (!hasSize) { width = defaults.Width; height = defaults.Height; notes.Add("Native Ersatzgröße (auch automatische Null-Achsen): " + role); }
+            if (!hasSize) { width = defaults.Width; height = defaults.Height; notes.Add("Native Ersatzgröße: " + role); }
             var origin = Pair(p.GetValueOrDefault("origin"), out var ox, out var oy) && ox is >= 0 and <= 1 && oy is >= 0 and <= 1;
             if (!origin) { ox = 0; oy = 0; if (p.ContainsKey("origin")) notes.Add("Ungültiger Ursprung ersetzt: " + role); }
             var z = Number(p.GetValueOrDefault("zIndex"), out var layer) ? (int)Math.Clamp(layer, -1000, 1000) : defaults.Layer;
             var opacity = Number(p.GetValueOrDefault("opacity"), out var alpha) ? Math.Clamp(alpha, 0, 1) : 1;
             var visible = !string.Equals(p.GetValueOrDefault("visible"), "false", StringComparison.OrdinalIgnoreCase) && p.GetValueOrDefault("visible") != "0";
-            var placement = new ThemePlacement(x, y, width, height, ox, oy, z, opacity, visible);
+            string Alignment(string key, string fallback, params string[] allowed)
+            {
+                var value = p.GetValueOrDefault(key)?.Trim().ToLowerInvariant();
+                if (value == null) return fallback;
+                if (allowed.Contains(value)) return value;
+                notes.Add("Ungültige Textausrichtung ersetzt: " + role + " / " + key); return fallback;
+            }
+            var horizontal = element.Type == "text" ? Alignment("alignment", "left", "left", "center", "right") : "left";
+            var vertical = element.Type == "text" ? Alignment("verticalAlignment", "top", "top", "center", "bottom") : "top";
+            var placement = new ThemePlacement(x, y, width, height, ox, oy, z, opacity, visible, proportional, horizontal, vertical);
             if (role == "gamelist")
             {
                 usable = hasPos && hasSize && placement.Left >= 0 && placement.Top >= 0 && placement.Left + width <= 1.001 && placement.Top + height <= 1.001 && width >= .2 && height >= .2 && visible && opacity >= .4;

@@ -4,6 +4,13 @@ Stand: 28. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.136](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.136).
 
+## Nächste Etappe – Textausrichtung und proportionale Theme-Bilder
+
+- [x] Titel/Beschreibung horizontal und vertikal ausrichten; ungültige Angaben kontrolliert ersetzen und berichten.
+- [x] Logo-/Covergrößen aus tatsächlichem Bildformat bestimmen, Null-Achsen und proportionale Begrenzungsboxen unterstützen; Ursprung nach Größenberechnung anwenden.
+- [x] Formatwechsel bei Auswahl, fehlende Cover, Fenstergrößen und unveränderte Metadaten automatisiert prüfen.
+- [ ] Vollständige Release-/Installationsprüfung abschließen.
+
 ## 0.14.136 – nativer Theme-Layout-Adapter (abgeschlossen)
 
 - [x] Normalisierte Positionen, Größen, Ursprünge, Ebenen, Sichtbarkeit und Transparenz für definierte Rollen in ein unabhängiges Modell übersetzen.
@@ -11,7 +18,7 @@ Aktueller geprüfter Release: [0.14.136](https://github.com/cpprograming/EmuVora
 - [x] Seitenverhältnis einpassen, dekorative Eingaben sperren und eine bedienbare Ersatzliste bei ungeeigneten oder kleinen Flächen erhalten.
 - [x] Import-Opt-in, gespeicherten Ansichtsmodus sowie Wechsel zwischen Raster/Liste/Karussell/Theme bei unveränderten Bibliotheksdaten prüfen.
 - [x] 398 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft und installiert. 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. [PR #46](https://github.com/cpprograming/EmuVora/pull/46).
-- [ ] Weitere Dekorationen, Textausrichtung, automatische Bildachsen und medienabhängige Varianten weiter ausbauen. [Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
+- [ ] Weitere Dekorationen und medienabhängige Varianten weiter ausbauen. [Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
 
 ## 0.14.134 – Theme-Auswahl und Importvorschau (abgeschlossen)
 

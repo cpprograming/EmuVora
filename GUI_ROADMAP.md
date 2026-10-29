@@ -42,7 +42,8 @@ Karussell-/Konsolenstand ab 0.14.132: 362 Funktions- und 6 Netzwerktests sowie S
 - [x] Variante, Farbschema und Vorlagen-Seitenverhältnis vor dem Import auswählbar machen; Auswahl in der importierten Kopie speichern.
 - [x] XML-Geometrie zunächst in ein unabhängiges Theme-Modell übersetzen; Parsing und Rendering für die definierten Rollen getrennt halten.
 - [x] Positionen, Größen, Ursprung, Sichtbarkeit, Transparenz und Ebenen für Liste, Hintergrund, Logo, Cover und Texte auf denselben nativen Renderer in Vorschau und Bibliothek abbilden.
-- [ ] Weitere Dekorationen, Textausrichtung, automatische Bildachsen und zusätzliche Bild-Skalierung ergänzen.
+- [x] Horizontale/vertikale Textausrichtung für Titel/Beschreibung und automatische Bildachsen für proportionale Logos/Cover ergänzen; Ursprung nach tatsächlicher Bildgröße berechnen.
+- [ ] Weitere Dekorationen und zusätzliche Bild-Skalierung ergänzen.
 - [ ] System-/Spieleansichten, Listen, Raster und Karussells schrittweise unterstützen; gemeinsame Bedienfunktionen in jeder Ansicht erhalten.
 - [x] Ausgewählte native Cover, Platzhalter sowie vorhandene Titel-/System-/Startangaben zuordnen; ungültige oder kleine Flächen erhalten eine bedienbare Ersatzliste.
 - [ ] Weitere Metadaten-/Medientypen und fremde Scraper-Beschreibungen gezielt integrieren.

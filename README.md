@@ -12,7 +12,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Theme-Import mit Vorschau:** Variante, Farbschema und Vorlagenformat auswählen, die unterstützten Eigenschaften mit Beispieldaten prüfen und erst anschließend übernehmen. Änderungen am Original erfordern eine neue Prüfung. [Ablauf und Unterstützungsmatrix](NATIVE_THEMES.md#emulationstation-es-de-theme-anpassen).
 
-**Theme-Layout:** Positionen, Größen und Ebenen für Liste, Hintergrund, Logo, Cover und Texte lassen sich in eine native Ansicht übernehmen. Die Option steht in der Importvorschau und unter der Suche bereit. Bei ungeeigneten Vorlagen bleibt eine bedienbare Ersatzliste verfügbar. [Unterstützter Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
+**Theme-Layout:** Positionen, Größen und Ebenen für Liste, Hintergrund, Logo, Cover und Texte lassen sich in eine native Ansicht übernehmen. Titel/Beschreibung unterstützen Textausrichtung; Logos und Cover erhalten proportionale Größen einschließlich automatischer Bildachsen. Die Option steht in der Importvorschau und unter der Suche bereit. Bei ungeeigneten Vorlagen bleibt eine bedienbare Ersatzliste verfügbar. [Unterstützter Umfang](NATIVE_THEMES.md#unterstütztes-theme-layout).
 
 **Aktueller geprüfter Stand: [0.14.136](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.136)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
