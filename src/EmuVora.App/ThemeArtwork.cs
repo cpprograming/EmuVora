@@ -9,6 +9,16 @@ namespace EmuVora.App;
 
 public static class ThemeArtwork
 {
+    public static Bitmap LoadDecoration(string file)
+    {
+        if (Path.GetExtension(file).Equals(".svg", StringComparison.OrdinalIgnoreCase)) return Load(file);
+        if (new FileInfo(file).Length > 16 * 1024 * 1024) throw new IOException("Theme-Bild ist zu groß.");
+        using var input = File.OpenRead(file); using var codec = SKCodec.Create(input);
+        var info = codec?.Info ?? throw new IOException("Dekorationsbild ist ungültig.");
+        if (info.Width is <= 0 or > 32768 || info.Height is <= 0 or > 32768 || (long)info.Width * info.Height > 64L * 1024 * 1024) throw new IOException("Dekorationsbild hat zu große Abmessungen.");
+        var width = Math.Max(1, (int)(info.Width * Math.Min(1, Math.Min(1920d / info.Width, 1080d / info.Height))));
+        using var decoded = File.OpenRead(file); return Bitmap.DecodeToWidth(decoded, width);
+    }
     public static Bitmap Load(string file)
     {
         if(new FileInfo(file).Length>16*1024*1024)throw new IOException("Theme-Bild ist zu groß.");

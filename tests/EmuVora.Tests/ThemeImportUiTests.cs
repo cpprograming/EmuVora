@@ -82,15 +82,20 @@ public class ThemeImportUiTests
     [AvaloniaFact] public async Task LayoutOptInUsesSamePanelForPreviewAndActiveLibraryAndPersists()
     {
         using var dir = new TestDirectory(); var root = ThemeLayoutTests.Fixture(dir); var data = Path.Combine(dir.Path, "data"); var window = Open(data, "Midnight", false);
+        var xml = Path.Combine(root, "theme.xml"); File.WriteAllText(xml, File.ReadAllText(xml).Replace("</theme>", "<view name='gamelist'><text name='collection-label'><text>LOCAL COLLECTION</text><pos>.04 .04</pos><size>.4 .08</size></text><image name='optional-decoration'><path>broken.svg</path><pos>.5 .5</pos><size>.2 .2</size></image></view></theme>")); File.WriteAllText(Path.Combine(root, "broken.svg"), "<svg><broken>");
         try
         {
             var shown = Show(window, root); var dialog = await Next(window);
             var layout = dialog.GetVisualDescendants().OfType<CheckBox>().Single(c => c.Content as string == "Theme-Layout in Vorschau und nach Übernahme verwenden"); layout.IsChecked = true;
             await Check(window, dialog); Assert.Single(dialog.GetVisualDescendants().OfType<ThemeLayoutPanel>()); Assert.Equal("Grid", new SettingsStore(Path.Combine(data, "settings.json")).Load().LibraryLayout);
+            Assert.Contains(dialog.GetVisualDescendants().OfType<TextBlock>(), text => text.Text?.Contains("Dekorationsbild unlesbar") == true);
+            Assert.Contains(dialog.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == "LOCAL COLLECTION");
             Click(dialog, "Geprüftes Theme übernehmen"); await shown.WaitAsync(TimeSpan.FromSeconds(10)); Render(window);
             var settings = new SettingsStore(Path.Combine(data, "settings.json")).Load(); Assert.Equal("Theme", settings.LibraryLayout); Assert.NotNull(settings.EmulationStationTheme);
             using var selection = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(settings.EmulationStationTheme, "emuvora-theme-options.json"))); Assert.True(selection.RootElement.GetProperty("UseLayout").GetBoolean());
             Assert.Single(window.GetVisualDescendants().OfType<ThemeLayoutPanel>()); Assert.Empty(new LibraryStore(Path.Combine(data, "library.db")).GetAll());
+            Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == "LOCAL COLLECTION");
+            Assert.True(File.Exists(Path.Combine(settings.EmulationStationTheme, "broken.svg")));
         }
         finally { foreach (var child in window.OwnedWindows.ToArray()) child.Close(); window.Close(); }
     }

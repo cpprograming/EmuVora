@@ -81,8 +81,8 @@ public sealed partial class MainWindow
             if (!await BusyAsync(async token => result = await Task.Run(() => EmulationStationTheme.PreviewImport(source, console, preferDark, selection, token), token)) || result == null || stamp != revision || isClosed || !dialog.IsVisible) { if (dialog.IsVisible) report.Text = status.Text; State(); return; }
             try
             {
-                preview.Content = ThemeSample(result.Preview, images, selection.UseLayout);
-                report.Text = $"{result.Files.Count} Dateien · {result.Bytes / 1024d / 1024d:F1} MiB · ausgewählte Kombination für alle {EmulatorCatalog.Systems.Length} Systeme strukturell geprüft.\n\n" + string.Join("\n", result.Notes);
+                var renderNotes = new List<string>(); preview.Content = ThemeSample(result.Preview, images, selection.UseLayout, renderNotes);
+                report.Text = $"{result.Files.Count} Dateien · {result.Bytes / 1024d / 1024d:F1} MiB · ausgewählte Kombination für alle {EmulatorCatalog.Systems.Length} Systeme strukturell geprüft.\n\n" + string.Join("\n", result.Notes.Concat(renderNotes));
                 plan = result;
                 Dispatcher.UIThread.Post(() => { if (dialog.IsVisible && stamp == revision) preview.BringIntoView(); }, DispatcherPriority.Loaded);
             }
@@ -94,7 +94,7 @@ public sealed partial class MainWindow
         FeedbackChanged += State; dialog.Closed += (_, _) => { FeedbackChanged -= State; Clear(); }; State();
         await dialog.ShowDialog(owner);
     }
-    private Control ThemeSample(EmulationStationTheme theme, List<Bitmap> images, bool useLayout = false)
+    private Control ThemeSample(EmulationStationTheme theme, List<Bitmap> images, bool useLayout = false, List<string>? renderNotes = null)
     {
         ThemeElement? Find(string name) => theme.Elements.LastOrDefault(e => e.Name == name);
         IBrush ColorFor(ThemeElement? element, string key, IBrush fallback)
@@ -118,6 +118,12 @@ public sealed partial class MainWindow
             stage.AddSlot("md_name", new TextBlock { Text = "Beispielspiel", FontSize = 18, TextWrapping = TextWrapping.Wrap, Foreground = ColorFor(Find("md_name"), "color", Foreground ?? Brushes.White), IsHitTestVisible = false });
             stage.AddSlot("md_description", new TextBlock { Text = "Beispiel-Konsole\n3 Starts · Beispieldaten", FontSize = 13, TextWrapping = TextWrapping.Wrap, Foreground = ColorFor(Find("md_description") ?? Find("description"), "color", Foreground ?? Brushes.White), IsHitTestVisible = false });
             stage.AddSlot("md_image", new Border { Background = Brush.Parse("#354C56"), Child = new TextBlock { Text = "EMUVORA", Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }, IsHitTestVisible = false });
+            var decorationNotes = ThemeDecorationRenderer.Replace(stage, element =>
+            {
+                var path = element.Properties.GetValueOrDefault("path"); if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
+                var bitmap = ThemeArtwork.LoadDecoration(path); images.Add(bitmap); return bitmap;
+            }, FontFamily, Foreground ?? Brushes.White, settings.TvMode ? 17 : 14);
+            renderNotes?.AddRange(decorationNotes);
             var adapted = new Border { CornerRadius = new(12), Child = stage, ClipToBounds = true }; adapted.Classes.Add("theme-preview"); return adapted;
         }
         var canvas = new Grid { Height = settings.TvMode ? 330 : 280, Background = ColorFor(Find("canvas"), "color", Background ?? Brushes.Black), ClipToBounds = true };

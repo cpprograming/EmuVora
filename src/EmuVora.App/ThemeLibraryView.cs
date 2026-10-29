@@ -14,6 +14,7 @@ public sealed partial class MainWindow
     private readonly ContentControl stageCover = new() { IsHitTestVisible = false };
     private readonly TextBlock stageTitle = new() { TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis, IsHitTestVisible = false };
     private readonly TextBlock stageDescription = new() { TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis, IsHitTestVisible = false };
+    private readonly Dictionary<string, Bitmap> stageDecorationImages = new(StringComparer.OrdinalIgnoreCase);
     private bool IsThemeLayout => settings.LibraryLayout == "Theme";
     private void MountLibrarySurface()
     {
@@ -29,7 +30,11 @@ public sealed partial class MainWindow
         }
         else librarySurface.Content = gamesList;
     }
-    private void ClearThemeStageImages() { stageBackground.Source = stageLogo.Source = null; stageCover.Content = null; }
+    private void ClearStageDecorations()
+    {
+        ThemeDecorationRenderer.Clear(themeStage); foreach (var bitmap in stageDecorationImages.Values) bitmap.Dispose(); stageDecorationImages.Clear();
+    }
+    private void ClearThemeStageImages() { ClearStageDecorations(); stageBackground.Source = stageLogo.Source = null; stageCover.Content = null; }
     private void ResetThemeStage()
     {
         ClearThemeStageImages(); themeStage.Model = ThemeLayout.From(null); themeStage.Background = Background;
@@ -40,6 +45,12 @@ public sealed partial class MainWindow
         if (!IsThemeLayout) return;
         ThemeElement? Find(string name) => theme.Elements.LastOrDefault(e => e.Name == name);
         themeStage.Model = ThemeLayout.From(theme);
+        ClearStageDecorations();
+        var decorationNotes = ThemeDecorationRenderer.Replace(themeStage, element =>
+        {
+            var path = element.Properties.GetValueOrDefault("path"); if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
+            if (!stageDecorationImages.TryGetValue(path, out var bitmap)) { bitmap = ThemeArtwork.LoadDecoration(path); stageDecorationImages[path] = bitmap; } return bitmap;
+        }, FontFamily, Foreground ?? Brushes.White, settings.TvMode ? 17 : 14);
         stageBackground.Source = imageFor(Find("background")); stageLogo.Source = imageFor(Find("logo"));
         stageTitle.FontSize = settings.TvMode ? 22 : 19; stageDescription.FontSize = settings.TvMode ? 17 : 14;
         stageTitle.FontFamily = stageDescription.FontFamily = FontFamily;
@@ -49,6 +60,7 @@ public sealed partial class MainWindow
         gamesList.Background = themeStage.Background;
         themeBackground.Source = null; themeLogo.IsVisible = false;
         themeStatus.Text = "Theme-Layout · " + (themeStage.Model.Usable ? themeStage.Model.Elements.Count + " zugeordnete Elemente" : "native Ersatzliste") + "\nKleine Ansichten verwenden bei Bedarf die native Liste.";
+        if (decorationNotes.Count > 0) themeStatus.Text += "\n" + string.Join("\n", decorationNotes.Take(3));
     }
     private void UpdateThemeStageSelection(Game? game)
     {
