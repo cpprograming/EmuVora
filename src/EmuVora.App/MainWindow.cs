@@ -102,9 +102,9 @@ public sealed partial class MainWindow : Window
         sidebar.Children.Add(BrandIdentity.Lockup());
         sidebar.Children.Add(new TextBlock {Text="DEINE BIBLIOTHEK",FontSize=11,Opacity=0.65});
         sidebar.Children.Add(backupReminder);backupReminder.Click+=async(_,_)=>await ShowSettingsAsync(initialTab:5);UpdateBackupReminder();
-        foreach(var name in new[]{"Alle Spiele","Favoriten","Zuletzt gespielt","Zuletzt hinzugefügt","Fehlende Cover"})
+        foreach(var name in new[]{"Startseite","Alle Spiele","Favoriten","Zuletzt gespielt","Zuletzt hinzugefügt","Fehlende Cover"})
         {
-            var item=ActionButton(name,()=>{view=name;collectionChoice.SelectedItem=null;systems.SelectedItem="Alle Konsolen";Refresh();});StyleNavigation(item);viewButtons[name]=item;sidebar.Children.Add(item);
+            var item=ActionButton(name,()=>{if(name=="Startseite"){ShowHome();return;}view=name;collectionChoice.SelectedItem=null;systems.SelectedItem="Alle Konsolen";Refresh();});StyleNavigation(item);viewButtons[name]=item;sidebar.Children.Add(item);
         }
         sidebar.Children.Add(new TextBlock{Text="SAMMLUNGEN",FontSize=11,Opacity=0.65,Margin=new(0,12,0,4)});sidebar.Children.Add(collectionChoice);sidebar.Children.Add(AsyncButton("Sammlungen verwalten",()=>ManageCollectionsAsync()));
         collectionChoice.SelectionChanged+=(_,_)=>{if(!updatingCollections&&collectionChoice.SelectedItem is string){view="Sammlung";Refresh();}};UpdateCollections();
@@ -124,7 +124,7 @@ public sealed partial class MainWindow : Window
         sideBorder.Child=new ScrollViewer {Content=sidebar};layout.Children.Add(sideBorder);
         var header=new Grid {ColumnDefinitions=new("Auto,*,Auto"),ColumnSpacing=16};
         header.Children.Add(themeLogo);var heading=new StackPanel{Spacing=5};heading.Children.Add(libraryEyebrow);heading.Children.Add(libraryHeading);Grid.SetColumn(heading,1);header.Children.Add(heading);summary.VerticalAlignment=VerticalAlignment.Center;summary.TextAlignment=TextAlignment.Right;Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
-        var filters=new Grid {ColumnDefinitions=new("*,Auto,Auto"),RowDefinitions=new("Auto,Auto"),ColumnSpacing=10,RowSpacing=4};Grid.SetColumnSpan(search,3);filters.Children.Add(search);
+        var filters=libraryFilters;Grid.SetColumnSpan(search,3);filters.Children.Add(search);
         var toolbar=new WrapPanel();Grid.SetRow(toolbar,1);Grid.SetColumnSpan(toolbar,3);filters.Children.Add(toolbar);
         detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});
         libraryLayoutChoice.SelectedIndex=IsThemeLayout?3:IsCarouselLayout?2:IsListLayout?1:0;Avalonia.Automation.AutomationProperties.SetName(libraryLayoutChoice,"Bibliothekslayout");ToolTip.SetTip(libraryLayoutChoice,"Raster, Liste, Karussell oder Theme-Layout · Auswahl und Filter bleiben erhalten");libraryLayoutChoice.SelectionChanged+=(_,_)=>Guard(ChangeLibraryLayout);
@@ -142,10 +142,10 @@ public sealed partial class MainWindow : Window
         gamesList.SizeChanged+=(_,_)=>ResizeCarousel();
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("carousel-layout").Descendant().OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.VerticalAlignmentProperty,VerticalAlignment.Center),new Setter(ListBoxItem.OpacityProperty,.72)}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("carousel-layout").Descendant().OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.OpacityProperty,1d)}});
-        var library=new Grid{RowDefinitions=new("*,Auto")};MountLibrarySurface();library.Children.Add(librarySurface);
+        var library=libraryArea;MountLibrarySurface();library.Children.Add(librarySurface);
         var pageButtons=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};pageButtons.Children.Add(previousPage);pageButtons.Children.Add(nextPage);libraryPager.Children.Add(pageLabel);libraryPager.Children.Add(pageButtons);Grid.SetRow(libraryPager,1);library.Children.Add(libraryPager);
         previousPage.Click+=(_,_)=>ChangeLibraryPage(-1);nextPage.Click+=(_,_)=>ChangeLibraryPage(1);emptyState.Children.Add(BrandIdentity.CreateMark(72));emptyState.Children.Add(empty);emptyState.Children.Add(emptyAction);operationButtons.Add(emptyAction);emptyAction.Click+=async(_,_)=>{try{if(allGames.Count==0)await ImportAsync();else{search.Text="";systems.SelectedItem="Alle Konsolen";view="Alle Spiele";Refresh();}}catch(Exception ex){ShowError(ex);}};library.Children.Add(emptyState);AddRow(main,library,2);
-        AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);var notices=new StackPanel{Spacing=8};notices.Children.Add(CreateOperationNotice(false));notices.Children.Add(footer);AddRow(main,notices,4);
+        AddRow(main,homeSurface,2);AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);var notices=new StackPanel{Spacing=8};notices.Children.Add(CreateOperationNotice(false));notices.Children.Add(footer);AddRow(main,notices,4);
         status.PropertyChanged+=(_,e)=>{if(e.Property==TextBlock.TextProperty)NotifyFeedback();};progress.PropertyChanged+=(_,e)=>{if(e.Property==ProgressBar.ValueProperty||e.Property==ProgressBar.IsIndeterminateProperty)NotifyFeedback();};
         var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
         var details=new StackPanel {Spacing=16,Margin=new(22,30)};details.Children.Add(new TextBlock{Text="IM FOKUS",FontSize=10,LetterSpacing=2,Opacity=0.6});details.Children.Add(new Border{CornerRadius=new(16),Padding=new Thickness(14),Background=new SolidColorBrush(Color.Parse("#10203030")),Child=detailCover});details.Children.Add(detailTitle);details.Children.Add(detailInfo);
@@ -159,8 +159,8 @@ public sealed partial class MainWindow : Window
         gamesList.SelectionChanged+=(_,_)=>{UpdateSelected();if(!changingLibraryLayout&&Selected!=null)ScrollToLibrarySelection();};gamesList.DoubleTapped+=async(_,_)=>await PlayAsync();
         gamesList.KeyDown+=async(_,e)=>{if(e.Key==Key.Enter){e.Handled=true;await PlayAsync();}};
         search.TextChanged+=(_,_)=>Refresh();systems.SelectionChanged+=(_,_)=>Refresh();sort.SelectionChanged+=(_,_)=>Refresh();cancel.Click+=(_,_)=>RequestOperationCancel();
-        KeyDown+=(_,e)=>{if(e.Key==Key.F&&e.KeyModifiers.HasFlag(KeyModifiers.Control)){search.Focus();e.Handled=true;}};
-        UpdateSystems();ApplyTheme();ApplyLibraryAppearance();Refresh();
+        KeyDown+=(_,e)=>{if(e.Key==Key.F&&e.KeyModifiers.HasFlag(KeyModifiers.Control)){if(IsHome)ReturnFromHome();search.Focus();e.Handled=true;}};
+        if(settings.HomeOnStartup)view="Startseite";UpdateSystems();ApplyTheme();ApplyLibraryAppearance();Refresh();
         PropertyChanged+=(_,e)=>{if(e.Property==ClientSizeProperty)ApplyLayout();};
         status.Text=settingsStore.LoadWarning??(allGames.Count==0?"Importiere deine Spiele, um loszulegen.":"Bereit zum Spielen · Strg+F zum Suchen");
         Opened+=async(_,_)=>{ApplyLayout();FitMonitor();if(settings.PreferGerman)Guard(ApplyManagedLanguages);if(setupOnly){await ShowSettingsAsync();return;}if(!settings.OnboardingCompleted&&allGames.Count==0&&settings.RomFolders.Count==0)await ShowOnboardingAsync();if(isClosed)return;if(settings.CheckAppUpdatesOnStartup)await CheckAppUpdatesAsync();if(settings.CheckUpdatesOnStartup)await CheckUpdatesAsync();if(settings.AutoDownloadCovers&&allGames.Count>0)await FetchAllCoversAsync();};
@@ -168,7 +168,7 @@ public sealed partial class MainWindow : Window
         Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();ClearThemeStageImages();consoleLogos.Dispose();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
-    private void ApplyLayout(){if(detailsToggle!=null){detailsToggle.IsEnabled=!settings.TvMode&&(ClientSize.Width==0||ClientSize.Width>=1120);ToolTip.SetTip(detailsToggle,"Die rechte Detailspalte ist im Desktop-Modus ab 1120 Pixel Fensterbreite verfügbar.");}var show=!settings.TvMode&&settings.ShowGameDetails&&(ClientSize.Width==0||ClientSize.Width>=1120);detailBorder.IsVisible=show;layout.ColumnDefinitions[0].Width=new GridLength(settings.TvMode?320:240);layout.ColumnDefinitions[2].Width=new GridLength(show?300:0);}
+    private void ApplyLayout(){if(detailsToggle!=null){detailsToggle.IsEnabled=!IsHome&&!settings.TvMode&&(ClientSize.Width==0||ClientSize.Width>=1120);ToolTip.SetTip(detailsToggle,"Die rechte Detailspalte ist im Desktop-Modus ab 1120 Pixel Fensterbreite verfügbar.");}var show=!IsHome&&!settings.TvMode&&settings.ShowGameDetails&&(ClientSize.Width==0||ClientSize.Width>=1120);detailBorder.IsVisible=show;layout.ColumnDefinitions[0].Width=new GridLength(settings.TvMode?320:240);layout.ColumnDefinitions[2].Width=new GridLength(show?300:0);if(IsHome)UpdateHomeColumns();}
     private void FitMonitor(){var screen=Screens.ScreenFromWindow(this);if(screen==null)return;Width=Math.Min(Width,Math.Max(MinWidth,screen.WorkingArea.Width/screen.Scaling-32));Height=Math.Min(Height,Math.Max(MinHeight,screen.WorkingArea.Height/screen.Scaling-48));}
     private Button ActionButton(string text,Action action)
     {var button=new Button {Content=text,HorizontalAlignment=HorizontalAlignment.Stretch};button.Click+=(_,_)=>Guard(action);return button;}
@@ -196,6 +196,7 @@ public sealed partial class MainWindow : Window
     }
     private void ApplyExternalTheme()
     {
+        if(IsHome){themeBackground.Source=null;themeLogo.IsVisible=false;themeStatus.Text="";return;}
         var system=systems.SelectedItem as string; if(system is null or "Alle Konsolen")system=Selected?.System??allGames.FirstOrDefault()?.System??"NES";
         if(currentThemeSystem==system)return;currentThemeSystem=system;
         themeBackground.Source=null;themeLogo.Source=null;themeLogo.IsVisible=false;themeStatus.Text="";ResetThemeStage();
@@ -236,6 +237,8 @@ public sealed partial class MainWindow : Window
     {allGames=store.GetAll();addedTimes=store.GetAddedTimes();UpdateSystems();Refresh(selected);}
     private void Refresh(string? selectedPath=null,bool keepPage=false)
     {
+        if(changingHome)return;if(IsHome){RefreshHome();return;}
+        homeSurface.Content=null;homeGameGrids.Clear();homeSurface.IsVisible=false;libraryArea.IsVisible=libraryFilters.IsVisible=true;libraryEyebrow.Text="DEINE SAMMLUNG";ApplyLayout();
         var explicitSelection=selectedPath!=null;if(!keepPage)libraryPage=0;selectedPath??=Selected?.Path;var query=search.Text?.Trim()??"";var console=systems.SelectedItem as string;
         var presented=LibraryPresentation.Create(allGames,settings,addedTimes,new(query,console,view,sort.SelectedIndex,collectionChoice.SelectedItem as string,selectedPath,libraryPage,explicitSelection&&!keepPage));
         visibleVersions.Clear();foreach(var family in presented.Families)visibleVersions[family.Representative.Path]=family.Versions;var result=presented.Families.Select(g=>g.Representative).ToArray();
@@ -447,6 +450,7 @@ public sealed partial class MainWindow : Window
     private async Task HandleGamepadAsync()
     {
         var pads=Gamepad.Read();controllerStatus.Text=pads.Length==0?"Controller: nicht verbunden":"Controller: "+pads.Length+" verbunden · "+Gamepad.Label(pads[0])+"\nD-Pad: wählen · A: spielen · Y: Favorit\nLB/RB: System · Menu: Einstellungen\nView: Bedienelemente · B: Spieleliste";
+        if(IsHome&&pads.Length>0)controllerStatus.Text="Controller: "+pads.Length+" verbunden\nD-Pad: Bedienelemente · A: öffnen\nB: Bibliothek · Menu: Einstellungen";
         ToolTip.SetTip(controllerStatus,Gamepad.BackendName+(Gamepad.BackendWarning is{} warning?" · Rückfall auf XInput: "+warning:" · Automatische Belegung für EmuVora"));
         var pressed=gamepadNavigation.Poll(pads,IsActive&&!dialogOpen&&running.Count==0,Environment.TickCount64);
         if(pressed==0)return;
@@ -457,6 +461,7 @@ public sealed partial class MainWindow : Window
         if(operation!=null&&(pressed&0x2000)!=0){RequestOperationCancel();return;}
         if(running.Count>0||pressed==0)return;
         if((pressed&0x10)!=0){if(operation==null)await ShowSettingsAsync();return;}
+        if(IsHome){if((pressed&0x2000)!=0)ReturnFromHome();else ControllerUi.Handle(this,pressed);return;}
         if((pressed&0x20)!=0){controllerUiMode=!controllerUiMode;if(controllerUiMode)ControllerUi.Handle(this,2);else gamesList.Focus();return;}
         if(controllerUiMode){if((pressed&0x2000)!=0){controllerUiMode=false;gamesList.Focus();}else ControllerUi.Handle(this,(ushort)pressed);return;}
         if((pressed&0x300)!=0&&systems.ItemCount>0)systems.SelectedIndex=(systems.SelectedIndex+((pressed&0x200)!=0?1:systems.ItemCount-1))%systems.ItemCount;

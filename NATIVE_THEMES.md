@@ -4,6 +4,16 @@ EmuVora verwendet seine eigene Oberfläche. Die ES-DE-Anwendung, ihr Start-/Expo
 
 Unter **Einstellungen → Darstellung** stehen die eigenen Basis-Themes **Midnight**, **Aurora**, **Studio**, **Classic Light**, **Retro Green** und **Neon Purple** bereit. Sie behalten Suche, Cover-Raster, Versionen, Sammlungen und Controller-Bedienung in einer gemeinsamen Oberfläche. Die Konsolenleiste reserviert für jede Zeile denselben Platz für Logo und Anzahl; Auswahlrahmen verändern die Breite nicht. Titelzeilen der Cover-Karten haben eine einheitliche Höhe.
 
+## Eigene Startseite
+
+Über **Startseite** in der linken Navigation öffnet sich eine native Übersicht mit höchstens sechs zuletzt gespielten Titeln, sechs Favoriten und acht alphabetisch geordneten Sammlungen. Vorhandene Cover werden proportional angezeigt, fehlende Cover erhalten die nativen Platzhalter. Die Karten verwenden gleichmäßige Spalten und passen sich an schmale Fenster, Desktop und TV-Modus an. Die Startseite benötigt kein importiertes Theme; die gewählte native Farbgestaltung bleibt aktiv.
+
+Eine Spielkarte öffnet den konkreten Bibliothekseintrag mit Details und gegebenenfalls Versionsauswahl. Sie startet das Spiel nicht automatisch. **Alle anzeigen** öffnet die jeweilige Bibliotheksansicht, eine Sammlung ihren vorhandenen Filter. Versionsgruppierung, Regionen und Konsolen bleiben wie in der Bibliothek getrennt; dieselben Spiele können in mehreren Startseitenbereichen auftauchen. Sammlungszahlen berücksichtigen nur vorhandene Bibliothekseinträge, keine verwaisten Pfadzuordnungen.
+
+**Zur Bibliothek** beziehungsweise Controller-B kehrt während derselben Sitzung zur vorherigen Suche, Konsole, Sammlung, Sortierung, Seite und ausgewählten Datei zurück. Das Öffnen einer Karte oder eines Bereichs setzt die passenden Bibliotheksfilter gezielt neu. Controller-D-Pad bewegt den Fokus zwischen Bedienelementen, A öffnet das fokussierte Element; die Menütaste öffnet weiterhin Einstellungen. Strg+F wechselt zur Bibliothek und fokussiert die Suche. Im laufenden Vorgang behält B seine Abbruchfunktion.
+
+Unter **Startseite anpassen** lassen sich die drei Bereiche einzeln ein-/ausblenden und **EmuVora mit der Startseite öffnen** aktivieren. Erst **Speichern** übernimmt die Auswahl, Abbrechen erhält die bisherigen Einstellungen. Alle Bereiche dürfen ausgeblendet sein; Bibliothekszugang und Anpassung bleiben erreichbar. Bestehende Einstellungen öffnen zunächst weiterhin die Bibliothek. Favoriten, Spielverlauf, Sammlungen, Dateien und Cover werden durch diese Darstellungsoptionen nicht verändert. Die Startseite lädt höchstens zwölf Spielkarten; die Bibliothek bleibt auf 48 Titel pro Seite begrenzt.
+
 ## Bibliothekslayout wählen
 
 In der Werkzeugleiste unter der Suche zwischen **Cover-Raster** und **Kompakte Liste** wechseln. Die Liste zeigt kleine proportionale Cover, Titel, Konsole, Versionszahl, fehlende Dateien und den bisherigen Spielverlauf. Fehlende Cover erhalten einen kompakten Platzhalter. Auf breiten Desktop-Fenstern kann dieselbe Detailspalte wie beim Raster verwendet werden; im TV-Modus bleiben größere Schrift und Zeilen aktiv. Die Werkzeugleiste bricht bei wenig Platz um.

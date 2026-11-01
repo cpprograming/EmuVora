@@ -16,6 +16,8 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Theme-Dekorationen:** Zusätzlich lassen sich bis zu 32 statische lokale Zierbilder und feste Beschriftungen übernehmen. Vorschau und Bibliothek teilen dieselbe Darstellung; fehlerhafte optionale Bilder werden einzeln ausgelassen. [Grenzen und Ressourcen](NATIVE_THEMES.md#statische-theme-dekorationen).
 
+**Eigene Startseite:** Letzte Spiele, Favoriten und Sammlungen mit Covern öffnen, Bereiche nach Wunsch ausblenden und optional direkt hier starten. Spielkarten führen zur vorhandenen Bibliothek einschließlich Versionsauswahl. [Bedienung](NATIVE_THEMES.md#eigene-startseite).
+
 **Aktueller geprüfter Stand: [0.14.140](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.140)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation

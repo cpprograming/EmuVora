@@ -28,6 +28,10 @@ public sealed class AppSettings
     public string CoverRegion {get;set;}="Europe";
     public int CoverSize {get;set;}=164;
     public string LibraryLayout {get;set;}="Grid";
+    public bool HomeOnStartup {get;set;}
+    public bool HomeShowRecent {get;set;}=true;
+    public bool HomeShowFavorites {get;set;}=true;
+    public bool HomeShowCollections {get;set;}=true;
     public bool TvMode {get;set;}
     public bool ShowGameDetails {get;set;}=true;
     public bool GroupGameVersions {get;set;}=true;
