@@ -24,7 +24,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Einheitliche Spielkarten:** Begrenzte Titel-/Infozeilen, proportionale Coverrahmen und stabile Auswahl-/Fokusrahmen in den nativen Ansichten; Konsolenlogos mit gleichmäßigen Flächen und getrennter Zahlenspalte. Beschädigte Cover erhalten einen Platzhalter. [Umfang](NATIVE_THEMES.md#einheitliche-karten-und-logos).
 
-**Aktueller geprüfter Stand: [0.14.146](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.146)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.148](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.148)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
