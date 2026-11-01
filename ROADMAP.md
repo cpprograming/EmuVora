@@ -4,6 +4,14 @@ Stand: 1. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.144](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.144).
 
+## Nächste Etappe – sichtbare Suche und Filter
+
+- [x] Suchtext, Konsole und Ansicht/Sammlung als begrenzte, einzeln entfernbare Markierungen anzeigen; vollständige zugängliche Beschriftung und sichtbare Entfernen-Markierung bei langen Texten erhalten.
+- [x] Gemeinsames Zurücksetzen für Filterleiste und Leerzustand anbieten; Sortierung/Layout und konkrete Auswahl mit neuer Ergebnisposition erhalten.
+- [x] Schnelle Suchänderungen, einzelne Einschränkungen, Startseiten-Rückkehr, Controller-Bedienung und 6.000 Einträge prüfen; helle/dunkle/schmale/TV-Darstellung kontrollieren.
+- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [ ] Persönliche Installation mit Sicherung und Bibliotheksprüfung abschließen.
+
 ## 0.14.144 – geordnete Spieldetails (veröffentlicht)
 
 - [x] Spielen, Versionsauswahl, Favorit/Sammlung und Coververwaltung in gemeinsamer Reihenfolge anbieten; Dateipfad/Anzeigeangaben und seltene Bearbeitungsaktionen einklappen.
