@@ -22,7 +22,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Aktive Filter:** Suche, Konsole und Ansicht/Sammlung sind als entfernbare Markierungen sichtbar. Ein gemeinsames Zurücksetzen erhält Layout, Sortierung und nach Möglichkeit die ausgewählte Datei. [Bedienung](NATIVE_THEMES.md#aktive-suche-und-filter).
 
-**Aktueller geprüfter Stand: [0.14.144](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.144)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.146](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.146)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 

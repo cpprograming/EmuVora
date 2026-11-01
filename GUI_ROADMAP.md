@@ -1,6 +1,6 @@
 # EmuVora – GUI und Theme-Roadmap
 
-Stand: 28. Oktober 2026. Aufgaben aus der aktuellen Quellcodeprüfung; abgehakte Aufgaben sind umgesetzt, offene Kästchen bezeichnen geplante Arbeiten.
+Stand: 1. November 2026. Aufgaben aus der aktuellen Quellcodeprüfung; abgehakte Aufgaben sind umgesetzt, offene Kästchen bezeichnen geplante Arbeiten.
 
 ## Ziel
 
@@ -61,7 +61,7 @@ Theme-Auswahl/Vorschau ab 0.14.134: 378 Funktions- und 6 Netzwerktests sowie Set
 - [x] Native Startansicht mit begrenzten zuletzt gespielten Titeln, Favoriten und Sammlungen; Bereiche ein-/ausblenden und Start beim Öffnen optional speichern. Karten verwenden die vorhandene Bibliotheks-/Versionsauswahl; Rückkehr erhält den Sitzungszustand.
 - [ ] Konsolenlogos, Kartengrößen, Textzeilen und Auswahlrahmen in jeder Ansicht einheitlich ausrichten.
 - [x] Spieldetails klar ordnen: Spielen, Version wählen, Favorit/Sammlung und Cover bearbeiten; technische Angaben einklappbar machen. Gemeinsames Detailfenster und kompakter Spielen-Knopf für schmale Fenster/TV, native Auswahl und Zusatzeingabehinweise erhalten.
-- [x] Such-/Filterleiste mit sichtbaren einzeln entfernbaren Einschränkungen und gemeinsamem Zurücksetzen vereinheitlichen; Layout/Sortierung, konkrete Auswahl und unveränderte Metadaten erhalten.
+- [x] Such-/Filterleiste mit sichtbaren einzeln entfernbaren Einschränkungen und gemeinsamem Zurücksetzen vereinheitlichen; Layout/Sortierung, konkrete Auswahl und unveränderte Metadaten erhalten. In 0.14.146 veröffentlicht ([PR #51](https://github.com/cpprograming/EmuVora/pull/51)); 472 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden, nach Sicherung installiert. 5.805 Einträge und 5.611 Cover unverändert; echte Hardwareabnahme bleibt separat.
 - [ ] Einstellungen übersichtlicher gliedern; erweiterte Optionen getrennt anzeigen und Änderungen verständlich bestätigen.
 - [ ] Verbleibende Spezialdialoge auf gemeinsame Vorschau, feste Aktionen, Validierung und sichtbare Fehlerhinweise umstellen.
 - [ ] Leere Bibliothek, fehlende Cover, fehlende Medien, Downloads und nicht erreichbare Laufwerke gestalterisch abstimmen.
