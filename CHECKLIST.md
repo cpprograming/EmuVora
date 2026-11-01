@@ -1,10 +1,10 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 29. Oktober 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 1. November 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
 
-- [x] Eigene native Startseite mit begrenzten Coverkarten für letzte Spiele/Favoriten und vorhandenen Sammlungen ergänzt. Bereiche und Start beim Öffnen optional gespeichert; Navigation öffnet konkrete Versionen in der vorhandenen Bibliothek, Rückkehr erhält Filter, Auswahl und Seite. Leere und große Bibliotheken sowie Optionsabbruch geprüft. Releaseprüfung läuft; persönliche Installation auf E: ausstehend. [Bedienung](NATIVE_THEMES.md#eigene-startseite).
+- [x] Eigene native Startseite in 0.14.142 veröffentlicht ([PR #49](https://github.com/cpprograming/EmuVora/pull/49)): begrenzte Coverkarten für letzte Spiele/Favoriten und vorhandenen Sammlungen ergänzt. Bereiche und Start beim Öffnen optional gespeichert; Navigation öffnet konkrete Versionen in der vorhandenen Bibliothek, Rückkehr erhält Filter, Auswahl und Seite. Leere und große Bibliotheken sowie Optionsabbruch geprüft. 449 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft. Persönliche Installation und Bibliotheksprüfung nach erneutem Anschluss von E: ausstehend. [Bedienung](NATIVE_THEMES.md#eigene-startseite).
 
 - [x] Statische Theme-Dekorationen in 0.14.140 veröffentlicht ([PR #48](https://github.com/cpprograming/EmuVora/pull/48)): bis zu 32 explizit positionierte lokale Zierbilder und feste Beschriftungen im gemeinsamen Vorschau-/Bibliotheksrenderer. Spieleliste bleibt bedienbar, kaputte optionale Bilder werden einzeln ausgelassen; aktuelle Bildressourcen sind begrenzt und werden beim Wechsel freigegeben. 435 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft. Persönliche Installation und Bibliotheksprüfung nach erneutem Anschluss von E: ausstehend. [Umfang](NATIVE_THEMES.md#statische-theme-dekorationen).
 

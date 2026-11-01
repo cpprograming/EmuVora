@@ -1,16 +1,16 @@
 # EmuVora – Roadmap
 
-Stand: 29. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 1. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.140](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.140).
+Aktueller geprüfter Release: [0.14.142](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.142).
 
-## Nächste Etappe – eigene native Startseite
+## 0.14.142 – eigene native Startseite (veröffentlicht)
 
 - [x] Zuletzt gespielte Titel, Favoriten und Sammlungen mit begrenzten, gleichmäßigen Coverkarten darstellen; schmale Fenster und TV-Modus berücksichtigen.
 - [x] Bereiche ein-/ausblendbar machen und Startseite beim Öffnen optional speichern; bestehende Bibliotheks-Startansicht erhalten.
 - [x] Konkrete Spielversionen und Sammlungsfilter in der vorhandenen Bibliothek öffnen; Rückkehr mit Suche, Auswahl und Seite prüfen.
 - [x] Leere Bibliothek, 6.000 Einträge, Abbruch/Speichern der Optionen, Controller-Navigation und unveränderte Metadaten prüfen.
-- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [x] 449 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #49](https://github.com/cpprograming/EmuVora/pull/49).
 - [ ] Persönliche Installation und Bibliotheksprüfung nach Anschluss von Laufwerk E: nachholen.
 
 ## 0.14.140 – statische Theme-Dekorationen (veröffentlicht)

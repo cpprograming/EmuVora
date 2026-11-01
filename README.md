@@ -18,7 +18,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Eigene Startseite:** Letzte Spiele, Favoriten und Sammlungen mit Covern öffnen, Bereiche nach Wunsch ausblenden und optional direkt hier starten. Spielkarten führen zur vorhandenen Bibliothek einschließlich Versionsauswahl. [Bedienung](NATIVE_THEMES.md#eigene-startseite).
 
-**Aktueller geprüfter Stand: [0.14.140](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.140)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.142](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.142)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
