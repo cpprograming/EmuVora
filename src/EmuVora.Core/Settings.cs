@@ -43,6 +43,7 @@ public sealed class AppSettings
 public record InstalledPackage(string Version,string ExecutablePath,string? PreviousExecutablePath=null);
 public sealed class SettingsStore(string file)
 {
+    public event EventHandler? Saved;
     public static readonly JsonSerializerOptions JsonOptions=new(){WriteIndented=true,PropertyNameCaseInsensitive=true};
     public string? LoadWarning {get;private set;}
     public AppSettings Load()
@@ -72,7 +73,11 @@ public sealed class SettingsStore(string file)
             try{File.Copy(file,file+".invalid-"+DateTime.UtcNow.ToString("yyyyMMddHHmmss"),false);}catch(Exception copyError) when(copyError is IOException or UnauthorizedAccessException){ }return new();
         }
     }
-    public void Save(AppSettings settings)=>AtomicFile.WriteText(file,JsonSerializer.Serialize(settings,JsonOptions));
+    public void Save(AppSettings settings)
+    {
+        AtomicFile.WriteText(file,JsonSerializer.Serialize(settings,JsonOptions));
+        Saved?.Invoke(this,EventArgs.Empty);
+    }
     internal static void RemoveRetiredFrontend(AppSettings settings)
     {
         foreach(var key in settings.EmulatorPaths.Keys.Where(IsRetiredFrontend).ToArray())settings.EmulatorPaths.Remove(key);

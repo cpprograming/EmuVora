@@ -27,7 +27,7 @@ public sealed partial class MainWindow
         option.IsCheckedChanged+=(_,_)=>Guard(()=>
         {
             settings.TvMode=option.IsChecked==true;settingsStore.Save(settings);ApplyLibraryAppearance();Refresh();
-            foreach(var dialog in OwnedWindows)WindowAppearance.SetTvMode(dialog,settings.TvMode);
+            RefreshSettingsWindows();
         });return option;
     }
 }
