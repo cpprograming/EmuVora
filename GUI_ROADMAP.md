@@ -95,3 +95,5 @@ Text-/Bildanpassung ab 0.14.138: 416 Funktions- und 6 Netzwerktests sowie automa
 Statische Dekorationen ab 0.14.140: 435 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden. Veröffentlichte EXE per SHA-256 geprüft. Persönliche Installation mit 0.14.142 nachgeholt; Bibliothek und Cover unverändert erhalten.
 
 Eigene Startseite ab 0.14.142: 449 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden. Veröffentlichte EXE per SHA-256 geprüft. Persönliche Installation mit 0.14.142 nachgeholt: Programmstart reagiert, 5.805 Einträge und 5.611 Cover unverändert erhalten; private Kopie mit drei Startseitenkarten und konkreter Versionsauswahl geprüft. Echte Hardwareabnahme bleibt separat.
+
+Geordnete Spieldetails ab 0.14.144: 458 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden. Veröffentlichte EXE per SHA-256 geprüft und nach Sicherung installiert. Programmstart geprüft; 5.805 Einträge und 5.611 Cover unverändert erhalten. Detailansicht mit privater Kopie geprüft, echte Hardwareabnahme weiterhin separat.

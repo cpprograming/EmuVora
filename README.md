@@ -20,7 +20,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Geordnete Spieldetails:** Spielen, Versionen, Favoriten, Sammlungen und Cover an einem Ort; technische Angaben bleiben einklappbar. In schmalen Fenstern und im TV-Modus stehen ein Detailfenster und ein kompakter Spielen-Knopf bereit. [Bedienung](NATIVE_THEMES.md#spieldetails-und-aktionen).
 
-**Aktueller geprüfter Stand: [0.14.142](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.142)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.144](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.144)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 
