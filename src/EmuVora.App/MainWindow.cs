@@ -136,8 +136,9 @@ public sealed partial class MainWindow : Window
         chooseVersion.Click+=async(_,_)=>{try{if(Selected is{} game&&await ChooseVersionAsync(game) is{} chosen)Refresh(chosen.Path);}catch(Exception ex){ShowError(ex);}};
         inputGuideButton.Click+=async(_,_)=>{try{await ShowInputGuideAsync();}catch(Exception ex){ShowError(ex);}};filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(inputGuideButton,4);Grid.SetColumnSpan(inputGuideButton,3);filters.Children.Add(inputGuideButton);
         manageCover.Click+=async(_,_)=>{try{await ManageCoverAsync();}catch(Exception ex){ShowError(ex);}};
-        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
-        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.BorderBrushProperty,Brushes.Transparent),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent")),new Setter(ListBoxItem.BackgroundProperty,new DynamicResourceExtension("EmuSelection"))}});
+        gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":focus-visible")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBox>().Class("list-layout").Descendant().OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.HorizontalAlignmentProperty,HorizontalAlignment.Stretch),new Setter(ListBoxItem.HorizontalContentAlignmentProperty,HorizontalAlignment.Stretch)}});
         gamesList.AutoScrollToSelectedItem=false;ConfigureLibraryLayout();
         gamesList.SizeChanged+=(_,_)=>ResizeCarousel();
@@ -274,16 +275,17 @@ public sealed partial class MainWindow : Window
                 if(!coverImages.TryGetValue(file,out var image)){using var stream=File.OpenRead(file);image=Bitmap.DecodeToWidth(stream,480);coverImages[file]=image;}
                 return new Image {Source=image,Stretch=Stretch.Uniform};
             }
-            catch(Exception ex) when(ex is IOException or ArgumentException or InvalidOperationException){Log(ex);}
+            // Skia can also throw NullReferenceException while decoding an invalid image stream.
+            catch(Exception ex) when(ex is IOException or ArgumentException or InvalidOperationException or NullReferenceException){Log(ex);}
         }
         return MissingArtwork(game);
     }
     private Control CreateCard(Game game)
     {
-        var width=CardWidth;var card=new StackPanel {Width=width,Spacing=9,Margin=new(8,8,8,12)};
-        card.Children.Add(new Border {Height=width*1.34,Padding=new Thickness(5),CornerRadius=new(12),Background=Brush.Parse(settings.Theme=="Classic Light"?"#E4EAEC":"#1E2932"),Child=Artwork(game,width),ClipToBounds=true});
-        card.Children.Add(new TextBlock {Text=(game.Favorite?"★ ":"")+game.Title,TextWrapping=TextWrapping.Wrap,Height=settings.TvMode?60:44,TextTrimming=TextTrimming.CharacterEllipsis,FontSize=settings.TvMode?18:14,FontWeight=FontWeight.SemiBold});
-        card.Children.Add(new TextBlock {Text=LibraryItemInfo(game),FontSize=settings.TvMode?16:12,Opacity=0.7});ToolTip.SetTip(card,game.Title+"\n"+game.Path);return card;
+        var width=CardWidth;var card=new StackPanel {Width=width,Spacing=8,Margin=new(8,8,8,12)};
+        card.Classes.Add("library-game-card");card.Children.Add(GameArtworkFrame(game,width,width*1.34));
+        card.Children.Add(GameTitleText(game));card.Children.Add(GameCaption(LibraryItemInfo(game)));
+        Avalonia.Automation.AutomationProperties.SetName(card,game.Title+" · "+LibraryItemInfo(game));ToolTip.SetTip(card,game.Title+"\n"+LibraryItemInfo(game)+"\n"+game.Path);return card;
     }
     private void UpdateSelected()
     {

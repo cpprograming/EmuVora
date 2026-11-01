@@ -113,13 +113,14 @@ public sealed partial class MainWindow
     private Button HomeGameCard(Game game)
     {
         var tv = settings.TvMode; var width = tv ? 220 : 180; var content = new StackPanel { Spacing = 8 };
-        content.Children.Add(new Border { Height = tv ? 210 : 180, CornerRadius = new(10), Child = Artwork(game, width), ClipToBounds = true });
-        content.Children.Add(new TextBlock { Text = game.Title, FontSize = tv ? 20 : 16, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis, MaxLines = 2, Height = tv ? 54 : 44 });
-        content.Children.Add(new TextBlock { Text = game.System + (game.LastPlayed is {} last ? " · " + last.ToLocalTime().ToString("d") : ""), FontSize = tv ? 15 : 12, Opacity = .7, TextTrimming = TextTrimming.CharacterEllipsis });
+        content.Children.Add(GameArtworkFrame(game, width, tv ? 210 : 180));content.Children.Add(GameTitleText(game));
+        content.Children.Add(GameCaption(game.System + (game.LastPlayed is {} last ? " · " + last.ToLocalTime().ToString("d") : "")));
         var button = ActionButton(game.Title, () => OpenHomeSelection(game)); button.Content = content; button.MaxWidth = tv ? 320 : 300; button.Margin = new(0, 0, 12, 12); button.Padding = new(10); button.HorizontalContentAlignment = HorizontalAlignment.Stretch;
         button.ContentTemplate = new FuncDataTemplate<Control>((control, _) => control); button.Tag = game.Path;
+        button.BorderThickness = new(2); button.CornerRadius = new(16);
+        button.Styles.Add(new Style(s => s.OfType<Button>()) { Setters = { new Setter(Button.BorderBrushProperty, Brushes.Transparent) } });
         button.Classes.Add("home-game"); AutomationProperties.SetName(button, game.Title + " · " + game.System + " · Spieldetails öffnen"); ToolTip.SetTip(button, game.Title + "\nSpieldetails öffnen");
-        button.Styles.Add(new Style(s => s.OfType<Button>().Class(":focus-visible")) { Setters = { new Setter(Button.BorderBrushProperty, new DynamicResourceExtension("EmuAccent")), new Setter(Button.BorderThicknessProperty, new Thickness(2)) } });
+        button.Styles.Add(new Style(s => s.OfType<Button>().Class(":focus")) { Setters = { new Setter(Button.BorderBrushProperty, new DynamicResourceExtension("EmuAccent")), new Setter(Button.BorderThicknessProperty, new Thickness(2)) } });
         return button;
     }
     private async Task ShowHomeOptionsAsync()

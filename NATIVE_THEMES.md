@@ -22,6 +22,16 @@ Beide Ansichten verwenden dieselbe Datenaufbereitung für Suche, Konsolenfilter,
 
 Controller-Auf/Ab bewegt sich in der Liste jeweils um einen Titel; Seitenwechsel und Spielen mit A, Coververwaltung mit X sowie Favoriten mit Y bleiben erhalten. Über den Bedienmodus (Back/View) ist auch die Layout-Auswahl erreichbar. Maus-Doppelklick und Enter starten weiterhin das ausgewählte Spiel. Es werden höchstens 48 Titel pro Seite bereitgestellt; die Liste erzeugt ihre sichtbaren Zeilen bedarfsweise. Bibliotheksdaten und ROM-Dateien werden durch einen Layoutwechsel nicht verändert.
 
+## Einheitliche Karten und Logos
+
+Raster und Karussell reservieren für jeden Spieltitel zwei Textzeilen und für Zusatzangaben eine Zeile. Die Startseite verwendet dieselben Titel- und Beschriftungsgrößen; die kompakte Liste erhält eine Titelzeile und feste Zeilen für Konsole und Spielverlauf. Lange Angaben werden mit Auslassungspunkten begrenzt. Vollständige Titel bleiben über Tooltip und zugängliche Beschriftung erreichbar. Die jeweiligen Coverflächen bleiben innerhalb einer Ansicht gleich groß, unabhängig von Titel, Coverformat oder fehlendem Bild.
+
+Vorhandene Cover werden proportional mit Innenabstand angezeigt. Hoch-, Quer- und quadratische Bilder werden weder gestreckt noch auf das Kartenformat beschnitten. Fehlende oder nicht lesbare Bilder erhalten einen Platzhalter; auch ein Decoderfehler bei einer beschädigten Bilddatei darf die Bibliothek nicht schließen. Die Datei und ihre Zuordnung werden dadurch nicht verändert.
+
+Auswahl und Tastatur-/Controller-Fokus verwenden den Akzent des gewählten Basis-Themes. Der Rahmen reserviert seinen Platz vorab, sodass sich Karteninhalte beim Fokussieren nicht verschieben. Konsolenlogos in der Seitenleiste erhalten gleich große helle Flächen und eine getrennte Zahlenspalte mit Platz für bis zu sechs Ziffern. CD-/FBNeo-Zusätze bleiben erkennbar. Unbekannte Systeme zeigen ihren Namen als begrenzten Ersatz; Tooltip und zugänglicher Name der Navigation enthalten weiterhin die vollständigen Angaben.
+
+TV-Modus vergrößert Texte und Logoflächen. Importierte Theme-Geometrien behalten ihre eigenen unterstützten Positionen und Größen; die native Ersatzliste verwendet die gemeinsamen Zeilen. Spielauswahl, Filter, Versionen, Favoriten und Coverzuordnungen werden durch diese Gestaltung nicht verändert.
+
 ## Aktive Suche und Filter
 
 Unter der Werkzeugleiste zeigt EmuVora aktive Einschränkungen für **Suche**, **Konsole** und die gewählte **Ansicht** beziehungsweise **Sammlung**. Die Markierungen enthalten eine sichtbare Entfernen-Markierung; bei langen Angaben wird nur die Beschriftung gekürzt. Tooltip und zugänglicher Name behalten den vollständigen Text. Die Anzahl zählt die Einschränkungen, nicht die Treffer. Die Konsolenzahl in der Ergebnisübersicht bezieht sich auf die gefilterte Auswahl.
