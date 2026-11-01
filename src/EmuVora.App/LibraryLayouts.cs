@@ -90,14 +90,10 @@ public sealed partial class MainWindow
     {
         var tv = settings.TvMode; var coverWidth = tv ? 68 : 54;
         var row = new Grid { ColumnDefinitions = new("Auto,*"), ColumnSpacing = tv ? 18 : 14, Margin = new(12, 8), MinHeight = tv ? 100 : 80 };
-        Control artwork = CoverLibrary.IsMissing(settings, game.Path)
-            ? new Border { CornerRadius = new(8), Background = Brush.Parse(settings.Theme == "Classic Light" ? "#E4EAEC" : "#1E2932"), Child = new TextBlock { Text = "\uE7FC", FontFamily = new("Segoe Fluent Icons, Segoe MDL2 Assets"), FontSize = 28, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center } }
-            : Artwork(game, coverWidth);
-        row.Children.Add(new Border { Width = coverWidth, Height = tv ? 92 : 74, CornerRadius = new(8), Child = artwork, ClipToBounds = true, VerticalAlignment = VerticalAlignment.Center });
+        var artwork = GameArtworkFrame(game, coverWidth, tv ? 92 : 74, compact: true); artwork.Width = coverWidth; artwork.VerticalAlignment = VerticalAlignment.Center; row.Children.Add(artwork);
         var text = new StackPanel { Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
-        text.Children.Add(new TextBlock { Text = (game.Favorite ? "★ " : "") + game.Title, FontSize = tv ? 21 : 16, FontWeight = FontWeight.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis });
-        text.Children.Add(new TextBlock { Text = LibraryItemInfo(game), FontSize = tv ? 16 : 13, Opacity = .8, TextTrimming = TextTrimming.CharacterEllipsis });
-        text.Children.Add(new TextBlock { Text = $"{game.PlayCount} Starts · " + (game.LastPlayed is {} last ? "Zuletzt " + last.ToLocalTime().ToString("g") : "Noch nicht gespielt"), FontSize = tv ? 15 : 12, Opacity = .65, TextTrimming = TextTrimming.CharacterEllipsis });
+        text.Children.Add(GameTitleText(game, compact: true));text.Children.Add(GameCaption(LibraryItemInfo(game)));
+        text.Children.Add(GameCaption($"{game.PlayCount} Starts · " + (game.LastPlayed is {} last ? "Zuletzt " + last.ToLocalTime().ToString("g") : "Noch nicht gespielt"), secondary: true));
         Grid.SetColumn(text, 1); row.Children.Add(text);
         ToolTip.SetTip(row, game.Title + "\n" + game.Path); AutomationProperties.SetName(row, game.Title + " · " + LibraryItemInfo(game));
         row.Classes.Add("library-list-row"); return row;

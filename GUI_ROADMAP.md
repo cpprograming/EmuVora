@@ -59,7 +59,7 @@ Theme-Auswahl/Vorschau ab 0.14.134: 378 Funktions- und 6 Netzwerktests sowie Set
 ## 4. Sichtbare GUI-Verbesserungen
 
 - [x] Native Startansicht mit begrenzten zuletzt gespielten Titeln, Favoriten und Sammlungen; Bereiche ein-/ausblenden und Start beim Öffnen optional speichern. Karten verwenden die vorhandene Bibliotheks-/Versionsauswahl; Rückkehr erhält den Sitzungszustand.
-- [ ] Konsolenlogos, Kartengrößen, Textzeilen und Auswahlrahmen in jeder Ansicht einheitlich ausrichten.
+- [x] Konsolenlogos sowie Kartengrößen, Textzeilen und Auswahlrahmen der nativen Ansichten einheitlich ausrichten: gemeinsame Titel-/Infozeilen und Coverrahmen in Raster/Karussell/Startseite/Liste; feste Logo- und Zahlenflächen in der Seitenleiste, stabile Akzentrahmen und Ersatzdarstellung für unbekannte Systeme/beschädigte Cover. Importierte Theme-Geometrien behalten ihre unterstützten eigenen Maße.
 - [x] Spieldetails klar ordnen: Spielen, Version wählen, Favorit/Sammlung und Cover bearbeiten; technische Angaben einklappbar machen. Gemeinsames Detailfenster und kompakter Spielen-Knopf für schmale Fenster/TV, native Auswahl und Zusatzeingabehinweise erhalten.
 - [x] Such-/Filterleiste mit sichtbaren einzeln entfernbaren Einschränkungen und gemeinsamem Zurücksetzen vereinheitlichen; Layout/Sortierung, konkrete Auswahl und unveränderte Metadaten erhalten. In 0.14.146 veröffentlicht ([PR #51](https://github.com/cpprograming/EmuVora/pull/51)); 472 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden, nach Sicherung installiert. 5.805 Einträge und 5.611 Cover unverändert; echte Hardwareabnahme bleibt separat.
 - [ ] Einstellungen übersichtlicher gliedern; erweiterte Optionen getrennt anzeigen und Änderungen verständlich bestätigen.

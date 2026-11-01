@@ -4,6 +4,14 @@ Stand: 1. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.146](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.146).
 
+## Nächste Etappe – einheitliche Karten und Logos
+
+- [x] Gemeinsame Titel-/Infozeilen und Coverrahmen für native Spielkarten und kompakte Zeilen verwenden; lange Angaben und unterschiedliche Coverformate begrenzen.
+- [x] Gleichmäßige Konsolenlogoflächen, getrennte Zahlenspalte und erkennbare Ersatznamen für unbekannte Systeme anbieten.
+- [x] Auswahl-/Fokusrahmen ohne Größenänderung und mit nativer Akzentfarbe gestalten; beschädigte Cover als Platzhalter anzeigen.
+- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [ ] Persönliche Installation mit Sicherung und Bibliotheksprüfung abschließen.
+
 ## 0.14.146 – sichtbare Suche und Filter (veröffentlicht)
 
 - [x] Suchtext, Konsole und Ansicht/Sammlung als begrenzte, einzeln entfernbare Markierungen anzeigen; vollständige zugängliche Beschriftung und sichtbare Entfernen-Markierung bei langen Texten erhalten.
