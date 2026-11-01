@@ -22,6 +22,16 @@ Beide Ansichten verwenden dieselbe Datenaufbereitung für Suche, Konsolenfilter,
 
 Controller-Auf/Ab bewegt sich in der Liste jeweils um einen Titel; Seitenwechsel und Spielen mit A, Coververwaltung mit X sowie Favoriten mit Y bleiben erhalten. Über den Bedienmodus (Back/View) ist auch die Layout-Auswahl erreichbar. Maus-Doppelklick und Enter starten weiterhin das ausgewählte Spiel. Es werden höchstens 48 Titel pro Seite bereitgestellt; die Liste erzeugt ihre sichtbaren Zeilen bedarfsweise. Bibliotheksdaten und ROM-Dateien werden durch einen Layoutwechsel nicht verändert.
 
+## Spieldetails und Aktionen
+
+Auf breiten Desktop-Fenstern ab 1.120 logischen Pixeln zeigt die rechte Detailspalte Cover, Titel und Spielverlauf sowie **Spielen**, gegebenenfalls **Version auswählen**, **Favorit**, **Zu Sammlungen zuordnen** und **Cover bearbeiten** in gemeinsamer Reihenfolge. **Details** blendet die Spalte ein oder aus. Diese Einstellung bleibt gespeichert.
+
+Im TV-Modus und in schmaleren Fenstern öffnet **Spieldetails** unter der Suche dieselben Bedienelemente in einem eigenen Fenster. Die Bibliothek bietet zusätzlich einen kompakten **Spielen**-Knopf mit dem ausgewählten Titel daneben, sobald die rechte Spalte ausgeblendet ist. Spielen verwendet die vorhandene Versionsauswahl, Einrichtung und Fehlerbehandlung. Das Detailfenster wird vor einem Spielstart geschlossen. **Zur Bibliothek** oder Controller-B schließt es ohne Änderungen; bei einem laufenden Vorgang bleibt B zunächst die Abbruchfunktion.
+
+**Technische Angaben** startet eingeklappt und enthält den vollständigen ROM-Pfad und die vorhandene Anzeige-/Skalierungsempfehlung. Die Angaben ändern weder Monitorauflösung noch Emulatorprofile. **Spieldetails bearbeiten** enthält eigene Coverwahl, Online-Suche, Cover-Schutz, Titel-/Konsolenbearbeitung, Ordnerzugriff und Entfernen. Eingeklappte Aktionen werden nicht für die Controller-Navigation angeboten. Hinweise zu möglicherweise nötigen Zusatzeingaben bleiben weiterhin vor dem Spielstart unter der Suche sichtbar.
+
+Rechte Spalte und Detailfenster teilen dieselben Steuerelemente und dieselbe Auswahl. Versionswechsel und Favoriten beziehen sich auf die gewählte Datei; ein reines Öffnen/Schließen oder ein Größenwechsel verändert keine Bibliotheksdaten. Ohne Auswahl oder während eines laufenden Vorgangs sind die betroffenen Aktionen deaktiviert. Die Startseite behält ihre eigene Übersicht.
+
 ## Cover-Karussell und Konsolenauswahl
 
 **Cover-Karussell** ist die dritte Auswahl unter der Suche. Die Cover stehen in einer horizontalen Reihe, die ausgewählte Karte ist hervorgehoben und wird möglichst mittig angezeigt. An den Enden einer Seite begrenzt der verfügbare Inhalt die Zentrierung. Links/Rechts am Controller oder an der Tastatur bewegt sich durch die Reihe; auch Auf/Ab bewegt jeweils einen Titel. Seitenwechsel am Rand behalten die Reihenfolge bei. Titel, Versionen, Favoriten, Filter und Spielaktionen verwenden dieselbe Bibliotheksgrundlage wie Raster und Liste. Auf einer neuen Karussellseite ohne bisherige Auswahl wird der erste Titel markiert.

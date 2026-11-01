@@ -37,7 +37,7 @@ public sealed partial class MainWindow
         panel.Children.Add(ActionButton("Neue Sammlung erstellen",()=>Edit(()=>{var value=GameCollections.ValidateName(name.Text);SaveCollections(s=>GameCollections.Create(s,value));ReloadNames(value);})));
         panel.Children.Add(ActionButton("Sammlung umbenennen",()=>Edit(()=>{if(list.SelectedItem is not string old)throw new IOException("Bitte eine Sammlung wählen.");var value=GameCollections.ValidateName(name.Text);SaveCollections(s=>GameCollections.Rename(s,old,value),value);ReloadNames(value);})));
         panel.Children.Add(ActionButton("Sammlung löschen · Spiele behalten",()=>Edit(()=>{if(list.SelectedItem is not string selected)throw new IOException("Bitte eine Sammlung wählen.");SaveCollections(s=>s.Collections.Remove(selected));ReloadNames();name.Text="";})));
-        panel.Children.Add(message);var dialog=Dialog("Sammlungen verwalten",panel);panel.Children.Add(ActionButton("Fertig",()=>dialog.Close()));await dialog.ShowDialog(this);
+        panel.Children.Add(message);var dialog=Dialog("Sammlungen verwalten",panel);panel.Children.Add(ActionButton("Fertig",()=>dialog.Close()));await dialog.ShowDialog(OwnedWindows.LastOrDefault(w=>w.IsActive)??this);
     }
     private async Task ChooseCollectionsAsync()
     {
@@ -48,6 +48,6 @@ public sealed partial class MainWindow
         foreach(var entry in choices)panel.Children.Add(entry.Option);
         panel.Children.Add(new TextBlock{Text="Mehrere Sammlungen sind möglich. Abwählen entfernt nur die Zuordnung.",TextWrapping=TextWrapping.Wrap});
         var dialog=Dialog("Spiel zu Sammlungen zuordnen",panel);panel.Children.Add(ActionButton("Zuordnung speichern",()=>dialog.Close(true)));panel.Children.Add(ActionButton("Abbrechen",()=>dialog.Close(false)));
-        if(await dialog.ShowDialog<bool>(this)&&!isClosed)Guard(()=>{SaveCollections(s=>{foreach(var entry in choices)if(s.Collections.TryGetValue(entry.Name,out var members)){if(entry.Option.IsChecked==true)members.Add(game.Path);else members.Remove(game.Path);}});status.Text="Sammlungen gespeichert.";});
+        if(await dialog.ShowDialog<bool>(OwnedWindows.LastOrDefault(w=>w.IsActive)??this)&&!isClosed)Guard(()=>{SaveCollections(s=>{foreach(var entry in choices)if(s.Collections.TryGetValue(entry.Name,out var members)){if(entry.Option.IsChecked==true)members.Add(game.Path);else members.Remove(game.Path);}});status.Text="Sammlungen gespeichert.";});
     }
 }

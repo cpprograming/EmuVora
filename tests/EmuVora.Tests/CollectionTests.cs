@@ -86,10 +86,13 @@ public class CollectionTests
         var window=new MainWindow(dir.Path);window.Show();Render(window);
         try
         {
-            window.GetVisualDescendants().OfType<ListBox>().Single().SelectedIndex=0;var button=window.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Zu Sammlungen zuordnen");Assert.True(button.IsEffectivelyVisible);Assert.True(button.IsEnabled);
-            var task=(Task)typeof(MainWindow).GetMethod("ChooseCollectionsAsync",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(window,null)!;var dialog=Assert.Single(window.OwnedWindows);Render(dialog);
-            dialog.GetVisualDescendants().OfType<CheckBox>().Single().Focus();ControllerUi.Handle(dialog,0x1000);dialog.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Zuordnung speichern").Focus();ControllerUi.Handle(dialog,0x1000);await task;
+            window.GetVisualDescendants().OfType<ListBox>().Single().SelectedIndex=0;Render(window);await window.HandleLibraryControllerAsync(0x20);
+            var detailsButton=window.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Spieldetails");detailsButton.Focus();await window.HandleLibraryControllerAsync(0x1000);var details=Assert.Single(window.OwnedWindows);Render(details);
+            var button=details.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Zu Sammlungen zuordnen");Assert.True(button.IsEffectivelyVisible);Assert.True(button.IsEnabled);button.Focus();ControllerUi.Handle(details,0x1000);var dialog=Assert.Single(details.OwnedWindows);Render(dialog);
+            dialog.GetVisualDescendants().OfType<CheckBox>().Single().Focus();ControllerUi.Handle(dialog,0x1000);dialog.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="Zuordnung speichern").Focus();ControllerUi.Handle(dialog,0x1000);
+            for(var i=0;i<100&&!saved.Load().Collections["Couch"].Contains("game.nes");i++){Dispatcher.UIThread.RunJobs();await Task.Delay(10);}
             Assert.Contains("game.nes",saved.Load().Collections["Couch"]);
+            ControllerUi.Handle(details,0x2000);Render(window);
         }
         finally{window.Close();}
     }

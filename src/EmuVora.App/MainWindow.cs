@@ -126,14 +126,14 @@ public sealed partial class MainWindow : Window
         header.Children.Add(themeLogo);var heading=new StackPanel{Spacing=5};heading.Children.Add(libraryEyebrow);heading.Children.Add(libraryHeading);Grid.SetColumn(heading,1);header.Children.Add(heading);summary.VerticalAlignment=VerticalAlignment.Center;summary.TextAlignment=TextAlignment.Right;Grid.SetColumn(summary,2);header.Children.Add(summary);main.Children.Add(header);
         var filters=libraryFilters;Grid.SetColumnSpan(search,3);filters.Children.Add(search);
         var toolbar=new WrapPanel();Grid.SetRow(toolbar,1);Grid.SetColumnSpan(toolbar,3);filters.Children.Add(toolbar);
-        detailsToggle=ActionButton("Details",()=>{settings.ShowGameDetails=!settings.ShowGameDetails;settingsStore.Save(settings);ApplyLayout();});
+        detailsToggle=AsyncButton("Details",ToggleGameDetailsAsync);
         libraryLayoutChoice.SelectedIndex=IsThemeLayout?3:IsCarouselLayout?2:IsListLayout?1:0;Avalonia.Automation.AutomationProperties.SetName(libraryLayoutChoice,"Bibliothekslayout");ToolTip.SetTip(libraryLayoutChoice,"Raster, Liste, Karussell oder Theme-Layout · Auswahl und Filter bleiben erhalten");libraryLayoutChoice.SelectionChanged+=(_,_)=>Guard(ChangeLibraryLayout);
         foreach(var control in new Control[]{systems,sort,libraryLayoutChoice,detailsToggle}){control.Margin=new(0,0,8,8);toolbar.Children.Add(control);}AddRow(main,filters,1);
         gamesList.Classes.Add("game-library");
-        filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(manageCover,2);var gameActions=new Grid{ColumnDefinitions=new("*,*"),ColumnSpacing=10};Grid.SetRow(gameActions,2);Grid.SetColumnSpan(gameActions,3);gameActions.Children.Add(manageCover);Grid.SetColumn(collectionGame,1);gameActions.Children.Add(collectionGame);filters.Children.Add(gameActions);
+        filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(compactGameActions,2);Grid.SetColumnSpan(compactGameActions,3);filters.Children.Add(compactGameActions);
         collectionGame.Click+=async(_,_)=>{try{await ChooseCollectionsAsync();}catch(Exception ex){ShowError(ex);}};
-        chooseVersion.Click+=async(_,_)=>{try{if(Selected is{} game&&await ChooseVersionAsync(game) is{} chosen)Refresh(chosen.Path);}catch(Exception ex){ShowError(ex);}};filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(chooseVersion,3);Grid.SetColumnSpan(chooseVersion,3);filters.Children.Add(chooseVersion);
-        inputGuideButton.Click+=async(_,_)=>{try{await ShowInputGuideAsync();}catch(Exception ex){ShowError(ex);}};filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(inputGuideButton,4);Grid.SetColumnSpan(inputGuideButton,3);filters.Children.Add(inputGuideButton);
+        chooseVersion.Click+=async(_,_)=>{try{if(Selected is{} game&&await ChooseVersionAsync(game) is{} chosen)Refresh(chosen.Path);}catch(Exception ex){ShowError(ex);}};
+        inputGuideButton.Click+=async(_,_)=>{try{await ShowInputGuideAsync();}catch(Exception ex){ShowError(ex);}};filters.RowDefinitions.Add(new RowDefinition(GridLength.Auto));Grid.SetRow(inputGuideButton,3);Grid.SetColumnSpan(inputGuideButton,3);filters.Children.Add(inputGuideButton);
         manageCover.Click+=async(_,_)=>{try{await ManageCoverAsync();}catch(Exception ex){ShowError(ex);}};
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>()){Setters={new Setter(ListBoxItem.PaddingProperty,new Thickness(0)),new Setter(ListBoxItem.MarginProperty,new Thickness(0,0,8,8)),new Setter(ListBoxItem.BorderThicknessProperty,new Thickness(2)),new Setter(ListBoxItem.CornerRadiusProperty,new CornerRadius(16))}});
         gamesList.Styles.Add(new Style(s=>s.OfType<ListBoxItem>().Class(":selected")){Setters={new Setter(ListBoxItem.BorderBrushProperty,new DynamicResourceExtension("EmuAccent"))}});
@@ -148,11 +148,8 @@ public sealed partial class MainWindow : Window
         AddRow(main,homeSurface,2);AddRow(main,progress,3);var footer=new Grid {ColumnDefinitions=new("*,Auto"),ColumnSpacing=12};footer.Children.Add(status);Grid.SetColumn(cancel,1);footer.Children.Add(cancel);var notices=new StackPanel{Spacing=8};notices.Children.Add(CreateOperationNotice(false));notices.Children.Add(footer);AddRow(main,notices,4);
         status.PropertyChanged+=(_,e)=>{if(e.Property==TextBlock.TextProperty)NotifyFeedback();};progress.PropertyChanged+=(_,e)=>{if(e.Property==ProgressBar.ValueProperty||e.Property==ProgressBar.IsIndeterminateProperty)NotifyFeedback();};
         var themedMain=new Grid();themedMain.Children.Add(themeBackground);themedMain.Children.Add(main);Grid.SetColumn(themedMain,1);layout.Children.Add(themedMain);
-        var details=new StackPanel {Spacing=16,Margin=new(22,30)};details.Children.Add(new TextBlock{Text="IM FOKUS",FontSize=10,LetterSpacing=2,Opacity=0.6});details.Children.Add(new Border{CornerRadius=new(16),Padding=new Thickness(14),Background=new SolidColorBrush(Color.Parse("#10203030")),Child=detailCover});details.Children.Add(detailTitle);details.Children.Add(detailInfo);
-        details.Children.Add(displayStatus);details.Children.Add(play);details.Children.Add(favorite);
-        var more=new StackPanel{Spacing=8};foreach(var button in new[]{cover,onlineCover,protectCover,edit,reveal,remove})more.Children.Add(button);details.Children.Add(new Expander{Header="Spieldetails bearbeiten",Content=more});
-        detailBorder.Child=new ScrollViewer {Content=details};Grid.SetColumn(detailBorder,2);layout.Children.Add(detailBorder);Content=layout;
-        play.Click+=async(_,_)=>await PlayAsync();favorite.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);}});
+        BuildGameDetails();Grid.SetColumn(detailBorder,2);layout.Children.Add(detailBorder);Content=layout;
+        play.Click+=async(_,_)=>{gameDetailsDialog?.Close();await PlayAsync();};favorite.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){store.Update(game with {Favorite=!game.Favorite});Reload(game.Path);}});
         cover.Click+=async(_,_)=>await ChooseCoverAsync();edit.Click+=async(_,_)=>await EditAsync();remove.Click+=async(_,_)=>await RemoveAsync();reveal.Click+=(_,_)=>Guard(()=>{if(Selected is{} game)OpenPath(Path.GetDirectoryName(game.Path)!);});
         protectCover.Click+=(_,_)=>Guard(()=>{if(Selected is{} game){if(!settings.ProtectedCovers.Remove(game.Path))settings.ProtectedCovers.Add(game.Path);settingsStore.Save(settings);UpdateSelected();}});
         onlineCover.Click+=async(_,_)=>await FetchCoverAsync();ToolTip.SetTip(onlineCover,"Sucht den Spieltitel bei libretro-thumbnails. Titel und Konsole werden dafür an GitHub gesendet.");
@@ -168,7 +165,7 @@ public sealed partial class MainWindow : Window
         Closed+=(_,_)=>{isClosed=true;gamepadTimer.Stop();operation?.Cancel();ClearThemeStageImages();consoleLogos.Dispose();foreach(var bitmap in coverImages.Values)bitmap.Dispose();foreach(var bitmap in themeImages.Values)bitmap.Dispose();foreach(var process in running.Values)process.Dispose();packages.Dispose();updateHttp.Dispose();};
     }
     private static void AddRow(Grid grid,Control control,int row){Grid.SetRow(control,row);grid.Children.Add(control);}
-    private void ApplyLayout(){if(detailsToggle!=null){detailsToggle.IsEnabled=!IsHome&&!settings.TvMode&&(ClientSize.Width==0||ClientSize.Width>=1120);ToolTip.SetTip(detailsToggle,"Die rechte Detailspalte ist im Desktop-Modus ab 1120 Pixel Fensterbreite verfügbar.");}var show=!IsHome&&!settings.TvMode&&settings.ShowGameDetails&&(ClientSize.Width==0||ClientSize.Width>=1120);detailBorder.IsVisible=show;layout.ColumnDefinitions[0].Width=new GridLength(settings.TvMode?320:240);layout.ColumnDefinitions[2].Width=new GridLength(show?300:0);if(IsHome)UpdateHomeColumns();}
+    private void ApplyLayout(){ApplyGameDetailsLayout();layout.ColumnDefinitions[0].Width=new GridLength(settings.TvMode?320:240);if(IsHome)UpdateHomeColumns();}
     private void FitMonitor(){var screen=Screens.ScreenFromWindow(this);if(screen==null)return;Width=Math.Min(Width,Math.Max(MinWidth,screen.WorkingArea.Width/screen.Scaling-32));Height=Math.Min(Height,Math.Max(MinHeight,screen.WorkingArea.Height/screen.Scaling-48));}
     private Button ActionButton(string text,Action action)
     {var button=new Button {Content=text,HorizontalAlignment=HorizontalAlignment.Stretch};button.Click+=(_,_)=>Guard(action);return button;}
@@ -298,7 +295,7 @@ public sealed partial class MainWindow : Window
         detailInfo.Text=game==null?"Wähle ein Spiel, um zu starten oder Details zu bearbeiten.":$"{game.System}\n{game.PlayCount} Starts · {(game.LastPlayed is{} last?last.ToLocalTime().ToString("g"):"Noch nicht gespielt")}";
         ToolTip.SetTip(detailInfo,game?.Path);displayStatus.Text=game==null?"":DisplayProfiles.Description(game.System,DisplayDetection.Current(TryGetPlatformHandle()?.Handle??IntPtr.Zero),settings,game.Path);
         if(game!=null&&settings.ProtectedCovers.Contains(game.Path))detailInfo.Text+="\nCover geschützt"+(CoverLibrary.IsMissing(settings,game.Path)?" · Bilddatei fehlt; eigenes Bild wählen oder Schutz aufheben.":"");
-        ApplyExternalTheme();UpdateThemeStageSelection(game);
+        ApplyExternalTheme();UpdateThemeStageSelection(game);UpdateGameDetailsActions(game);
     }
     private async Task<bool> BusyAsync(Func<CancellationToken,Task> action)
     {
