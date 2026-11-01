@@ -15,7 +15,7 @@ public sealed partial class MainWindow
         {
             var row=new Grid {ColumnDefinitions=new("24,*"),ColumnSpacing=9};
             // Segoe Fluent Icons keeps navigation consistent with Windows and avoids emoji rendering.
-            var glyph=text switch {"Alle Spiele"=>"\uE80A","Favoriten"=>"\uEB51","Zuletzt gespielt"=>"\uE81C","Einstellungen"=>"\uE713",_=>"\uE7F4"};
+            var glyph=text switch {"Startseite"=>"\uE80F","Alle Spiele"=>"\uE80A","Favoriten"=>"\uEB51","Zuletzt gespielt"=>"\uE81C","Einstellungen"=>"\uE713",_=>"\uE7F4"};
             row.Children.Add(new TextBlock{Text=glyph,FontFamily=new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"),FontSize=16,VerticalAlignment=VerticalAlignment.Center,Opacity=0.8});
             var label=new TextBlock{Text=text,TextWrapping=TextWrapping.Wrap,VerticalAlignment=VerticalAlignment.Center};Grid.SetColumn(label,1);row.Children.Add(label);return row;
         });

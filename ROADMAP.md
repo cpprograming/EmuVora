@@ -4,6 +4,15 @@ Stand: 29. Oktober 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.140](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.140).
 
+## Nächste Etappe – eigene native Startseite
+
+- [x] Zuletzt gespielte Titel, Favoriten und Sammlungen mit begrenzten, gleichmäßigen Coverkarten darstellen; schmale Fenster und TV-Modus berücksichtigen.
+- [x] Bereiche ein-/ausblendbar machen und Startseite beim Öffnen optional speichern; bestehende Bibliotheks-Startansicht erhalten.
+- [x] Konkrete Spielversionen und Sammlungsfilter in der vorhandenen Bibliothek öffnen; Rückkehr mit Suche, Auswahl und Seite prüfen.
+- [x] Leere Bibliothek, 6.000 Einträge, Abbruch/Speichern der Optionen, Controller-Navigation und unveränderte Metadaten prüfen.
+- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [ ] Persönliche Installation und Bibliotheksprüfung nach Anschluss von Laufwerk E: nachholen.
+
 ## 0.14.140 – statische Theme-Dekorationen (veröffentlicht)
 
 - [x] Bis zu 32 frei benannte lokale Zierbilder und feste Beschriftungen mit expliziter Geometrie in Vorschau und Bibliothek abbilden.

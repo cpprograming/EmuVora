@@ -58,7 +58,7 @@ Theme-Auswahl/Vorschau ab 0.14.134: 378 Funktions- und 6 Netzwerktests sowie Set
 
 ## 4. Sichtbare GUI-Verbesserungen
 
-- [ ] Startansicht mit zuletzt gespielten Titeln, Favoriten und Sammlungen; Module ein-/ausblendbar machen.
+- [x] Native Startansicht mit begrenzten zuletzt gespielten Titeln, Favoriten und Sammlungen; Bereiche ein-/ausblenden und Start beim Öffnen optional speichern. Karten verwenden die vorhandene Bibliotheks-/Versionsauswahl; Rückkehr erhält den Sitzungszustand.
 - [ ] Konsolenlogos, Kartengrößen, Textzeilen und Auswahlrahmen in jeder Ansicht einheitlich ausrichten.
 - [ ] Spieldetails klar ordnen: Spielen, Version wählen, Favorit/Sammlung und Cover bearbeiten; technische Angaben in einen aufklappbaren Bereich verschieben.
 - [ ] Such-/Filterleiste mit erkennbaren aktiven Filtern und direktem Zurücksetzen vereinheitlichen.
