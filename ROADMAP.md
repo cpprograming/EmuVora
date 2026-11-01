@@ -4,6 +4,15 @@ Stand: 1. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.148](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.148).
 
+## Nächste Etappe – Einstellungen als gemeinsamer Arbeitsbereich
+
+- [x] Sechs gegliederte Kategorien mit fester Suche, Rückmeldung und Schließen anbieten; lange Beschriftungen umbrechen und Expertenbereiche trennen.
+- [x] Alle Kategorien nach mehreren Suchwörtern durchsuchen, passende Expertenbereiche öffnen und ihren Zustand nach dem Suchen wiederherstellen; Maus/Tastatur/Controller erhalten.
+- [x] Erfolgreiches Speichern sichtbar bestätigen; Theme- und TV-Änderungen im offenen Fenster übernehmen.
+- [x] EXE-/Core-Entwürfe pro Emulator/System erhalten, vorhandene Dateien prüfen, Schreibfehler lokal erklären und alte Werte wiederherstellen; offene Entwürfe beim Schließen schützen.
+- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [ ] Persönliche Installation mit Sicherung und Bibliotheksprüfung abschließen.
+
 ## 0.14.148 – einheitliche Karten und Logos (veröffentlicht)
 
 - [x] Gemeinsame Titel-/Infozeilen und Coverrahmen für native Spielkarten und kompakte Zeilen verwenden; lange Angaben und unterschiedliche Coverformate begrenzen.
