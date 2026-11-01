@@ -21,7 +21,8 @@ public sealed partial class MainWindow
     private readonly Grid libraryFilters = new() { ColumnDefinitions = new("*,Auto,Auto"), RowDefinitions = new("Auto,Auto"), ColumnSpacing = 10, RowSpacing = 4 };
     private bool IsHome => view == "Startseite";
     private bool changingHome;
-    private int homeNavigationRevision;
+    private int libraryNavigationRevision;
+    private LibraryQuery? pendingLibraryNavigationQuery;
     private readonly List<UniformGrid> homeGameGrids = [];
     private int HomeColumns => ClientSize.Width - (settings.TvMode ? 320 : 240) - 60 >= 1800 ? 6 : ClientSize.Width - (settings.TvMode ? 320 : 240) - 60 >= 840 ? 3 : 2;
     private void UpdateHomeColumns() { foreach (var grid in homeGameGrids) grid.Columns = HomeColumns; }
@@ -29,7 +30,8 @@ public sealed partial class MainWindow
     private sealed record HomeReturn(string View, string Search, string? System, int Sort, string? Collection, int Page, string? Path);
     private void ShowHome()
     {
-        homeNavigationRevision++;
+        libraryNavigationRevision++;
+        pendingLibraryNavigationQuery = null;
         if (!IsHome) homeReturn = new(view, search.Text ?? "", systems.SelectedItem as string, sort.SelectedIndex, collectionChoice.SelectedItem as string, libraryPage, Selected?.Path);
         view = "Startseite"; Refresh();
     }
@@ -43,25 +45,23 @@ public sealed partial class MainWindow
             if (view == "Sammlung" && collectionChoice.SelectedItem == null) view = "Alle Spiele";
         }
         finally { changingHome = false; }
-        homeReturn = null; controllerUiMode = false; CompleteHomeNavigation(previous?.Path, previous?.Page ?? 0, true);
+        homeReturn = null; controllerUiMode = false; CompleteLibraryNavigation(previous?.Path, previous?.Page ?? 0, true);
     }
     private void OpenHomeSelection(Game? game = null, string? collection = null, string? targetView = null)
     {
         changingHome = true;
         try { view = targetView ?? (collection == null ? "Alle Spiele" : "Sammlung"); search.Text = ""; systems.SelectedItem = "Alle Konsolen"; sort.SelectedIndex = targetView == "Zuletzt gespielt" ? 2 : 0; collectionChoice.SelectedItem = collection; }
         finally { changingHome = false; }
-        homeReturn = null; controllerUiMode = false; CompleteHomeNavigation(game?.Path, 0, false);
+        homeReturn = null; controllerUiMode = false; CompleteLibraryNavigation(game?.Path, 0, false);
     }
-    private void CompleteHomeNavigation(string? path, int page, bool restorePage)
+    private void CompleteLibraryNavigation(string? path, int page, bool restorePage, bool resetTheme = true)
     {
-        var revision = ++homeNavigationRevision; var targetView = view; var text = search.Text; var system = systems.SelectedItem; var collection = collectionChoice.SelectedItem; var order = sort.SelectedIndex;
-        ApplyTheme(); Refresh(path, keepPage: restorePage); gamesList.Focus();
-        // TextBox.TextChanged is deferred. Restore the destination once those filter notifications have settled.
+        var revision = ++libraryNavigationRevision; var target = CurrentFilterQuery(); pendingLibraryNavigationQuery = target;
+        if (restorePage) libraryPage = page; if (resetTheme) ApplyTheme(); Refresh(path, keepPage: restorePage); gamesList.Focus();
+        // Ignore only deferred notifications for this exact destination; newer user input still refreshes normally.
         Dispatcher.UIThread.Post(() =>
         {
-            if (isClosed || IsHome || revision != homeNavigationRevision || view != targetView || search.Text != text || !Equals(systems.SelectedItem, system) || !Equals(collectionChoice.SelectedItem, collection) || sort.SelectedIndex != order) return;
-            var focused = FocusManager?.GetFocusedElement() as Control; var restoreFocus = focused == gamesList || focused?.GetVisualAncestors().Contains(gamesList) == true;
-            if (restorePage) libraryPage = page; Refresh(path, keepPage: restorePage); if (restoreFocus) gamesList.Focus();
+            if (revision == libraryNavigationRevision && ReferenceEquals(pendingLibraryNavigationQuery, target)) pendingLibraryNavigationQuery = null;
         }, DispatcherPriority.Background);
     }
     private void RefreshHome()

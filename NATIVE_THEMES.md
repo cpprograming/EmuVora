@@ -22,6 +22,14 @@ Beide Ansichten verwenden dieselbe Datenaufbereitung für Suche, Konsolenfilter,
 
 Controller-Auf/Ab bewegt sich in der Liste jeweils um einen Titel; Seitenwechsel und Spielen mit A, Coververwaltung mit X sowie Favoriten mit Y bleiben erhalten. Über den Bedienmodus (Back/View) ist auch die Layout-Auswahl erreichbar. Maus-Doppelklick und Enter starten weiterhin das ausgewählte Spiel. Es werden höchstens 48 Titel pro Seite bereitgestellt; die Liste erzeugt ihre sichtbaren Zeilen bedarfsweise. Bibliotheksdaten und ROM-Dateien werden durch einen Layoutwechsel nicht verändert.
 
+## Aktive Suche und Filter
+
+Unter der Werkzeugleiste zeigt EmuVora aktive Einschränkungen für **Suche**, **Konsole** und die gewählte **Ansicht** beziehungsweise **Sammlung**. Die Markierungen enthalten eine sichtbare Entfernen-Markierung; bei langen Angaben wird nur die Beschriftung gekürzt. Tooltip und zugänglicher Name behalten den vollständigen Text. Die Anzahl zählt die Einschränkungen, nicht die Treffer. Die Konsolenzahl in der Ergebnisübersicht bezieht sich auf die gefilterte Auswahl.
+
+Eine Markierung entfernt ausschließlich ihren Filter. **Alle Filter zurücksetzen** und die bisherige Aktion **Filter zurücksetzen** im Leerzustand verwenden denselben Weg: Suchtext leeren, alle Konsolen anzeigen und zur Ansicht **Alle Spiele** ohne Sammlungsfilter wechseln. Sortierung, Bibliothekslayout, Versionsgruppierung, Favoriten und Sammlungszuordnungen bleiben erhalten. Eine noch passende ausgewählte Datei bleibt ausgewählt; EmuVora ermittelt bei Bedarf ihre neue Seite. Pro Seite bleiben höchstens 48 Titel bereitgestellt.
+
+Ohne Einschränkungen wird die Filterleiste ausgeblendet. Auf der Startseite bleibt sie verborgen; die Rückkehr zur vorherigen Bibliotheksauswahl stellt die Markierungen wieder her. Über den Controller-Bedienmodus (View), D-Pad und A lassen sich Markierungen und Zurücksetzen bedienen. B behält die bisherigen Funktionen für Spieleliste beziehungsweise laufende Vorgänge. Filteränderungen verändern keine Bibliotheksdaten oder gespeicherten Darstellungsoptionen. Schnelle anschließende Suchänderungen werden nicht durch eine verzögerte Navigation überschrieben.
+
 ## Spieldetails und Aktionen
 
 Auf breiten Desktop-Fenstern ab 1.120 logischen Pixeln zeigt die rechte Detailspalte Cover, Titel und Spielverlauf sowie **Spielen**, gegebenenfalls **Version auswählen**, **Favorit**, **Zu Sammlungen zuordnen** und **Cover bearbeiten** in gemeinsamer Reihenfolge. **Details** blendet die Spalte ein oder aus. Diese Einstellung bleibt gespeichert.
