@@ -11,7 +11,7 @@ Aktueller geprüfter Release: [0.14.142](https://github.com/cpprograming/EmuVora
 - [x] Konkrete Spielversionen und Sammlungsfilter in der vorhandenen Bibliothek öffnen; Rückkehr mit Suche, Auswahl und Seite prüfen.
 - [x] Leere Bibliothek, 6.000 Einträge, Abbruch/Speichern der Optionen, Controller-Navigation und unveränderte Metadaten prüfen.
 - [x] 449 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #49](https://github.com/cpprograming/EmuVora/pull/49).
-- [ ] Persönliche Installation und Bibliotheksprüfung nach Anschluss von Laufwerk E: nachholen.
+- [x] Persönliche Installation mit 0.14.142 auf E: nachgeholt: Sicherung angelegt, Programmstart geprüft; 5.805 Einträge und 5.611 Cover unverändert erhalten.
 
 ## 0.14.140 – statische Theme-Dekorationen (veröffentlicht)
 
@@ -19,7 +19,7 @@ Aktueller geprüfter Release: [0.14.142](https://github.com/cpprograming/EmuVora
 - [x] Native Bedienung und Vordergrundliste erhalten; dynamische Metadaten nicht erfinden und fehlende/kaputte optionale Bilder einzeln auslassen.
 - [x] Bilddekodierung begrenzen und aktive Dekorationsressourcen beim Layoutwechsel/Schließen freigeben; helle/dunkle, schmale und TV-Ansichten prüfen.
 - [x] 435 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #48](https://github.com/cpprograming/EmuVora/pull/48).
-- [ ] Persönliche Installation und Bibliotheksprüfung nach Anschluss von Laufwerk E: nachholen.
+- [x] Persönliche Installation mit 0.14.142 auf E: nachgeholt: Sicherung angelegt, Programmstart geprüft; 5.805 Einträge und 5.611 Cover unverändert erhalten.
 
 ## 0.14.138 – Textausrichtung und proportionale Theme-Bilder (veröffentlicht)
 
@@ -27,7 +27,7 @@ Aktueller geprüfter Release: [0.14.142](https://github.com/cpprograming/EmuVora
 - [x] Logo-/Covergrößen aus tatsächlichem Bildformat bestimmen, Null-Achsen und proportionale Begrenzungsboxen unterstützen; Ursprung nach Größenberechnung anwenden.
 - [x] Formatwechsel bei Auswahl, fehlende Cover, Fenstergrößen und unveränderte Metadaten automatisiert prüfen.
 - [x] 416 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; veröffentlichte EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #47](https://github.com/cpprograming/EmuVora/pull/47).
-- [ ] Persönliche Installation und erneute Prüfung der Bibliothekskopie nach Anschluss von Laufwerk E: nachholen. Hardwareabnahme bleibt separat.
+- [x] Persönliche Installation mit 0.14.142 nachgeholt; private Kopie mit 5.805 Einträgen geprüft. Hardwareabnahme bleibt separat.
 
 ## 0.14.136 – nativer Theme-Layout-Adapter (abgeschlossen)
 
