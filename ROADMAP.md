@@ -4,6 +4,14 @@ Stand: 1. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.142](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.142).
 
+## Nächste Etappe – geordnete Spieldetails
+
+- [x] Spielen, Versionsauswahl, Favorit/Sammlung und Coververwaltung in gemeinsamer Reihenfolge anbieten; Dateipfad/Anzeigeangaben und seltene Bearbeitungsaktionen einklappen.
+- [x] Dieselben Bedienelemente im Detailfenster für schmale Fenster/TV wiederverwenden; sichtbaren kompakten Spielen-Knopf ergänzen und Zusatzeingabehinweise erhalten.
+- [x] Versions-/Favoritenaktionen, Dialog-Rückkehr, wiederholtes Öffnen/Größenwechsel und fehlende ROMs prüfen; helle/dunkle/TV-Darstellung kontrollieren.
+- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [ ] Persönliche Installation mit Sicherung und Bibliotheksprüfung abschließen.
+
 ## 0.14.142 – eigene native Startseite (veröffentlicht)
 
 - [x] Zuletzt gespielte Titel, Favoriten und Sammlungen mit begrenzten, gleichmäßigen Coverkarten darstellen; schmale Fenster und TV-Modus berücksichtigen.

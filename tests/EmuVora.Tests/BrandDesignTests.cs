@@ -51,7 +51,7 @@ public class BrandDesignTests
     public void CoversAndPrimaryActionsFitDesktopAndCompactLibrary(string theme)
     {
         using var dir=new TestDirectory();var window=Demo(dir,theme);Assert.NotNull(window.Icon);
-        var play=window.GetVisualDescendants().OfType<Button>().Single(b=>b.Content as string=="▶ Spielen");Assert.True(play.IsEnabled);Assert.True(play.Bounds.Height>=46);
+        var play=window.GetVisualDescendants().OfType<Button>().Single(b=>b.IsEffectivelyVisible&&b.Content as string=="▶ Spielen");Assert.True(play.IsEnabled);Assert.True(play.Bounds.Height>=46);
         Assert.Contains(window.GetVisualDescendants().OfType<Image>(),i=>i.Width==40&&i.Source!=null);
         var list=window.GetVisualDescendants().OfType<ListBox>().Single();Assert.Equal(10,list.ItemCount);
         Capture(window,"Brand-library-"+theme.Replace(' ','-')+".png");
