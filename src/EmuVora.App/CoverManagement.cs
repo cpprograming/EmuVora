@@ -51,7 +51,7 @@ public sealed partial class MainWindow
             var proposed=new StackPanel{Spacing=8};proposed.Children.Add(new TextBlock{Text="Vorschlag"});
             var preview=new Image{Height=230,Source=bitmap,Stretch=Stretch.Uniform};proposed.Children.Add(preview);Grid.SetColumn(proposed,1);comparison.Children.Add(proposed);panel.Children.Add(comparison);
             panel.Children.Add(new TextBlock{Text="Dieses Cover wird nach dem Übernehmen geschützt. Die Sammelsuche ersetzt es nicht. Den Schutz kannst du in den Spieldetails aufheben. Das bisherige Bild bleibt im Datenordner erhalten.",TextWrapping=TextWrapping.Wrap});
-            var actions=new StackPanel{Spacing=8};var feedback=new TextBlock{TextWrapping=TextWrapping.Wrap};actions.Children.Add(feedback);var dialog=LibraryDialog("Cover prüfen",panel,actions);
+            var actions=new StackPanel{Spacing=8};var feedback=new TextBlock{TextWrapping=TextWrapping.Wrap};actions.Children.Add(feedback);var dialog=LibraryDialog("Cover prüfen",panel,actions,cancelBeforeClosing:false);
             actions.Children.Add(ActionButton("Dieses Cover übernehmen",()=>
             {
                 var previous=settings.Covers.GetValueOrDefault(game.Path);var wasProtected=settings.ProtectedCovers.Contains(game.Path);

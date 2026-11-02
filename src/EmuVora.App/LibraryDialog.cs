@@ -12,7 +12,7 @@ public sealed partial class MainWindow
         feedback.Text=title+": "+text;ToolTip.SetTip(feedback,error.GetType().Name+": "+error.Message);
     }
     // Keep decisions reachable while long paths, notes and previews scroll independently.
-    private Window LibraryDialog(string title, Control body, StackPanel actions)
+    private Window LibraryDialog(string title, Control body, StackPanel actions, bool cancelBeforeClosing = true)
     {
         body.Margin = new(0);
         var layout = new Grid { RowDefinitions = new("*,Auto"), Margin = new(24) };
@@ -25,10 +25,12 @@ public sealed partial class MainWindow
         dialog.Height = 720;
         dialog.Closing += (_, e) =>
         {
-            if (operation == null) return;
+            if (!cancelBeforeClosing || operation == null) return;
             e.Cancel = true;
             RequestOperationCancel();
         };
+        // Decision previews can be awaited by a download operation after the file is complete.
+        if (!cancelBeforeClosing) ControllerUi.SetBack(dialog,dialog.Close);
         return dialog;
     }
 }

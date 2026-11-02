@@ -67,6 +67,19 @@ public class MediaDialogTests
         }
         finally{main.Close();}
     }
+    [AvaloniaTheory][InlineData("accept")][InlineData("cancel")][InlineData("back")]
+    public async Task DownloadOperationCanFinishAfterCoverPreviewDecision(string action)
+    {
+        using var dir=new TestDirectory();var(main,game)=Open(dir);var source=Image(dir,"downloaded.png");var before=File.ReadAllBytes(Path.Combine(dir.Path,"settings.json"));bool? accepted=null;
+        try
+        {
+            Func<CancellationToken,Task> decision=async _=>{accepted=await (Task<bool>)typeof(MainWindow).GetMethod("PreviewCoverAsync",Private)!.Invoke(main,[game,source,"Downloaded image fixture"])!;};
+            var outer=(Task<bool>)typeof(MainWindow).GetMethod("BusyAsync",Private)!.Invoke(main,[decision])!;var dialog=Assert.Single(main.OwnedWindows);dialog.Height=600;Render(dialog);Fixed(dialog,"Dieses Cover übernehmen","Abbrechen");
+            if(action=="back")ControllerUi.Handle(dialog,0x2000);else Click(dialog,action=="accept"?"Dieses Cover übernehmen":"Abbrechen");Render(main);Assert.True(await outer.WaitAsync(TimeSpan.FromSeconds(3)));Assert.Equal(action=="accept",accepted);Assert.Empty(main.OwnedWindows);Assert.Null(typeof(MainWindow).GetField("operation",Private)!.GetValue(main));
+            if(action!="accept"){Assert.Equal(before,File.ReadAllBytes(Path.Combine(dir.Path,"settings.json")));Assert.Empty(Directory.GetFiles(Path.Combine(dir.Path,"covers")));}Assert.True(File.Exists(source));
+        }
+        finally{main.Close();}
+    }
     [AvaloniaFact] public async Task CoverProtectionFailureStaysOpenAndDoesNotChangeMemory()
     {
         using var dir=new TestDirectory();var(main,game)=Open(dir);var file=Path.Combine(dir.Path,"settings.json");
