@@ -28,7 +28,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Neue Einstellungen:** Sechs gegliederte Kategorien mit bereichsübergreifender Suche, festen Rückmeldungen und getrennten Expertenoptionen. Eigene Emulator-/Core-Pfade bleiben als Entwürfe erhalten und werden vor Übernahme geprüft. [Bedienung](SETTINGS.md).
 
-**Aktueller geprüfter Stand: [0.14.152](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.152)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.156](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.156)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Download und Installation
 

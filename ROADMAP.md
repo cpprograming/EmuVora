@@ -2,15 +2,15 @@
 
 Stand: 2. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.152](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.152).
+Aktueller geprüfter Release: [0.14.156](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.156).
 
-## Nächste Etappe – Cover-, Versions- und Sammlungsdialoge
+## 0.14.156 – Cover-, Versions- und Sammlungsdialoge (veröffentlicht)
 
 - [x] Sechs Medien-/Sammlungsdialoge mit gemeinsamem scrollendem Inhalt und fester Aktionsleiste ausstatten.
 - [x] Speicherfehler für Coverübernahme, Cover-Schutz und Sammlungszuordnung im offenen Dialog erklären; alte Werte erhalten und erneutes Speichern ermöglichen.
 - [x] Leere Coversuche lokal abfangen; Abbruch, Vorschaukopien, lange Titel/Pfade und viele Sammlungen in hellen/dunklen/schmalen/TV-Ansichten prüfen.
-- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
-- [ ] Persönliche Installation mit Sicherung und Bibliotheksprüfung abschließen.
+- [x] 504 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #55](https://github.com/cpprograming/EmuVora/pull/55), [Online-Vorschaukorrektur #56](https://github.com/cpprograming/EmuVora/pull/56).
+- [x] Persönliche Installation mit Sicherung und Programmstart geprüft; 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. Private Bibliothekskopie: Cover-/Sammlungsdialoge und Abbruch erhalten Auswahl, Einstellungsbytes und Metadaten. Echte Hardwareabnahme bleibt separat.
 
 ## 0.14.152 – Einstellungen als gemeinsamer Arbeitsbereich (veröffentlicht)
 
