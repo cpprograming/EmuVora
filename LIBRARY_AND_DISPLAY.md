@@ -28,6 +28,14 @@ Duplikatübersicht, SHA-256-Ergebnisse, Zusammenführung, Playlist-Vorschau und 
 
 Während einer laufenden Prüfung fordert **Schließen**, die Fensterschaltfläche oder Controller **B** zunächst den Abbruch an und erhält die Übersicht. Nach Ende der Prüfung kann das Fenster geschlossen werden. Bereits begonnene gesicherte Datenübernahmen werden konsistent beendet; Abbrechen ist kein Rückgängigmachen einer abgeschlossenen Übernahme. Die Vorschau selbst verändert keine ROMs oder Bibliotheksdaten.
 
+### Cover, Spielversionen und Sammlungen
+
+Auch **Cover bearbeiten**, **Cover prüfen**, **Cover online suchen**, **Spielversion auswählen**, **Sammlungen verwalten** und **Spiel zu Sammlungen zuordnen** besitzen feste Aktionsleisten. Lange Titel, Herkunftsangaben, Pfade und Sammlungslisten scrollen darüber. Übernehmen, Auswahl, Speichern und Abbrechen bleiben erreichbar. Ein leerer Titel startet keine Online-Coversuche; der Hinweis erscheint am geöffneten Suchdialog.
+
+Coverübernahme, Cover-Schutz und Sammlungszuordnung schließen erst nach erfolgreichem Speichern. Bei Schreibproblemen bleibt der Dialog mit Vorschau beziehungsweise gesetzten Zuordnungen geöffnet. Die bisherigen Einstellungen werden im Arbeitsspeicher wiederhergestellt; die Fehlermeldung bleibt bei den Aktionen sichtbar. Technische Einzelheiten sind per Tooltip erreichbar. Nach Beheben des Problems kann erneut gespeichert oder abgebrochen werden.
+
+Eine abgebrochene Covervorschau entfernt ausschließlich die neue temporäre Kandidatenkopie. Bisherige Bilder und die ausgewählte Quelldatei bleiben erhalten. Abbrechen einer Sammlungszuordnung verändert keine Zuordnungen. Die Sammlungsverwaltung speichert dagegen jede erfolgreiche Erstellen-/Umbenennen-/Löschen-Aktion unmittelbar; **Fertig** schließt die Verwaltung. Beim Löschen einer Sammlung bleiben Spiele und Dateien erhalten. Die Versionsauswahl wählt weiterhin eine konkrete Datei, ohne sie zu verändern oder automatisch zu starten.
+
 ## Bestätigte Duplikate zusammenführen
 
 Nach dem SHA-256-Vergleich eine Ergebnisgruppe auswählen und **Ausgewählte Duplikate zusammenführen** öffnen. Unterstützt werden 2 bis 100 Einzeldateien desselben Systems; reine Verweisdateien bleiben ausgenommen. Den verbleibenden Titel/ROM-Pfad sowie die Quellen für Cover (einschließlich Schutz) und eigenes Bildprofil auswählen. Vor der Übernahme werden die Inhalte erneut vollständig gelesen. Abbrechen während der Inhaltsprüfung verändert keine Einträge. Laufende Spiele und andere Bibliotheksübernahmen blockieren die Übernahme.

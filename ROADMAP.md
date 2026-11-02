@@ -4,6 +4,14 @@ Stand: 2. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den p
 
 Aktueller geprüfter Release: [0.14.152](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.152).
 
+## Nächste Etappe – Cover-, Versions- und Sammlungsdialoge
+
+- [x] Sechs Medien-/Sammlungsdialoge mit gemeinsamem scrollendem Inhalt und fester Aktionsleiste ausstatten.
+- [x] Speicherfehler für Coverübernahme, Cover-Schutz und Sammlungszuordnung im offenen Dialog erklären; alte Werte erhalten und erneutes Speichern ermöglichen.
+- [x] Leere Coversuche lokal abfangen; Abbruch, Vorschaukopien, lange Titel/Pfade und viele Sammlungen in hellen/dunklen/schmalen/TV-Ansichten prüfen.
+- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
+- [ ] Persönliche Installation mit Sicherung und Bibliotheksprüfung abschließen.
+
 ## 0.14.152 – Einstellungen als gemeinsamer Arbeitsbereich (veröffentlicht)
 
 - [x] Sechs gegliederte Kategorien mit fester Suche, Rückmeldung und Schließen anbieten; lange Beschriftungen umbrechen und Expertenbereiche trennen.
