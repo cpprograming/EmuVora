@@ -1,8 +1,10 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 2. November 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 2. November 2026. Ziel: ein zuverlässiges öffentliches Windows-Frontend mit freiwilliger Entwicklungsfinanzierung, ohne Pro-Version oder Bezahlschranke.
 
 ## Aktueller Stand
+
+- [x] Öffentlichen Repository-Status und MIT-Lizenz geprüft; Startplan für GitHub Sponsors und optional Patreon aktualisiert. Zahlungsfreigabe ist noch nicht bestätigt. Klärung nichtkommerzieller Konsolenlogos, konkreter Fremdkomponenten und echte Hardwareabnahme bleiben vor dem finanzierten Start offen. [SPONSORS.md](SPONSORS.md).
 
 - [x] Coveraktionen/-vorschau/-suche, Versionsauswahl und beide Sammlungsdialoge auf feste Aktionsleisten umgestellt. Schreibfehler erhalten Vorschau, gesetzte Zuordnungen und bisherige Einstellungen; erneutes Speichern bleibt möglich. Leere Coversuche startet keinen Abruf. In 0.14.156 veröffentlicht ([PR #55](https://github.com/cpprograming/EmuVora/pull/55), [Online-Vorschaukorrektur #56](https://github.com/cpprograming/EmuVora/pull/56)): 504 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft und nach Sicherung installiert. Programmstart reagiert; 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. [Bedienung](LIBRARY_AND_DISPLAY.md#cover-spielversionen-und-sammlungen).
 
