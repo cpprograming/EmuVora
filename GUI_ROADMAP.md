@@ -1,6 +1,6 @@
 # EmuVora – GUI und Theme-Roadmap
 
-Stand: 1. November 2026. Aufgaben aus der aktuellen Quellcodeprüfung; abgehakte Aufgaben sind umgesetzt, offene Kästchen bezeichnen geplante Arbeiten.
+Stand: 2. November 2026. Aufgaben aus der aktuellen Quellcodeprüfung; abgehakte Aufgaben sind umgesetzt, offene Kästchen bezeichnen geplante Arbeiten.
 
 ## Ziel
 
@@ -62,7 +62,7 @@ Theme-Auswahl/Vorschau ab 0.14.134: 378 Funktions- und 6 Netzwerktests sowie Set
 - [x] Konsolenlogos sowie Kartengrößen, Textzeilen und Auswahlrahmen der nativen Ansichten einheitlich ausrichten: gemeinsame Titel-/Infozeilen und Coverrahmen in Raster/Karussell/Startseite/Liste; feste Logo- und Zahlenflächen in der Seitenleiste, stabile Akzentrahmen und Ersatzdarstellung für unbekannte Systeme/beschädigte Cover. Importierte Theme-Geometrien behalten ihre unterstützten eigenen Maße. In 0.14.148 veröffentlicht ([PR #52](https://github.com/cpprograming/EmuVora/pull/52)); 482 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden, nach Sicherung installiert. 5.805 Einträge und 5.611 Cover unverändert; echte Hardwareabnahme bleibt separat.
 - [x] Spieldetails klar ordnen: Spielen, Version wählen, Favorit/Sammlung und Cover bearbeiten; technische Angaben einklappbar machen. Gemeinsames Detailfenster und kompakter Spielen-Knopf für schmale Fenster/TV, native Auswahl und Zusatzeingabehinweise erhalten.
 - [x] Such-/Filterleiste mit sichtbaren einzeln entfernbaren Einschränkungen und gemeinsamem Zurücksetzen vereinheitlichen; Layout/Sortierung, konkrete Auswahl und unveränderte Metadaten erhalten. In 0.14.146 veröffentlicht ([PR #51](https://github.com/cpprograming/EmuVora/pull/51)); 472 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden, nach Sicherung installiert. 5.805 Einträge und 5.611 Cover unverändert; echte Hardwareabnahme bleibt separat.
-- [x] Einstellungen in sechs gegliederte Kategorien mit bereichsübergreifender Suche, festen Rückmeldungen/Schließen und getrennten Expertenbereichen überführen. Sofortige Optionen erst nach erfolgreichem Schreiben bestätigen; EXE-/Core-Entwürfe pro Auswahl erhalten, lokal prüfen und vor versehentlichem Verwerfen schützen. Theme-/TV-Wechsel im offenen Fenster übernehmen.
+- [x] Einstellungen in sechs gegliederte Kategorien mit bereichsübergreifender Suche, festen Rückmeldungen/Schließen und getrennten Expertenbereichen überführen. Sofortige Optionen erst nach erfolgreichem Schreiben bestätigen; EXE-/Core-Entwürfe pro Auswahl erhalten, lokal prüfen und vor versehentlichem Verwerfen schützen. Theme-/TV-Wechsel im offenen Fenster übernehmen. In 0.14.152 veröffentlicht ([PR #53](https://github.com/cpprograming/EmuVora/pull/53), [Paketergänzung #54](https://github.com/cpprograming/EmuVora/pull/54)); 492 Funktions- und 6 Netzwerktests sowie Setup-/Update-Prüfungen bestanden, nach Sicherung am 2. November installiert. 5.805 Einträge und 5.611 Cover unverändert; echte Hardwareabnahme bleibt separat.
 - [ ] Verbleibende Spezialdialoge auf gemeinsame Vorschau, feste Aktionen, Validierung und sichtbare Fehlerhinweise umstellen.
 - [ ] Leere Bibliothek, fehlende Cover, fehlende Medien, Downloads und nicht erreichbare Laufwerke gestalterisch abstimmen.
 - [ ] Klar sichtbaren Tastatur-/Controller-Fokus und kontextabhängige Tastenhinweise in allen Layouts anbieten.

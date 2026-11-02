@@ -1,10 +1,10 @@
 # EmuVora – Checkliste für die nächsten Schritte
 
-Stand: 1. November 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+Stand: 2. November 2026. Ziel: ein zuverlässiges Windows-Frontend für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
 
 ## Aktueller Stand
 
-- [x] Einstellungen als gemeinsamen Arbeitsbereich mit sechs Kategorien, bereichsübergreifender Suche, fester Speicherrückmeldung und getrennten Expertenbereichen umgesetzt. Eigene EXE-/Core-Pfade bleiben als geprüfte Entwürfe pro Auswahl erhalten; Schreibfehler erhalten alte Werte, Schließen schützt offene Entwürfe. Theme-/TV-Wechsel aktualisieren das offene Fenster. Gezielte Prüfungen bestanden; Release-/Installationsprüfung läuft. [Bedienung](SETTINGS.md).
+- [x] Einstellungen als gemeinsamen Arbeitsbereich mit sechs Kategorien, bereichsübergreifender Suche, fester Speicherrückmeldung und getrennten Expertenbereichen umgesetzt. Eigene EXE-/Core-Pfadentwürfe bleiben pro Auswahl erhalten und werden vor der Übernahme geprüft; Schreibfehler erhalten alte Werte, Schließen schützt offene Entwürfe. Theme-/TV-Wechsel aktualisieren das offene Fenster. In 0.14.152 veröffentlicht ([PR #53](https://github.com/cpprograming/EmuVora/pull/53), [Paketergänzung #54](https://github.com/cpprograming/EmuVora/pull/54)): 492 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft und nach Sicherung am 2. November installiert. Programmstart reagiert, Anleitung mitgeliefert; 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. [Bedienung](SETTINGS.md).
 
 - [x] Native Karten und Logos vereinheitlicht: feste Titel-/Infozeilen, proportionale Coverflächen, stabile Akzentrahmen und gleich große Konsolenlogoflächen mit getrennter Zahlenspalte. Unbekannte Systeme behalten erkennbare Ersatznamen; beschädigte Bilder erhalten einen Platzhalter. In 0.14.148 veröffentlicht ([PR #52](https://github.com/cpprograming/EmuVora/pull/52)): 482 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft und nach Sicherung installiert. Programmstart reagiert; 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. [Umfang](NATIVE_THEMES.md#einheitliche-karten-und-logos).
 

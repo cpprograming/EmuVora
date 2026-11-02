@@ -1,17 +1,17 @@
 # EmuVora – Roadmap
 
-Stand: 1. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 2. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
-Aktueller geprüfter Release: [0.14.148](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.148).
+Aktueller geprüfter Release: [0.14.152](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.152).
 
-## Nächste Etappe – Einstellungen als gemeinsamer Arbeitsbereich
+## 0.14.152 – Einstellungen als gemeinsamer Arbeitsbereich (veröffentlicht)
 
 - [x] Sechs gegliederte Kategorien mit fester Suche, Rückmeldung und Schließen anbieten; lange Beschriftungen umbrechen und Expertenbereiche trennen.
 - [x] Alle Kategorien nach mehreren Suchwörtern durchsuchen, passende Expertenbereiche öffnen und ihren Zustand nach dem Suchen wiederherstellen; Maus/Tastatur/Controller erhalten.
 - [x] Erfolgreiches Speichern sichtbar bestätigen; Theme- und TV-Änderungen im offenen Fenster übernehmen.
 - [x] EXE-/Core-Entwürfe pro Emulator/System erhalten, vorhandene Dateien prüfen, Schreibfehler lokal erklären und alte Werte wiederherstellen; offene Entwürfe beim Schließen schützen.
-- [ ] Vollständige Releaseprüfung und Download-Verifikation abschließen.
-- [ ] Persönliche Installation mit Sicherung und Bibliotheksprüfung abschließen.
+- [x] 492 Funktions- und 6 Netzwerktests sowie automatisierte Setup-/Update-Prüfungen bestanden; EXE per Selbstupdate einschließlich SHA-256 geprüft. [PR #53](https://github.com/cpprograming/EmuVora/pull/53), [Paketergänzung #54](https://github.com/cpprograming/EmuVora/pull/54).
+- [x] Persönliche Installation mit Sicherung und Programmstart am 2. November geprüft; 5.805 Einträge und 5.611 vorhandene Cover unverändert erhalten. Einstellungsanleitung im installierten Paket geprüft. Private Bibliothekskopie: Einstellungen öffnen/suchen/schließen erhält Einstellungsbytes und Metadaten. Echte Hardwareabnahme bleibt separat.
 
 ## 0.14.148 – einheitliche Karten und Logos (veröffentlicht)
 
