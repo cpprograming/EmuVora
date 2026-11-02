@@ -4,11 +4,28 @@ EmuVora bleibt als kostenloser Download und mit öffentlichem Quellcode verfügb
 
 ## Einrichtung und aktueller Status
 
-Stand der Prüfung: 23. Oktober 2026. Der Sponsors-Antrag für `cpprograming` wurde eingereicht. Das Dashboard zeigt „Pending approval“ und eine zusätzliche Prüfung durch GitHub. Der Repository-Link ist in `.github/FUNDING.yml` vorbereitet. Die öffentliche Sponsors-Seite ist noch nicht freigeschaltet.
+Stand der Prüfung: 2. November 2026. Das Repository `cpprograming/EmuVora` ist bereits öffentlich, der eigene Code steht unter MIT. Der Sponsors-Link ist in `.github/FUNDING.yml` vorbereitet. Bei der öffentlichen Prüfung leitete `github.com/sponsors/cpprograming` auf das normale Benutzerprofil um; eine aktive Zahlungsseite ist damit nicht bestätigt. Der private Dashboard-Status wurde heute nicht geprüft. Die frühere Meldung „Pending approval“ stammt vom 23. Oktober und ist kein aktueller Statusnachweis.
 
-Der Antrag wartet auf GitHubs Entscheidung; laut Dashboard kommt nach Freigabe eine E-Mail. Weitere Kontoschritte oder Rückfragen sind unter [GitHub Sponsors](https://github.com/sponsors/accounts) zu bearbeiten. Persönliche Auszahlungs- und Steuerinformationen gibt der Kontoinhaber selbst bei GitHub beziehungsweise dessen Zahlungsdienstleister an. Vertrauliche Konto- und Steuerdaten gehören nicht ins Repository, in Issues oder in Chatnachrichten.
+Der Kontoinhaber prüft unter [GitHub Sponsors](https://github.com/sponsors/accounts), ob die Freigabe abgeschlossen ist oder noch Kontoschritte fehlen. Persönliche Auszahlungs- und Steuerinformationen gibt er selbst bei GitHub beziehungsweise dessen Zahlungsdienstleister an. Vertrauliche Konto- und Steuerdaten gehören nicht ins Repository, in Issues oder in Chatnachrichten.
 
 Nach Freigabe lautet die öffentliche Adresse [github.com/sponsors/cpprograming](https://github.com/sponsors/cpprograming). Erst dann die Zahlungsbereitschaft der Seite und den Sponsor-Button im Repository praktisch prüfen. Falls nötig unter Repository Settings → General → Features → Sponsorships aktivieren.
+
+## Öffentlicher Start mit freiwilliger Finanzierung
+
+Arbeitsmodell für den Start: EmuVora als kostenloses Open-Source-Frontend anbieten und seine Entwicklung freiwillig unterstützen lassen. GitHub Sponsors ist für das vorhandene GitHub-Projekt vorbereitet. Patreon kann ergänzend Entwicklungsberichte und Community-Beiträge bündeln; es ist noch kein Patreon-Konto verknüpft. Eine Paywall oder zahlungspflichtige Funktionen werden durch diesen Plan nicht eingeführt. Einnahmen sind nicht zugesichert.
+
+- [x] Öffentlichen Repository-Status und MIT-Lizenz des eigenen Codes prüfen.
+- [x] Bestehenden Sponsors-Link und Profilentwurf bereitstellen.
+- [ ] Aktuellen Sponsors-Freigabestatus im eigenen Dashboard prüfen und nach Freigabe den öffentlichen Zahlungsweg testen.
+- [ ] Enthaltene Konsolenlogos mit nichtkommerziellen Bedingungen ersetzen oder die nötigen Rechte für das konkrete Finanzierungsmodell klären. Bestehende Releases enthalten diese Grafiken weiterhin.
+- [ ] Direkte und transitive Build-Abhängigkeiten sowie konkret angebotene Emulator-/Core-Downloads mit Versions-, Quellen- und Lizenznachweisen erfassen. Ein separater Download ist keine pauschale Rechtefreigabe; das vollständige Core-Archiv enthält unterschiedliche Lizenzen.
+- [ ] Ausschließlich eigene Demo-Grafiken oder Bilder mit passenden Rechten für Screenshots und Kampagnenseiten verwenden. Keine Spiele, BIOS-Dateien oder fremden Coverpakete anbieten.
+- [ ] Die noch offenen echten Windows-/Xbox-/Monitor-/Update- und Wiederherstellungstests vor einem breiten Start durchführen. Bisherige automatisierte Prüfungen klar davon unterscheiden.
+- [ ] Öffentliche Downloadbeschreibung, bekannte Einschränkungen, Fehlermeldeweg und realistisch leistbaren Support veröffentlichen.
+- [ ] Falls Patreon gewünscht: echten Profilnamen/Link festlegen und erst danach `patreon: PROFILNAME` in `.github/FUNDING.yml` ergänzen; kein erfundener Zahlungslink.
+- [ ] Steuerliche Einordnung, Anbieterangaben und Datenschutz für den eigenen Standort und die tatsächlich angebotenen Leistungen klären.
+
+Freiwillige Unterstützung ersetzt keine Lizenzprüfung. Creative Commons beurteilt die NC-Klausel anhand der konkreten Nutzung und ihres Zwecks; weder „kostenloser Download“ noch „Spende“ ist für sich eine allgemeine kommerzielle Freigabe. Bei unklarer Nutzung Rechteinhaber fragen oder Material mit passenden Nutzungsrechten verwenden. [CC-FAQ](https://creativecommons.org/faq/#does-my-use-violate-the-noncommercial-clause-of-the-licenses). Patreon setzt ebenfalls die nötigen Rechte an angebotenen Inhalten voraus. [Patreon-Bedingungen](https://www.patreon.com/policy/legal).
 
 ## Profiltext zum Übernehmen
 

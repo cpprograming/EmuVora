@@ -28,7 +28,7 @@ Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Z
 
 **Neue Einstellungen:** Sechs gegliederte Kategorien mit bereichsübergreifender Suche, festen Rückmeldungen und getrennten Expertenoptionen. Eigene Emulator-/Core-Pfade bleiben als Entwürfe erhalten und werden vor Übernahme geprüft. [Bedienung](SETTINGS.md).
 
-**Aktueller geprüfter Stand: [0.14.156](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.156)** · Entwicklung für den privaten Gebrauch, ohne Pro-Version oder Bezahlsystem.
+**Aktueller geprüfter Stand: [0.14.156](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.156)** · Öffentliches Open-Source-Projekt; freiwillige Finanzierung wird vorbereitet, ohne Pro-Version oder Bezahlschranke.
 
 ## Download und Installation
 
@@ -298,7 +298,7 @@ Die [Checkliste](CHECKLIST.md) hält erledigte Funktionen und offene Arbeiten fe
 
 ## Entwicklung unterstützen
 
-EmuVora bleibt kostenlos erhältlich. Freiwillige Unterstützung über GitHub Sponsors ist vorbereitet; der Antrag ist eingereicht und wartet auf GitHubs Freigabe. Es gibt keine kostenpflichtigen Funktionen oder exklusiven Downloads. [Einrichtung und Profilentwurf](SPONSORS.md).
+EmuVora ist bereits öffentlich und bleibt kostenlos erhältlich. Freiwillige Unterstützung über GitHub Sponsors ist vorbereitet; eine aktive Zahlungsseite ist noch nicht bestätigt. Patreon kann ergänzend eingerichtet werden. Vor einem finanzierten öffentlichen Start sind insbesondere die nichtkommerziellen Konsolenlogos und die konkreten Fremdkomponenten zu klären. Es gibt keine kostenpflichtigen Funktionen oder exklusiven Downloads. [Startplan, Status und Profilentwurf](SPONSORS.md).
 
 ## Lizenz
 

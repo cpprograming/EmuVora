@@ -1,8 +1,15 @@
 # EmuVora – Roadmap
 
-Stand: 2. November 2026. Ziel ist ein zuverlässiges Windows-Frontend für den privaten Gebrauch. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
+Stand: 2. November 2026. Ziel ist ein zuverlässiges öffentliches Windows-Frontend mit freiwilliger Entwicklungsfinanzierung. Die Versionsnummern bezeichnen Etappen, keine festen Veröffentlichungstermine.
 
 Aktueller geprüfter Release: [0.14.156](https://github.com/cpprograming/EmuVora/releases/tag/v0.14.156).
+
+## Öffentlicher Start und freiwillige Finanzierung
+
+- [x] Öffentliches Repository und MIT-Lizenz des eigenen Codes bestätigt; Startplan und Profilentwurf festgehalten. [SPONSORS.md](SPONSORS.md).
+- [ ] Nichtkommerzielle Konsolenlogos und konkrete Fremdkomponenten für das gewählte Finanzierungsmodell klären; geeignete eigene/ausreichend lizenzierte Assets verwenden.
+- [ ] Sponsors-Freigabe und öffentlichen Zahlungsweg bestätigen; optional einen echten Patreon-Link ergänzen.
+- [ ] Echte Hardware-/Installationsabnahme, öffentliche Produktbeschreibung und Supportumfang abschließen.
 
 ## 0.14.156 – Cover-, Versions- und Sammlungsdialoge (veröffentlicht)
 
