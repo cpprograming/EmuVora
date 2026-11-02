@@ -394,9 +394,9 @@ public sealed partial class MainWindow : Window
         var panel=new StackPanel{Spacing=14,Margin=new(24)};
         panel.Children.Add(new TextBlock{Text="Mit einem abweichenden Titel nach einem Cover suchen. Der gespeicherte Spielname bleibt erhalten. Anschließend den Treffer vor dem Übernehmen prüfen.",TextWrapping=TextWrapping.Wrap});
         var title=new TextBox{Text=game.Title,Watermark="Titel für die Cover-Suche"};panel.Children.Add(title);
-        var dialog=Dialog("Cover online suchen",panel);
-        panel.Children.Add(ActionButton("Treffer suchen",()=>{if(!string.IsNullOrWhiteSpace(title.Text))dialog.Close(title.Text.Trim());}));
-        panel.Children.Add(ActionButton("Abbrechen",()=>dialog.Close()));
+        var actions=new StackPanel{Spacing=8};var feedback=new TextBlock{TextWrapping=TextWrapping.Wrap};actions.Children.Add(feedback);var dialog=LibraryDialog("Cover online suchen",panel,actions);
+        actions.Children.Add(ActionButton("Treffer suchen",()=>{if(string.IsNullOrWhiteSpace(title.Text)){feedback.Text="Bitte einen Titel für die Cover-Suche eingeben.";title.Focus();return;}dialog.Close(title.Text.Trim());}));
+        actions.Children.Add(ActionButton("Abbrechen",()=>dialog.Close()));
         var query=await dialog.ShowDialog<string?>(this);if(query==null||isClosed)return;
         await BusyAsync(async token=>
         {

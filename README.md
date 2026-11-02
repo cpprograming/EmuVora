@@ -4,6 +4,8 @@ EmuVora ist eine Windows-Spielbibliothek für deine eigenen ROMs und vorhandenen
 
 Bibliotheksprüfungen besitzen feste Aktionsleisten: Duplikate, Datei-Inhalte, Zusammenführung, Mehrdisc-Playlists und ROM-Pfadzuordnung zeigen ihre Entscheidungen auch bei langen Vorschauen unten an. [Bedienung](LIBRARY_AND_DISPLAY.md#bibliotheksdialoge-bedienen).
 
+**Cover- und Sammlungsdialoge:** Feste Aktionen auch bei langen Vorschauen und vielen Sammlungen. Speicherfehler bleiben im Dialog sichtbar; Cover, Schutz und Zuordnungen lassen sich danach erneut übernehmen. [Bedienung](LIBRARY_AND_DISPLAY.md#cover-spielversionen-und-sammlungen).
+
 **Eigenes Frontend:** Die ES-DE-Anwendung samt Start-/Export-/Downloadcode ist entfernt. Der lokale EmulationStation-/ES-DE-Theme-Import bleibt erhalten; ein erster Layout-Adapter verwendet ausschließlich EmuVoras eigene Oberfläche. [GUI- und Theme-Roadmap](GUI_ROADMAP.md).
 
 **Native Layouts:** Unter der Suche zwischen Cover-Raster und kompakter Liste wechseln. Filter, Sortierung, Versionen, Seite und Auswahl bleiben gemeinsam; die Liste zeigt kleine Cover und den Spielverlauf. [Bedienung und Grenzen](NATIVE_THEMES.md#bibliothekslayout-wählen).

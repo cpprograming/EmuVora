@@ -33,11 +33,12 @@ public sealed partial class MainWindow
         void ReloadNames(string? selected=null){list.ItemsSource=settings.Collections.Keys.Order(StringComparer.OrdinalIgnoreCase).ToArray();list.SelectedItem=selected;}
         list.SelectionChanged+=(_,_)=>{if(list.SelectedItem is string selected)name.Text=selected;};ReloadNames(collectionChoice.SelectedItem as string);
         panel.Children.Add(list);panel.Children.Add(name);
-        void Edit(Action action){try{action();message.Text="Sammlungen gespeichert.";}catch(Exception ex){message.Text=ex.Message;}}
-        panel.Children.Add(ActionButton("Neue Sammlung erstellen",()=>Edit(()=>{var value=GameCollections.ValidateName(name.Text);SaveCollections(s=>GameCollections.Create(s,value));ReloadNames(value);})));
-        panel.Children.Add(ActionButton("Sammlung umbenennen",()=>Edit(()=>{if(list.SelectedItem is not string old)throw new IOException("Bitte eine Sammlung wählen.");var value=GameCollections.ValidateName(name.Text);SaveCollections(s=>GameCollections.Rename(s,old,value),value);ReloadNames(value);})));
-        panel.Children.Add(ActionButton("Sammlung löschen · Spiele behalten",()=>Edit(()=>{if(list.SelectedItem is not string selected)throw new IOException("Bitte eine Sammlung wählen.");SaveCollections(s=>s.Collections.Remove(selected));ReloadNames();name.Text="";})));
-        panel.Children.Add(message);var dialog=Dialog("Sammlungen verwalten",panel);panel.Children.Add(ActionButton("Fertig",()=>dialog.Close()));await dialog.ShowDialog(OwnedWindows.LastOrDefault(w=>w.IsActive)??this);
+        void Edit(Action action){try{action();message.Text="Sammlungen gespeichert.";ToolTip.SetTip(message,null);}catch(Exception ex){DialogSaveError(message,"Nicht gespeichert",ex);}}
+        var actions=new StackPanel{Spacing=8};actions.Children.Add(message);
+        actions.Children.Add(ActionButton("Neue Sammlung erstellen",()=>Edit(()=>{var value=GameCollections.ValidateName(name.Text);SaveCollections(s=>GameCollections.Create(s,value));ReloadNames(value);})));
+        actions.Children.Add(ActionButton("Sammlung umbenennen",()=>Edit(()=>{if(list.SelectedItem is not string old)throw new InvalidOperationException("Bitte eine Sammlung wählen.");var value=GameCollections.ValidateName(name.Text);SaveCollections(s=>GameCollections.Rename(s,old,value),value);ReloadNames(value);})));
+        actions.Children.Add(ActionButton("Sammlung löschen · Spiele behalten",()=>Edit(()=>{if(list.SelectedItem is not string selected)throw new InvalidOperationException("Bitte eine Sammlung wählen.");SaveCollections(s=>s.Collections.Remove(selected));ReloadNames();name.Text="";})));
+        var dialog=LibraryDialog("Sammlungen verwalten",panel,actions);actions.Children.Add(ActionButton("Fertig",()=>dialog.Close()));await dialog.ShowDialog(OwnedWindows.LastOrDefault(w=>w.IsActive)??this);
     }
     private async Task ChooseCollectionsAsync()
     {
@@ -47,7 +48,12 @@ public sealed partial class MainWindow
         var choices=settings.Collections.OrderBy(c=>c.Key,StringComparer.OrdinalIgnoreCase).Select(c=>(Name:c.Key,Option:new CheckBox{Content=c.Key,IsChecked=c.Value.Contains(game.Path)})).ToArray();
         foreach(var entry in choices)panel.Children.Add(entry.Option);
         panel.Children.Add(new TextBlock{Text="Mehrere Sammlungen sind möglich. Abwählen entfernt nur die Zuordnung.",TextWrapping=TextWrapping.Wrap});
-        var dialog=Dialog("Spiel zu Sammlungen zuordnen",panel);panel.Children.Add(ActionButton("Zuordnung speichern",()=>dialog.Close(true)));panel.Children.Add(ActionButton("Abbrechen",()=>dialog.Close(false)));
-        if(await dialog.ShowDialog<bool>(OwnedWindows.LastOrDefault(w=>w.IsActive)??this)&&!isClosed)Guard(()=>{SaveCollections(s=>{foreach(var entry in choices)if(s.Collections.TryGetValue(entry.Name,out var members)){if(entry.Option.IsChecked==true)members.Add(game.Path);else members.Remove(game.Path);}});status.Text="Sammlungen gespeichert.";});
+        var actions=new StackPanel{Spacing=8};var feedback=new TextBlock{TextWrapping=TextWrapping.Wrap};actions.Children.Add(feedback);var dialog=LibraryDialog("Spiel zu Sammlungen zuordnen",panel,actions);
+        actions.Children.Add(ActionButton("Zuordnung speichern",()=>
+        {
+            try{SaveCollections(s=>{foreach(var entry in choices)if(s.Collections.TryGetValue(entry.Name,out var members)){if(entry.Option.IsChecked==true)members.Add(game.Path);else members.Remove(game.Path);}});status.Text="Sammlungen gespeichert.";dialog.Close();}
+            catch(Exception ex){DialogSaveError(feedback,"Nicht gespeichert",ex);}
+        }));actions.Children.Add(ActionButton("Abbrechen",()=>dialog.Close()));
+        await dialog.ShowDialog(OwnedWindows.LastOrDefault(w=>w.IsActive)??this);
     }
 }

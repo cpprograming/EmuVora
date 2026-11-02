@@ -4,6 +4,13 @@ namespace EmuVora.App;
 
 public sealed partial class MainWindow
 {
+    private static void DialogSaveError(TextBlock feedback,string title,Exception error)
+    {
+        var text=error is UnauthorizedAccessException or IOException
+            ? "Die Datei konnte nicht gespeichert werden. Prüfe Laufwerk, Schreibrechte und ob eine andere Anwendung sie verwendet."
+            : error.Message;
+        feedback.Text=title+": "+text;ToolTip.SetTip(feedback,error.GetType().Name+": "+error.Message);
+    }
     // Keep decisions reachable while long paths, notes and previews scroll independently.
     private Window LibraryDialog(string title, Control body, StackPanel actions)
     {
