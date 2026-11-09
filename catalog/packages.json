@@ -1,48 +1,48 @@
 {
+  "SchemaVersion": 1,
+  "GeneratedAt": "2026-11-09T16:39:51.9383100Z",
   "Packages": [
     {
       "Executable": "duckstation-qt-x64-ReleaseLTCG.exe",
-      "Id": "duckstation",
-      "Sha256": "b55d1cf45bdb6d0326a9083cf787ca7d6386dff6c837f6d3b8713f48af2a02b7",
-      "Version": "latest-673934896",
-      "Url": "https://github.com/stenzek/duckstation/releases/download/latest/duckstation-windows-x64-release.zip"
+      "Url": "https://github.com/stenzek/duckstation/releases/download/latest/duckstation-windows-x64-release.zip",
+      "Version": "latest-719432465",
+      "Sha256": "ca02e8eac40c0c6de801638f6b16bec80b605b5df32e406fe2fba7f21016b14b",
+      "Id": "duckstation"
     },
     {
       "Executable": "pcsx2-qt.exe",
-      "Id": "pcsx2",
-      "Sha256": "7dfc829ca1994cc1045ac49f05e39b6cf968b72e6a374c40e05c2a2b4ac200b4",
+      "Url": "https://github.com/PCSX2/pcsx2/releases/download/v2.8.2/pcsx2-v2.8.2-windows-x64-Qt.7z",
       "Version": "v2.8.2-544610696",
-      "Url": "https://github.com/PCSX2/pcsx2/releases/download/v2.8.2/pcsx2-v2.8.2-windows-x64-Qt.7z"
+      "Sha256": "7dfc829ca1994cc1045ac49f05e39b6cf968b72e6a374c40e05c2a2b4ac200b4",
+      "Id": "pcsx2"
     },
     {
       "Executable": "PPSSPPWindows64.exe",
-      "Id": "ppsspp",
-      "Sha256": "fbc9cd2f5131b159a92424e5c458c35ce43ba603cdded64dfc98e4bd4f17ff93",
+      "Url": "https://github.com/hrydgard/ppsspp/releases/download/v1.20.4/PPSSPP-v1.20.4-Windows-x64.zip",
       "Version": "v1.20.4-421816268",
-      "Url": "https://github.com/hrydgard/ppsspp/releases/download/v1.20.4/PPSSPP-v1.20.4-Windows-x64.zip"
+      "Sha256": "fbc9cd2f5131b159a92424e5c458c35ce43ba603cdded64dfc98e4bd4f17ff93",
+      "Id": "ppsspp"
     },
     {
       "Executable": "Dolphin.exe",
-      "Id": "dolphin",
-      "Sha256": "bbfd13bf9e6d2a4164a15c392b1f32a9b18150e5136746b388704608fbb60f76",
-      "Version": "2609a",
-      "Url": "https://dl.dolphin-emu.org/releases/2609a/dolphin-2609a-x64.7z"
+      "Url": "https://dl.dolphin-emu.org/releases/2609b/dolphin-2609b-x64.7z",
+      "Version": "2609b",
+      "Sha256": "926eb7594d885b4fba8fd9807058d90618efab4b3d75d1ef297022ba14925133",
+      "Id": "dolphin"
     },
     {
       "Executable": "retroarch.exe",
-      "Id": "retroarch",
-      "Sha256": "b2139b1d0f9d4526dc6b5ce23cbb3efdc766096fa6f2c3df016818b486ac6372",
+      "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch.7z",
       "Version": "1.22.2",
-      "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch.7z"
+      "Sha256": "b2139b1d0f9d4526dc6b5ce23cbb3efdc766096fa6f2c3df016818b486ac6372",
+      "Id": "retroarch"
     },
     {
       "Executable": "fceumm_libretro.dll",
-      "Id": "retroarch-cores",
-      "Sha256": "86b871e11b9b4772ac644b40a38f2c8e9449da1f355eae7da08aa061148547b0",
+      "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch_cores.7z",
       "Version": "1.22.2",
-      "Url": "https://buildbot.libretro.com/stable/1.22.2/windows/x86_64/RetroArch_cores.7z"
+      "Sha256": "86b871e11b9b4772ac644b40a38f2c8e9449da1f355eae7da08aa061148547b0",
+      "Id": "retroarch-cores"
     }
-  ],
-  "SchemaVersion": 1,
-  "GeneratedAt": "2026-11-02T16:19:14.1946410Z"
+  ]
 }
